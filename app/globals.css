@@ -66,6 +66,8 @@ pre {
   overflow-x: auto;
   border-radius: var(--r);
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 code:not(pre code) {
@@ -73,6 +75,9 @@ code:not(pre code) {
   padding: 0.1em 0.4em;
   border-radius: 2px;
   color: var(--amber);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 blockquote {
