@@ -30,7 +30,7 @@ export default function HomePage() {
             </a>
           </div>
         </div>
-        <div style={s.heroDecor} />
+        <div className="hero-decor" style={s.heroDecor} />
       </section>
 
       {/* ── Syllabus ──────────────────────────────────────── */}
