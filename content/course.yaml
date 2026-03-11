@@ -1,0 +1,222 @@
+# ─────────────────────────────────────────────────────────────
+#  MP26 · Molecular Phylogenetics
+#  Edit this file to update the whole website.
+# ─────────────────────────────────────────────────────────────
+#
+#  Per-lecture pages:
+#    Each lecture can have any number of markdown pages.
+#    Add a file at: content/pages/{id}/{pageId}.md
+#    Then list it under the lecture's `pages:` array.
+#
+#    Built-in page ids: practicals, transcript, notes, summary
+#    You can invent any id — just create the .md file.
+# ─────────────────────────────────────────────────────────────
+
+course:
+  title: "Molecular Phylogenetics"
+  subtitle: "MSc in Bioinformatics · University of Bologna · 2026"
+  github: "https://github.com/for-giobbe/MP26"
+
+resources:
+  recordings: 'https://drive.google.com/drive/folders/1uBJ5eLK1M396rmwWbZuh0R_xj33mioAR'
+  exam_sample: "/exam"
+  single_slides_pack: null
+
+data:
+  clone_command: "git clone https://github.com/for-giobbe/MP26.git"
+  description: "Course datasets including OrthoFinder results, example alignments, trees, and more."
+  folders:
+    - name: "OrthoFinder results"
+      path: "data/OrthoFinder/"
+    - name: "Single copy orthologues"
+      path: "data/Single_Copy_Orthologue_Sequences/"
+    - name: "Example alignments"
+      path: "data/example_alignements/"
+    - name: "Example trees"
+      path: "data/example_trees/"
+    - name: "Example dating"
+      path: "data/example_dating/"
+    - name: "Example selection"
+      path: "data/example_selection/"
+    - name: "Proteomes"
+      path: "data/proteoms/"
+
+instructors:
+  - name: "Giobbe Forni"
+    email: "giobbe.forni2@unibo.it"
+    role: "Course Curator"
+  - name: "Jacopo Martelossi"
+    role: "Contributor"
+  - name: "Andrea Luchetti"
+    role: "Contributor"
+
+weeks:
+  - week: 1
+    lectures:
+      - id: "01"
+        code: "W1_L01"
+        title: "Intro to the course & software installation"
+        slides: "/slides/01.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+          - id: transcript
+            label: Transcript
+            icon: "📝"
+
+      - id: "02"
+        code: "W1_L02"
+        title: "Phylogenetics 101 — Part A"
+        slides: "/slides/02.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+          - id: transcript
+            label: Transcript
+            icon: "📝"
+          - id: notes
+            label: Notes
+            icon: "📓"
+
+      - id: "03"
+        code: "W1_L03"
+        title: "Phylogenetics 101 — Part B"
+        slides: "/slides/03.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+          - id: refresher
+            label: Refresher
+            icon: "📝"
+
+  - week: 2
+    lectures:
+      - id: "04"
+        code: "W2_L04"
+        title: "Orthology inference and taxon sampling"
+        slides: "/slides/04.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "05"
+        code: "W2_L05"
+        title: "Sequence alignment and filtering"
+        slides: "/slides/05.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "06"
+        code: "W2_L06"
+        title: "Distance-based vs character-based algorithms"
+        slides: "/slides/06.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+  - week: 3
+    lectures:
+      - id: "07"
+        code: "W3_L07"
+        title: "MK models of molecular evolution"
+        slides: "/slides/07.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "08"
+        code: "W3_L08"
+        title: "Maximum Likelihood (ML)"
+        slides: "/slides/08.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "09"
+        code: "W3_L09"
+        title: "Bayesian Inference (BI)"
+        slides: "/slides/09.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+  - week: 4
+    lectures:
+      - id: "10"
+        code: "W4_L10"
+        title: "Support metrics"
+        slides: "/slides/10.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+  - week: 6
+    lectures:
+      - id: "11"
+        code: "W6_L11"
+        title: "Complex substitution models"
+        slides: "/slides/11.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "12"
+        code: "W6_L12"
+        title: "Discordance, ILS & the coalescent"
+        slides: "/slides/12.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+  - week: 7
+    lectures:
+      - id: "13"
+        code: "W7_L13"
+        title: "Stochastic and systematic bias"
+        slides: "/slides/13.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "14"
+        code: "W7_L14"
+        title: "Divergence times analyses"
+        slides: "/slides/14.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+  - week: 8
+    lectures:
+      - id: "15"
+        code: "W8_L15"
+        title: "Inferring selection"
+        slides: "/slides/15.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
+
+      - id: "16"
+        code: "W8_L16"
+        title: "Modelling trait evolution on phylogenies"
+        slides: "/slides/16.pdf"
+        pages:
+          - id: practicals
+            label: Practicals
+            icon: "⚗"
