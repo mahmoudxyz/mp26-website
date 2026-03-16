@@ -61,8 +61,8 @@ weeks:
           - id: practicals
             label: Practicals
             icon: "⚗"
-          - id: transcript
-            label: Transcript
+          - id: docker-setup
+            label: Docker Setup
             icon: "📝"
 
       - id: "02"
