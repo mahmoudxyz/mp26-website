@@ -76,8 +76,8 @@ weeks:
           - id: transcript
             label: Transcript
             icon: "📝"
-          - id: notes
-            label: Notes
+          - id: lab_notes
+            label: Lab Notes
             icon: "📓"
 
       - id: "03"
@@ -91,6 +91,10 @@ weeks:
           - id: refresher
             label: Refresher
             icon: "📝"
+          - id: lab_notes
+            label: Lab Notes
+            icon: "📓"
+
 
   - week: 2
     lectures:
@@ -102,6 +106,10 @@ weeks:
           - id: practicals
             label: Practicals
             icon: "⚗"
+          - id: lab_notes
+            label: Lab Notes
+            icon: "📓"
+
 
       - id: "05"
         code: "W2_L05"
@@ -111,6 +119,10 @@ weeks:
           - id: practicals
             label: Practicals
             icon: "⚗"
+          - id: lab_notes
+            label: Lab Notes
+            icon: "📓"
+
 
       - id: "06"
         code: "W2_L06"
@@ -120,6 +132,9 @@ weeks:
           - id: practicals
             label: Practicals
             icon: "⚗"
+          - id: lab_notes
+            label: Lab Notes
+            icon: "📓"
 
   - week: 3
     lectures:
