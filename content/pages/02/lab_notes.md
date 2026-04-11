@@ -1,5 +1,3 @@
-# Lesson 02 — Phylogenetics 101 (Part A): Tree Thinking
-
 ## Core Idea (bird's-eye view)
 
 A **phylogenetic tree** is a *hypothesis* about evolutionary relationships among taxa, inferred from data (never directly observed). This practical is about **how trees are represented as text files** (Newick, Nexus) and the **structural rules/math** behind them. You need to be fluent in reading a tree string, counting its parts, and knowing why two strings can describe the same tree.
@@ -15,7 +13,7 @@ Key conceptual anchors from theory you must carry into the practical:
 
 ---
 
-## 📥 Inputs
+## Inputs
 
 The practical works on **tree files** as text. The two formats:
 
@@ -78,7 +76,7 @@ Number of possible trees explodes:
 
 ---
 
-## 🔍 Interpretations
+## Interpretations
 
 - **Same tree, different strings**: `(A,B,(C,D));` ≡ `(B,A,(C,D));` ≡ `((C,D),A,B);` ≡ `(A,B,(D,C));`. Any internal node can be **rotated** without changing the topology. Don't be fooled by tip order.
 - **Different trees** look superficially similar but differ in their **bipartitions/splits** (which taxa are grouped together). For 4 taxa: only 3 distinct unrooted topologies exist → `AB|CD`, `AC|BD`, `AD|BC`.
@@ -94,11 +92,17 @@ Number of possible trees explodes:
 - Whitespace is ignored; trees can wrap across lines
 
 
-## 📝 Possible Exam Questions
+## Possible Exam Questions
 
+- ............................................................
+- ............................................................
+- ............................................................
+- ............................................................
+- ............................................................
+- ............................................................
+- ............................................................
 
-
-## ⚡ 60-second mental cheat sheet
+## 60-second mental cheat sheet
 - Newick = string with `( , ) ;`. Nexus = `#NEXUS` file with `BEGIN ... END;` blocks containing Newick trees.
 - N tips → N−2 internal nodes, 2N−3 total branches, N−3 internal branches.
 - Rotation of internal nodes = SAME tree.

@@ -103,10 +103,13 @@ orthofinder --help
 ```
 
 ### Look at the summary statistics
+
 ```bash
-RESULTS=Analyses/My_Orthology.Inference/Results_*/
-csvlook -t $RESULTS/Comparative_Genomics_Statistics/Statistics_Overall.tsv
+head -n 22 test/Results_Apr07/Comparative_Genomics_Statistics/Statistics_Overall.tsv | csvlook -t
+
 ```
+
+
 `csvlook -t` formats the TSV as a real table in the terminal. The numbers to read off:
 - `Number of single-copy orthogroups` — how many clean markers you can carry to Lesson 05.
 - `Number of orthogroups with all species present` — broader complete set.
