@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 ## Core Idea (bird's-eye view)
 
 Phylogenetics needs **homologous characters**, but sequences in a FASTA file are just strings of different lengths. Before you can compare them, you need to **align** them: arrange the sequences so that each column represents a single position that descended from one position in the common ancestor. **Orthologous genes give you homologous genes; alignment gives you homologous sites.**

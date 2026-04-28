@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 ## Core Idea (bird's-eye view)
 
 A **phylogenetic tree** is a *hypothesis* about evolutionary relationships among taxa, inferred from data (never directly observed). This practical is about **how trees are represented as text files** (Newick, Nexus) and the **structural rules/math** behind them. You need to be fluent in reading a tree string, counting its parts, and knowing why two strings can describe the same tree.

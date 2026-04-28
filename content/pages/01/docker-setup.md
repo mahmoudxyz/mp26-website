@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 # MP26 · Molecular Phylogenetics
 
 A complete, ready-to-run Docker environment for the MP26 Molecular Phylogenetics course. Everything is pre-installed — R packages, bioinformatics CLI tools, and the full course repository. No setup, no compilation, no dependency issues. Pull the image and start working in under a minute.

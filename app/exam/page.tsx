@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getExamSampleContent } from "@/lib/course";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import AuthGate from "@/components/AuthGate";
 
 export const metadata = { title: "Exam Sample · MP26" };
 
@@ -19,6 +20,7 @@ export default function ExamPage() {
           <p style={s.sub}>A representative example of the exam format and expected answers.</p>
         </header>
         <hr style={s.rule} />
+        <AuthGate>
         {content ? (
           <MarkdownRenderer content={content} />
         ) : (
@@ -28,6 +30,7 @@ export default function ExamPage() {
             <p style={s.emptyText}>Check back closer to the exam date.</p>
           </div>
         )}
+        </AuthGate>
       </div>
     </div>
   );

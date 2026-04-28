@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 ## Core Idea (bird's-eye view)
 
 Now that you have aligned sequences (Lesson 05), you finally build a tree from them. There are two fundamentally different ways to do this, and this lesson contrasts them head-to-head:

@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 
 To cut the long story short, if can remember and use all comands listed subsequently, you can say you are a shell professional!
 

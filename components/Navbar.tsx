@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import UserMenu from "./UserMenu";
 
 export default function Navbar({ github }: { github: string }) {
   const [open, setOpen] = useState(false);
@@ -20,6 +22,7 @@ export default function Navbar({ github }: { github: string }) {
           <a href="/#data" className="nav-link">Data</a>
           <a href="/#instructors" className="nav-link">Instructors</a>
           <a href={github} target="_blank" rel="noreferrer" className="nav-link">GitHub ↗</a>
+          <UserMenu />
         </div>
 
         <button className="nav-burger" onClick={() => setOpen(o => !o)} aria-label="Menu">

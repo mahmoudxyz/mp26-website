@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 # Lesson 04 — Orthology Inference and Taxon Sampling
 
 ## Core Idea (bird's-eye view)

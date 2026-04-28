@@ -1,3 +1,5 @@
+<!-- auth-wall -->
+
 ## Core Idea (bird's-eye view)
 
 Lesson 02 was about **trees as objects** (Newick/Nexus). Lesson 03 is about **the data that goes into building those trees**: molecular sequences. The practical is short and format-focused (FASTA, PHYLIP, Nexus-DATA), but it sits on top of a heavy theoretical layer you must carry into the meeting:

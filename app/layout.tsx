@@ -3,6 +3,7 @@ import "./globals.css";
 import { getCourseData } from "@/lib/course";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "MP26 · Molecular Phylogenetics",
@@ -20,9 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        <Navbar github={data.course.github} />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar github={data.course.github} />
+          <main>{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
