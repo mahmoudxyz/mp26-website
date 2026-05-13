@@ -19,8 +19,8 @@ course:
 
 resources:
   recordings: 'https://drive.google.com/drive/folders/1uBJ5eLK1M396rmwWbZuh0R_xj33mioAR'
-  exam_sample: "/exam"
-  single_slides_pack: null
+  exam_sample: "/exam/exam.md"
+  single_slides_pack: /slides/total.pdf
 
 data:
   clone_command: "git clone https://github.com/for-giobbe/MP26.git"
@@ -235,3 +235,13 @@ weeks:
           - id: practicals
             label: Practicals
             icon: "⚗"
+
+
+  - week: 9
+    lectures:
+      - id: "17"
+        code: "Wt_L01"
+        title: "TOTAL"
+        slides: "/slides/total.pdf"
+        pages:
+          

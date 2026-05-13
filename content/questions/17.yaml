@@ -1,0 +1,1281 @@
+oral:
+  # LESSON 02 — Tree Thinking
+  - q: What is a synapomorphy and why is it important in phylogenetic inference?
+    a: |
+      A synapomorphy is a shared derived trait inherited by two or more taxa from their most recent
+      common ancestor. It is central to phylogenetic inference because synapomorphies define
+      monophyletic groups (clades) — they provide evidence of shared ancestry. Unlike ancestral
+      traits, synapomorphies are informative precisely because they mark the origin of a clade.
+      Example: the presence of feathers is a synapomorphy uniting birds within reptiles.
+
+  - q: Explain the difference between monophyly, paraphyly, and polyphyly with examples.
+    a: |
+      - **Monophyly**: a group containing an ancestor and ALL of its descendants. This is a true
+        clade, the gold standard in phylogenetic classification. Example: birds (all descendants
+        of the last common avian ancestor).
+      - **Paraphyly**: a group containing an ancestor and SOME but not all of its descendants.
+        The excluded lineage makes the group non-monophyletic. Example: "reptiles" excluding
+        birds is paraphyletic, since birds are derived reptiles.
+      - **Polyphyly**: a group assembled from two or more lineages with separate common ancestors;
+        the most recent common ancestor of the group would also be ancestor to taxa excluded from it.
+        Example: "warm-blooded animals" grouping birds and mammals is polyphyletic.
+
+  - q: What is the difference between a cladogram, a phylogram, and a chronogram?
+    a: |
+      - **Cladogram**: shows only the branching pattern (topology). Branch lengths carry no
+        quantitative meaning — they do not represent time or amount of evolutionary change.
+      - **Phylogram**: branch lengths are proportional to the amount of evolutionary change
+        (e.g. nucleotide substitutions per site). A scale bar is shown (e.g. 0.05 subs/site).
+      - **Chronogram (timetree)**: branch lengths represent time. Produced via divergence time
+        analysis; includes a time scale (e.g. millions of years).
+
+  - q: What is the role of an outgroup in phylogenetic analysis?
+    a: |
+      An outgroup is a taxon (or set of taxa) assumed a priori to lie outside the monophyly of
+      the focal ingroup. It serves two key purposes:
+      1. **Rooting**: by providing an external reference, it determines the direction of evolution
+         and identifies which node is the root — the most recent common ancestor of all taxa.
+      2. **Polarity**: it allows us to distinguish ancestral (plesiomorphic) from derived
+         (apomorphic) character states, since any trait shared with the outgroup is likely ancestral.
+
+  - q: What is a polytomy and what does it signify biologically or analytically?
+    a: |
+      A polytomy is a node in a phylogenetic tree where more than two descendant lineages emerge
+      simultaneously, making the tree multifurcating rather than fully dichotomous. It can signify:
+      - **Soft polytomy**: an analytical artifact — the data are insufficient to resolve the
+        branching order between those lineages.
+      - **Hard polytomy**: a true biological event — multiple lineages diverged so rapidly that
+        they are genuinely simultaneous (e.g. rapid radiations). In practice, distinguishing the two
+        requires additional data and analyses.
+
+  # LESSON 03 — Molecular Phylogenetics Foundations
+  - q: What is homoplasy? Give three biological examples and explain how it misleads phylogenetic inference.
+    a: |
+      Homoplasy refers to similarity between taxa that is NOT due to shared ancestry but to
+      independent evolutionary origins. Types include convergent evolution, parallel evolution,
+      and evolutionary reversals.
+      Examples:
+      1. **Wings**: independently evolved in birds, bats, and insects — same function, different anatomy.
+      2. **Echolocation**: evolved independently in bats and toothed whales.
+      3. **Camera-type eyes**: evolved independently in vertebrates and cephalopods.
+      Homoplasy misleads phylogenetics because it creates character conflict: a homoplasious
+      character groups unrelated taxa together based on superficial similarity rather than shared
+      ancestry. This inflates the apparent relatedness of unrelated lineages and reduces the
+      accuracy of tree reconstruction.
+
+  - q: What is the molecular clock hypothesis, and what are its main limitations?
+    a: |
+      The molecular clock hypothesis proposes that neutral mutations accumulate at a relatively
+      constant rate over evolutionary time, allowing divergence times to be estimated from
+      genetic distances. It is grounded in Kimura's neutral theory — most molecular changes are
+      selectively neutral and accumulate via genetic drift at a predictable rate.
+      Main limitations:
+      1. **Rate variation across lineages**: generation time, metabolic rate, and DNA repair
+         mechanisms differ among species, causing rate heterogeneity.
+      2. **Selection**: purifying and positive selection alter substitution rates at some loci.
+      3. **Saturation**: at very long timescales, multiple substitutions at the same site
+         obscure the true divergence signal.
+      In practice, calibrations using fossils or known divergence times are essential to
+      correct for rate variation.
+
+  - q: Why is molecular data preferred over morphological data for modern phylogenetic analyses?
+    a: |
+      Molecular data is preferred for several reasons:
+      1. **Abundance**: a single genome provides millions of characters.
+      2. **Objectivity**: a nucleotide is unambiguously A, T, G, or C — less subjective than
+         morphological scoring.
+      3. **Multiple resolutions**: different markers resolve relationships at different evolutionary
+         depths (e.g. mitochondrial genes for shallow, nuclear genes for deeper divergences).
+      4. **Standardization**: computational tools, models, and databases are well-developed and
+         reproducible.
+      5. **Homology**: molecular homology is more rigorously defined through sequence alignment
+         than morphological homology.
+
+  # LESSON 04 — Orthology Inference
+  - q: Explain the difference between orthologs, paralogs, and xenologs, and why this distinction matters for phylogenetics.
+    a: |
+      - **Orthologs**: genes whose most recent common ancestor is a speciation event. Their
+        evolutionary history mirrors the species tree, making them ideal markers for phylogenetics.
+      - **Paralogs**: genes whose most recent common ancestor is a gene duplication event. They
+        may exist within the same genome (in-paralogs) or across species (out-paralogs). Their
+        history reflects duplication, not speciation, so they can mislead species tree inference.
+      - **Xenologs**: genes whose most recent common ancestor is a horizontal gene transfer (HGT)
+        event. Common in prokaryotes. Their history reflects transfer rather than descent.
+      For phylogenetics, using paralogs or xenologs instead of orthologs can produce incorrect
+      gene trees that do not match the species tree, leading to wrong evolutionary conclusions.
+      The unifying principle: classification depends on the mechanism at the most recent common
+      ancestor — speciation, duplication, or transfer.
+
+  - q: What is Reciprocal Best Hit (RBH) orthology inference? What is its main limitation?
+    a: |
+      RBH identifies orthologs between two genomes by performing all-vs-all BLAST searches in
+      both directions. Gene A in species 1 and gene X in species 2 are called orthologs only if
+      A's top hit is X AND X's top hit is A — a bidirectional confirmation.
+      The bidirectionality is important because a gene lost in one species could otherwise produce
+      a false orthology inference.
+      Main limitation: RBH **fails to detect one-to-many and many-to-many orthologs**. If a gene
+      duplicated in one lineage after speciation, RBH will only recover one copy, discarding
+      potentially valid orthologous relationships. To address this, orthogroup clustering methods
+      (e.g. OrthoFinder) are used, grouping all homologs descending from the MRCA of a set of
+      species.
+
+  # LESSON 05 — Sequence Alignment
+  - q: Why is sequence alignment a prerequisite for phylogenetic analysis, and what does a "correct" alignment represent?
+    a: |
+      Phylogenetic analysis requires comparing homologous characters — sites that share the same
+      evolutionary history. Alignment is the process of arranging sequences so that homologous
+      positions are placed in the same column. Without alignment, we would be comparing
+      non-homologous nucleotides, introducing spurious signal.
+      A "correct" alignment places nucleotides that descended from the same ancestral nucleotide
+      in the same column. It correctly represents insertion and deletion (indel) events with gaps,
+      ensuring that the evolutionary distances computed from the alignment reflect true divergence
+      rather than positional artifacts.
+
+  - q: Explain linear versus affine gap penalty scoring in sequence alignment. Why does the choice of penalty matter?
+    a: |
+      - **Linear gap penalty**: c = -d × g, where d is a constant and g is the gap length.
+        Every gap position is penalized equally.
+      - **Affine gap penalty**: c = -d - (g-1) × e, where d is the gap open penalty and e is
+        the (smaller) gap extension penalty. Opening a gap is expensive, but extending it is
+        cheaper. Typical values: d = 10, e = 0.1.
+      Affine penalties are biologically more realistic: in evolution, a single indel event often
+      affects multiple consecutive positions rather than many independent single-site events.
+      Affine scoring encourages fewer, longer gaps over many short ones, which better reflects
+      the underlying biology. The choice of penalty directly affects which alignment is recovered
+      and therefore affects all downstream phylogenetic inference.
+
+  # LESSON 06 — Distance vs Character-Based Methods
+  - q: Compare UPGMA and Neighbor Joining (NJ). What are the key assumptions and limitations of each?
+    a: |
+      **UPGMA**:
+      - Produces a **rooted**, ultrametric tree.
+      - Assumes a **strict molecular clock** — all lineages evolve at the same rate.
+      - Clusters the two most similar taxa first, then recalculates distances as averages.
+      - Fast and simple, but biased when evolutionary rates differ across lineages.
+
+      **Neighbor Joining (NJ)**:
+      - Produces an **unrooted** tree.
+      - Does **not** assume a molecular clock — allows rate variation across lineages.
+      - Uses a Q-matrix (net divergence correction) to select the best pair to merge, correcting
+        for the overall evolutionary rate of each taxon.
+      - More accurate than UPGMA for real biological data, but less accurate than ML or BI.
+
+      Both are distance-based and fast, making them useful for exploratory analyses of large
+      datasets before more intensive character-based analyses.
+
+  - q: What is Maximum Parsimony and what are parsimony-informative sites?
+    a: |
+      Maximum Parsimony (MP) selects the phylogenetic tree that requires the fewest evolutionary
+      changes (substitutions) to explain the observed alignment data.
+      A **parsimony-informative site** must meet two criteria:
+      1. It contains **at least two different character states**.
+      2. **Each state appears in at least two taxa**.
+      Invariant sites (all taxa have the same state) and singleton sites (one state appears in
+      only one taxon) are non-informative because they do not favor one topology over another.
+      Parsimony is computationally expensive for large trees, does not correct for multiple
+      substitutions, and is sensitive to homoplasy and long-branch attraction.
+
+  - q: Describe the three main tree rearrangement methods used in phylogenetic tree searching.
+    a: |
+      1. **Nearest Neighbour Interchange (NNI)**: the simplest method. Takes one internal branch,
+         considers the four subtrees around it, and swaps one pair of neighboring subtrees.
+         Fast but explores a small neighborhood — prone to local optima.
+      2. **Subtree Pruning and Regrafting (SPR)**: prunes (cuts) a subtree from the tree and
+         regrafts (reattaches) it at a different position. More thorough than NNI — explores a
+         larger region of tree space.
+      3. **Tree Bisection and Reconnection (TBR)**: cuts the tree into two large subtrees by
+         breaking an internal branch, then reconnects them by joining any two branches. The most
+         comprehensive of the three — least likely to get stuck in local optima but most
+         computationally expensive.
+
+  # LESSON 07 — Models of Sequence Evolution
+  - q: Explain the GTR model. Why is it considered the most general time-reversible nucleotide model?
+    a: |
+      GTR (General Time Reversible, Tavaré 1986) is the most parameter-rich reversible nucleotide
+      model. It includes:
+      - **6 substitution rate parameters**: one for each pair of nucleotides (A↔C, A↔G, A↔T,
+        C↔G, C↔T, G↔T).
+      - **4 equilibrium base frequency parameters**: πA, πC, πG, πT (with πT = 1 – the others).
+      All simpler models (JC69, K80, F81, HKY85, TN93) are special cases of GTR with certain
+      rate parameters constrained to be equal or base frequencies forced to be equal.
+      It is "time-reversible" because the substitution process looks the same forward and backward
+      in time at equilibrium: πi × Qij = πj × Qji. This simplifies likelihood computation but
+      means the root cannot be identified from the model alone — an outgroup is needed.
+
+  - q: What is the ω (dN/dS) ratio, and what do values above, below, and equal to 1 indicate?
+    a: |
+      ω = dN/dS is the ratio of the nonsynonymous substitution rate (dN, amino acid-changing) to
+      the synonymous substitution rate (dS, silent changes). It is used in codon models to
+      measure selective pressure on protein-coding genes.
+      - **ω < 1**: purifying (negative) selection. Nonsynonymous mutations are removed because
+        they are deleterious. Most genes in most lineages show ω < 1.
+      - **ω = 1**: neutral evolution. Synonymous and nonsynonymous changes accumulate at equal
+        rates; selection is not acting on the amino acid sequence.
+      - **ω > 1**: positive (Darwinian) selection. Nonsynonymous changes are fixed faster than
+        synonymous ones — the protein is evolving adaptively. Common in immune genes,
+        host-pathogen interactions, and sensory proteins.
+
+  - q: What is the Gamma (+Γ) rate heterogeneity model and why is it important?
+    a: |
+      In real sequences, different sites evolve at different rates — some are highly conserved
+      (e.g. active sites of enzymes) while others are highly variable. Assuming a uniform rate
+      across all sites violates biological reality.
+      The **+Γ model** assumes that per-site rates are drawn from a Gamma distribution, defined
+      by a shape parameter α:
+      - Small α (< 1): highly skewed — many conserved sites and a few hypervariable ones.
+      - Large α (> 1): rates are more uniform across sites.
+      - α → ∞: all sites evolve at the same rate (equivalent to no rate heterogeneity).
+      Adding +Γ to a base model (e.g. GTR+Γ) significantly improves likelihood fit and avoids
+      underestimating distances between divergent taxa, which would otherwise inflate branch
+      lengths and cause artifacts like long-branch attraction.
+
+  # LESSON 08 — Maximum Likelihood & Concatenation
+  - q: Explain the principle of Maximum Likelihood in phylogenetics. What is being maximized?
+    a: |
+      Maximum Likelihood (ML) estimates the phylogenetic tree and model parameters that maximize
+      the probability of observing the data given the model: P(D|M).
+      In practice, the **log-likelihood** is maximized (log of the product of per-site
+      likelihoods, assuming sites evolve independently). For each site, the likelihood is
+      computed using Felsenstein's pruning algorithm, which sums over all possible ancestral
+      states at internal nodes — naturally incorporating uncertainty about ancestral sequences.
+      ML evaluates many candidate trees using tree rearrangement methods (NNI, SPR, TBR),
+      scoring each and retaining the topology with the highest log-likelihood. Parameters
+      (branch lengths, substitution rates, base frequencies) are optimized simultaneously.
+
+  - q: What is supermatrix (concatenation) phylogenomics? What are its main assumptions and pitfalls?
+    a: |
+      Concatenation combines multiple gene alignments (orthogroups) into a single large matrix,
+      which is then analyzed as if it were one locus. This increases the total amount of
+      phylogenetic signal and reduces stochastic errors.
+      Main assumption: all genes share the same evolutionary history — one true tree for all loci.
+      Main pitfalls:
+      - **Heterotachy**: evolutionary rates vary across genes and lineages, potentially violating
+        model assumptions.
+      - **Gene tree discordance**: genes may have genuinely different histories due to ILS,
+        hybridization, or HGT — concatenation ignores this.
+      - **Partitioning strategy**: the choice of partitions must be made a priori and affects
+        the analysis.
+      - **Systematic bias**: when gene tree conflict is high, concatenation can confidently
+        recover a wrong species tree.
+
+  # LESSON 09 — Bayesian Inference
+  - q: Explain Bayes' theorem as applied to phylogenetic inference.
+    a: |
+      Bayes' theorem states: P(M|D) = [P(D|M) × P(M)] / P(D)
+      In phylogenetics:
+      - **P(M|D)** = posterior probability: the probability that tree T (with model parameters)
+        is correct given the sequence data.
+      - **P(D|M)** = likelihood: probability of observing the data given the tree and model.
+      - **P(M)** = prior probability: our prior belief about trees and parameters before seeing
+        the data (e.g. uniform prior over topologies).
+      - **P(D)** = marginal likelihood: normalizing constant summing over all possible models.
+      Computing P(D) directly is practically impossible (it requires integrating over all
+      topologies and parameter values), so MCMC is used to approximate the posterior distribution
+      without calculating the marginal likelihood explicitly.
+
+  - q: What is MCMC in Bayesian phylogenetics? Describe how it works and what convergence means.
+    a: |
+      MCMC (Markov Chain Monte Carlo) approximates the posterior distribution of trees and model
+      parameters by generating a sequence of samples via:
+      1. **Initialize**: start from an arbitrary tree/parameter set.
+      2. **Propose**: generate a new state (e.g. via NNI/SPR rearrangement or parameter perturbation).
+      3. **Evaluate**: accept the new state with probability min(1, R), where R = posterior(proposed)
+         / posterior(current). Uphill moves always accepted; downhill moves accepted probabilistically
+         (Metropolis-Hastings criterion).
+      4. **Iterate**: repeat to build a chain of samples.
+      **Convergence** means the chain has reached the stationary (target) distribution — the
+      posterior. Diagnostics include:
+      - Reproducibility across independent runs started from different points.
+      - **ESS (Effective Sample Size)** > 200 for key parameters (correcting for autocorrelation).
+      - Stable trace plots for likelihood and parameters.
+      **Burn-in** (typically 10–25% of samples) is discarded because early samples before
+      convergence do not represent the true posterior.
+
+  # LESSON 10 — Support Metrics
+  - q: What does a bootstrap proportion (BP) value represent, and what are its limitations?
+    a: |
+      A BP value is the percentage of bootstrap replicate trees that contain a given clade.
+      Each replicate is generated by resampling alignment columns with replacement (same length
+      as the original), inferring a tree, and recording which splits are present.
+      BP reflects **robustness of the phylogenetic signal** in the data — how consistently the
+      data support a branch — but it is NOT a direct probability that the branch is correct.
+      Main limitations:
+      - **Binary scoring**: a clade is either present or absent. A single misplaced "rogue taxon"
+        causes a large clade with hundreds of correctly placed taxa to score zero — this is a
+        major problem for large trees.
+      - **Computational cost**: requires many full tree searches.
+      - **Conservatism vs. overconfidence**: BPs tend to be more conservative than Bayesian
+        posterior probabilities, but both can support incorrect topologies under model violation.
+      - **Not a significance test**: there is no universally agreed threshold for significance.
+
+  - q: What are gene concordance factors (gCF) and site concordance factors (sCF)? How do they complement bootstrap support?
+    a: |
+      **gCF**: the proportion of gene trees (from individual locus analyses) that contain a
+      specific branch present in the reference species tree. Measures concordance across loci.
+      **sCF**: the proportion of parsimony-informative sites in the alignment that support a
+      given branch, compared to the two alternative topologies for that quartet. Does not require
+      individual gene tree estimation.
+      They complement bootstrap because:
+      - High BP can occur even when most gene trees conflict (concatenation inflates confidence).
+      - gCF and sCF directly quantify gene tree discordance and site-level signal.
+      - A branch with BP=100 but gCF=20 indicates strong concatenation signal but widespread
+        gene tree conflict — a biologically meaningful warning of ILS or other discordance sources.
+      Reporting all three together gives a much more complete picture of support.
+
+  # LESSON 11 — Complex Models
+  - q: What is the difference between partition models and mixture models in phylogenetics?
+    a: |
+      **Partition models**: divide the alignment into predefined subsets (e.g. by gene or codon
+      position). Each subset is assigned its own substitution model. The assignment of sites to
+      partitions is fixed before analysis. Three variants differ in how branch lengths are shared:
+      edge-equal (same BLs), edge-proportional (scaled BLs), edge-unlinked (independent BLs).
+      **Mixture models**: do not assign sites to fixed categories. Instead, each site has a
+      probability of belonging to multiple model components (rate classes, frequency profiles,
+      or full substitution models). The site-to-class assignment is latent — inferred
+      probabilistically during analysis (e.g. LG+C60 profile mixture, +Γ rate mixture).
+      Key difference: partition models require prior biological knowledge to define partitions;
+      mixture models infer heterogeneity structure from the data itself, making them more flexible
+      but sometimes harder to interpret.
+
+  # LESSON 12 — ILS and the Coalescent
+  - q: What is Incomplete Lineage Sorting (ILS) and under what conditions is it most likely to occur?
+    a: |
+      ILS occurs when ancestral polymorphisms (multiple alleles) persist across speciation events
+      and sort randomly into descendant lineages. The result is that gene trees can differ from
+      the species tree — not because of error, but because of the stochastic nature of allele
+      sorting in finite populations.
+      ILS is most likely when:
+      1. **Effective population size (Nₑ) is large**: more ancestral polymorphism exists.
+      2. **Speciation events are closely spaced in time**: short internal branches give less
+         time for lineages to coalesce before the next speciation — the "anomaly zone."
+      ILS produces TRUE BIOLOGICAL CONFLICT between gene trees and the species tree, in contrast
+      to technical artifacts from alignment or model errors.
+
+  - q: What is ASTRAL and on what principle is it based?
+    a: |
+      ASTRAL is a coalescent-based summary method for species tree inference. It takes a set of
+      individually estimated gene trees as input and finds the species tree that maximizes the
+      number of shared quartets with the input gene trees.
+      The theoretical basis is the **multispecies coalescent (MSC)** prediction: for any quartet
+      of taxa, the most frequent gene tree topology among all loci should match the species tree
+      topology. The two discordant quartet topologies are equally probable and always less
+      frequent under the MSC.
+      ASTRAL breaks each gene tree into its constituent quartets, counts which topology is most
+      common for each quartet, and assembles the species tree consistent with the majority of
+      quartet topologies. It is statistically consistent under the MSC — given sufficient
+      data, it converges on the true species tree.
+
+  # LESSON 13 — Biases in Phylogenetics
+  - q: What is Long Branch Attraction (LBA)? How does it arise and how can it be mitigated?
+    a: |
+      LBA is a systematic bias where two or more taxa with long branches (high substitution rates)
+      are incorrectly grouped together in the inferred tree, even if they are not closely related.
+      Mechanism: on long branches, the probability of multiple substitutions at the same site
+      increases. Some of these parallel substitutions produce identical character states by chance,
+      creating a spurious similarity (homoplasy) that is mistaken for shared ancestry.
+      Mitigation strategies:
+      1. Use better-fitting models (e.g. GTR+Γ, CAT profile mixture) that account for rate
+         variation — LBA is often a model + long branch problem.
+      2. Add **intermediate taxa** to break long branches and reduce the chance of convergent
+         substitutions being interpreted as synapomorphies.
+      3. Use ML or BI methods rather than parsimony, which is especially prone to LBA.
+      4. If LBA is confirmed and unsolvable, consider excluding the problematic long-branched taxa.
+
+  - q: Explain the difference between stochastic and systematic bias in phylogenetics.
+    a: |
+      | | Stochastic bias | Systematic bias |
+      |---|---|---|
+      | **Cause** | Random noise from limited data | Violation of model assumptions |
+      | **Consistency** | Decreases with more data | Persists or worsens with more data |
+      | **Mitigation** | More genes, longer alignments | Better-fitting models, appropriate assumptions |
+      Stochastic bias arises when phylogenetic signal is overwhelmed by random variation —
+      few informative sites, short alignments. Adding data averages out noise.
+      Systematic bias is model-based: saturation, LBA, compositional heterogeneity, SRH
+      violations. More data does not fix it — it may even increase confidence in the wrong answer.
+      This makes systematic bias the more dangerous of the two.
+
+  # LESSON 14 — Divergence Time Analysis
+  - q: What is node dating versus tip dating in divergence time analyses?
+    a: |
+      **Node dating**: fossil information is used to constrain the age of internal nodes in the
+      tree. Fossils provide minimum age bounds (the fossil gives us the earliest confirmed date
+      for the node). Soft maximum bounds are often incorporated via prior distributions
+      (e.g. lognormal, exponential). This approach uses only extant (living) taxa as terminals.
+      **Tip dating**: fossils are included directly as terminal taxa (tips) in the tree, with
+      their known stratigraphic age as the tip date. This requires morphological characters
+      (or molecular data for ancient DNA) and is often combined with total-evidence dating,
+      which integrates both molecular and morphological data. It avoids the need for fixed
+      node calibrations and naturally accounts for extinction.
+
+  # LESSON 15 — Inferring Selection
+  - q: What are site-specific, branch-specific, and branch-site codon models? When would you use each?
+    a: |
+      **Site-specific models**: allow ω to vary across codon sites but average it across all
+      branches. Use when you want to identify specific amino acid positions under positive
+      selection throughout the evolutionary history of the protein.
+      **Branch-specific models**: allow ω to vary across lineages (foreground vs. background
+      branches) but average it across all sites. Use when you hypothesize that a specific
+      lineage experienced a shift in selective regime (e.g. gene relaxation after lifestyle change).
+      **Branch-site models**: allow ω to vary across both sites AND lineages simultaneously.
+      These are the most powerful — they detect positive selection acting on specific codons
+      in specific lineages. Use when you have an a priori foreground hypothesis (e.g. a lineage
+      that colonized a new niche) and want to find the specific sites under adaptive evolution.
+
+  # LESSON 16 — Trait Evolution
+  - q: What is the difference between Brownian Motion (BM) and the Ornstein-Uhlenbeck (OU) model for continuous trait evolution?
+    a: |
+      **Brownian Motion (BM)**: a random walk model where traits change by small random amounts
+      each unit time, with no preferred direction. Trait variance increases linearly with
+      evolutionary time. It models neutral drift or random evolution and serves as the null
+      model for comparative analyses.
+      **Ornstein-Uhlenbeck (OU)**: extends BM by adding a "rubber band" force that pulls the
+      trait toward an optimal value θ. It has three key parameters:
+      - θ: trait optimum
+      - α: strength of pull toward the optimum (higher α = stronger stabilizing selection)
+      - σ²: rate of stochastic change (same as BM)
+      OU is used when traits are constrained by stabilizing selection or when testing adaptive
+      hypotheses (e.g. convergent evolution toward the same phenotypic optimum in independent
+      lineages). At α → 0, OU reduces to BM.
+
+  - q: Why is phylogenetic non-independence a problem in comparative analyses, and how do PIC and PGLS address it?
+    a: |
+      Species share evolutionary history — closely related species tend to resemble each other
+      simply due to shared ancestry, not independent adaptation. Treating species as independent
+      data points in standard statistical tests (e.g. linear regression) inflates the effective
+      sample size and causes elevated Type I error rates (false positives).
+      **PIC (Phylogenetically Independent Contrasts)**: transforms species data into contrasts
+      at each internal node of the tree. Each contrast represents the difference between two
+      sister clades and is mathematically independent under Brownian motion. These contrasts
+      can then be used in standard regression through the origin.
+      **PGLS (Phylogenetic Generalized Least Squares)**: directly models the phylogenetic
+      covariance structure in the residuals of a regression. More flexible than PIC — can
+      incorporate different models of trait evolution (BM, OU, Pagel's λ) and is easier to
+      extend to multivariate cases.
+
+
+mcq:
+  # LESSON 02 — Tree Thinking
+  - question: Which type of character is most useful for defining monophyletic groups in cladistic analysis?
+    options:
+      - text: Symplesiomorphies (shared ancestral traits)
+        correct: false
+      - text: Autapomorphies (unique derived traits)
+        correct: false
+      - text: Synapomorphies (shared derived traits)
+        correct: true
+      - text: Plesiomorphies (ancestral traits)
+        correct: false
+    explanation: |
+      Synapomorphies are shared derived traits inherited from the most recent common ancestor of
+      a clade. They are the only character type that provides positive evidence for grouping taxa
+      into a monophyletic clade. Symplesiomorphies mislead because they are ancestral and shared
+      broadly; autapomorphies are unique to one taxon and say nothing about relationships among
+      multiple taxa.
+
+  - question: "A group that includes an ancestor and ALL of its descendants is called:"
+    options:
+      - text: Paraphyletic
+        correct: false
+      - text: Polyphyletic
+        correct: false
+      - text: Monophyletic
+        correct: true
+      - text: Holophyletic only if it excludes outgroups
+        correct: false
+    explanation: |
+      A monophyletic group (clade) contains a common ancestor and every single one of its
+      descendants — no exclusions. Paraphyletic groups exclude some descendants; polyphyletic
+      groups unite lineages with separate common ancestors.
+
+  - question: "In a phylogenetic tree, two taxa that appear adjacent at the tips:"
+    options:
+      - text: Are always more closely related to each other than to any other taxon
+        correct: false
+      - text: Are not necessarily more closely related than taxa at distant tips
+        correct: true
+      - text: Share a more recent common ancestor than any non-adjacent pair
+        correct: false
+      - text: Represent the most derived lineages on the tree
+        correct: false
+    explanation: |
+      Relatedness is determined by branching pattern (common ancestry), NOT by the visual order
+      of tips. Any internal node can be rotated without changing the tree — so adjacency at the
+      tips is a display artifact, not biological information.
+
+  - question: Which of the following best describes an unrooted tree?
+    options:
+      - text: A tree with a designated ancestor at the base
+        correct: false
+      - text: A tree that shows the direction of evolution
+        correct: false
+      - text: A tree that shows branching relationships but not the direction of evolution
+        correct: true
+      - text: A tree where all tips represent extinct taxa
+        correct: false
+    explanation: |
+      An unrooted tree shows topological relationships among taxa but does not specify which node
+      is the most ancient ancestor. Adding a root (via outgroup or midpoint rooting) gives the
+      tree directionality and allows interpretation of ancestral vs. derived states.
+
+  - question: What is the minimum number of distinct unrooted tree topologies possible for 4 taxa (a quartet)?
+    options:
+      - text: 1
+        correct: false
+      - text: 3
+        correct: true
+      - text: 15
+        correct: false
+      - text: 105
+        correct: false
+    explanation: |
+      For 4 taxa, there are exactly 3 possible unrooted bifurcating topologies (AB|CD, AC|BD,
+      AD|BC). The quartet is the simplest case showing topological ambiguity — this is why
+      quartet-based methods like ASTRAL are powerful.
+
+  - question: '"Reptilia" (traditionally excluding birds) is a classic example of a:'
+    options:
+      - text: Monophyletic group
+        correct: false
+      - text: Paraphyletic group
+        correct: true
+      - text: Polyphyletic group
+        correct: false
+      - text: Holophyletic group
+        correct: false
+    explanation: |
+      Traditional "Reptilia" excludes birds, even though birds are descended from archosaur
+      reptiles. Because it contains the ancestor but not all descendants, it is paraphyletic.
+      To be monophyletic, it would need to include birds.
+
+  # LESSON 03 — Molecular Phylogenetics Foundations
+  - question: Which of the following is a symplesiomorphy for amniotes (mammals, reptiles, birds)?
+    options:
+      - text: Feathers
+        correct: false
+      - text: Mammary glands
+        correct: false
+      - text: Four limbs (tetrapody)
+        correct: true
+      - text: Endothermy
+        correct: false
+    explanation: |
+      Four limbs evolved in the ancestor of all tetrapods — including amphibians — long before
+      amniotes diverged. It is an ancestral trait shared broadly and predates the focal clade,
+      making it a symplesiomorphy for amniotes. Feathers are a synapomorphy of birds; mammary
+      glands of mammals; endothermy is shared by birds and mammals but evolved independently.
+
+  - question: "Convergent evolution is a form of:"
+    options:
+      - text: Homology
+        correct: false
+      - text: Orthology
+        correct: false
+      - text: Homoplasy
+        correct: true
+      - text: Synapomorphy
+        correct: false
+    explanation: |
+      Homoplasy is the umbrella term for similarity not due to shared ancestry. Convergent
+      evolution — independent evolution of similar traits in unrelated lineages — is the most
+      common form of homoplasy. It misleads phylogenetics by creating false synapomorphies.
+
+  - question: "The neutral theory of molecular evolution, proposed by Motoo Kimura, implies that:"
+    options:
+      - text: Most molecular changes are driven by positive selection
+        correct: false
+      - text: Most molecular changes are selectively neutral and fix by genetic drift
+        correct: true
+      - text: Synonymous and nonsynonymous substitutions occur at the same rate in all genes
+        correct: false
+      - text: Morphological and molecular evolution follow identical rates
+        correct: false
+    explanation: |
+      Kimura proposed that the vast majority of molecular substitutions are neutral or nearly
+      neutral — they are not favored or disfavored by natural selection and fix by random
+      genetic drift. This underpins the molecular clock hypothesis. Phenotypic evolution is
+      still governed by selection (Darwinian evolution).
+
+  - question: Which sequencing approach is MOST suitable for resolving deep phylogenetic relationships across many species at low cost?
+    options:
+      - text: RADseq
+        correct: false
+      - text: Transcriptomics (RNAseq)
+        correct: true
+      - text: Chromosome-level genome sequencing
+        correct: false
+      - text: PCR amplification of a single gene
+        correct: false
+    explanation: |
+      Transcriptomics provides thousands of gene markers at relatively low cost (~€250–500 per
+      sample), does not require a reference genome, and performs well for both shallow and deep
+      evolutionary distances. RADseq is cheapest but only provides SNPs suitable for closely
+      related taxa. Chromosome-level genomes are expensive and fewer samples are feasible.
+
+  # LESSON 04 — Orthology Inference
+  - question: "Two genes that are related by a gene duplication event that occurred BEFORE a speciation event are called:"
+    options:
+      - text: In-paralogs
+        correct: false
+      - text: Orthologs
+        correct: false
+      - text: Out-paralogs
+        correct: true
+      - text: Xenologs
+        correct: false
+    explanation: |
+      Out-paralogs arise from a duplication event that predates the speciation event of interest.
+      They exist in both descendant species and represent separate lineages from before the split.
+      In-paralogs arise from duplication AFTER speciation, within a single lineage.
+      Orthologs arise from speciation events; xenologs from gene transfer events.
+
+  - question: Why are 1-to-1 (single-copy) orthologs traditionally preferred for species tree inference?
+    options:
+      - text: They evolve faster and provide more substitutions
+        correct: false
+      - text: Their evolutionary history directly mirrors the species tree with no duplication complications
+        correct: true
+      - text: They are always the most conserved genes
+        correct: false
+      - text: They are easier to align than multi-copy genes
+        correct: false
+    explanation: |
+      Single-copy orthologs arose by speciation events, so their gene tree is expected to track
+      the species tree directly. Multi-copy genes (paralogs) introduce ambiguity: if the wrong
+      copy is selected, the gene tree will reflect a duplication history rather than speciation,
+      misleading species tree inference.
+
+  - question: "An orthogroup is defined as:"
+    options:
+      - text: All genes in a single genome that share sequence similarity
+        correct: false
+      - text: A pair of genes with the highest BLAST score between two species
+        correct: false
+      - text: All homologous genes descending from the MRCA of a defined group of species
+        correct: true
+      - text: Genes that are orthologous between exactly two species
+        correct: false
+    explanation: |
+      An orthogroup extends orthology to multiple species simultaneously. It includes all genes
+      (orthologs AND in-paralogs) descended from the single gene present in the most recent
+      common ancestor of the species group being analyzed. It is always defined relative to a
+      reference speciation event.
+
+  # LESSON 05 — Sequence Alignment
+  - question: "In the Needleman-Wunsch algorithm, sequences are aligned:"
+    options:
+      - text: Locally, finding the highest-scoring subsequence
+        correct: false
+      - text: Globally, end-to-end across their full length
+        correct: true
+      - text: Only at conserved domains or motifs
+        correct: false
+      - text: Using a guide tree to progressively align closest pairs
+        correct: false
+    explanation: |
+      Needleman-Wunsch performs global alignment, aligning the full length of both sequences
+      from end to end. It is ideal when sequences are of similar length and expected to be
+      homologous throughout. Smith-Waterman is the local alignment counterpart, finding the
+      best-scoring subsequence — useful when sequences are globally dissimilar but share local
+      conserved regions.
+
+  - question: "Affine gap penalties (c = -d - (g-1)e) differ from linear penalties because:"
+    options:
+      - text: They always assign a higher penalty to longer gaps
+        correct: false
+      - text: Opening a gap is more expensive than extending it, reflecting that indels often span multiple positions
+        correct: true
+      - text: They only penalize gaps at the ends of alignments
+        correct: false
+      - text: They treat insertions and deletions differently
+        correct: false
+    explanation: |
+      Affine penalties have a high gap-open cost (d) and a lower gap-extension cost (e), so it
+      is relatively cheaper to extend an existing gap than to open a new one. This biologically
+      models the fact that a single indel event typically affects multiple consecutive nucleotides.
+
+  # LESSON 06 — Distance vs Character-Based Methods
+  - question: "Neighbor Joining (NJ) differs from UPGMA mainly because NJ:"
+    options:
+      - text: Does not use a distance matrix
+        correct: false
+      - text: Assumes a strict molecular clock
+        correct: false
+      - text: Corrects for overall evolutionary rate using a Q-matrix, producing an unrooted tree without clock assumption
+        correct: true
+      - text: Always produces a rooted, ultrametric tree
+        correct: false
+    explanation: |
+      NJ corrects for the overall divergence of each taxon (net divergence R) by computing a
+      Q-matrix, which ensures that rapidly evolving taxa are not incorrectly clustered together.
+      Unlike UPGMA, NJ does not assume rate constancy and produces an unrooted tree. It is more
+      accurate than UPGMA when evolutionary rates vary across lineages.
+
+  - question: Which tree rearrangement method is MOST likely to escape local optima during tree searching?
+    options:
+      - text: Nearest Neighbour Interchange (NNI)
+        correct: false
+      - text: Subtree Pruning and Regrafting (SPR)
+        correct: false
+      - text: Tree Bisection and Reconnection (TBR)
+        correct: true
+      - text: UPGMA clustering
+        correct: false
+    explanation: |
+      TBR is the most aggressive rearrangement method — it bisects the tree completely and
+      reconnects any two branches, exploring the largest region of tree space. NNI makes only
+      minimal local changes and is most prone to local optima. SPR is intermediate. TBR is
+      the least likely to get stuck but the most computationally expensive.
+
+  - question: "A parsimony-informative site must have:"
+    options:
+      - text: All taxa sharing the same character state
+        correct: false
+      - text: At least two character states, each present in at least two taxa
+        correct: true
+      - text: At least two character states, with one state present in only one taxon
+        correct: false
+      - text: All taxa having different character states
+        correct: false
+    explanation: |
+      A site is parsimony-informative only if it can distinguish between competing topologies.
+      This requires at least two different states AND each state must appear in at least two
+      taxa — otherwise the site cannot favor one grouping over another (it is a singleton or
+      invariant site).
+
+  # LESSON 07 — Models of Sequence Evolution
+  - question: "The JC69 model differs from the K80 model in that JC69:"
+    options:
+      - text: Allows variable base frequencies
+        correct: false
+      - text: Has both a transition and a transversion rate parameter
+        correct: false
+      - text: Treats all substitutions as equally likely with a single rate parameter
+        correct: true
+      - text: Only models transitions
+        correct: false
+    explanation: |
+      JC69 (Jukes-Cantor 1969) is the simplest model: one rate for all substitutions, equal
+      base frequencies. K80 (Kimura 2-parameter) adds a second rate for transitions vs.
+      transversions, reflecting the observed biological transition bias. F81 keeps equal rates
+      but allows unequal base frequencies. HKY85 combines both extensions.
+
+  - question: The HKY85 model includes which combination of parameters?
+    options:
+      - text: Equal base frequencies + one substitution rate
+        correct: false
+      - text: Unequal base frequencies + one transition rate and one transversion rate
+        correct: true
+      - text: Equal base frequencies + six substitution rates
+        correct: false
+      - text: Unequal base frequencies + six substitution rates
+        correct: false
+    explanation: |
+      HKY85 (Hasegawa-Kishino-Yano) combines F81's unequal base frequencies (πA, πC, πG, πT)
+      with K80's distinction between transitions and transversions. It has two rate parameters
+      (κ for Ts/Tv ratio) and four frequency parameters. GTR is the most general, with six
+      independent rates and four frequencies.
+
+  - question: "In the Q-matrix of a substitution model, the diagonal elements are set so that:"
+    options:
+      - text: The sum of the entire matrix equals zero
+        correct: false
+      - text: Each row sums to zero, conserving total probability
+        correct: true
+      - text: The off-diagonal elements sum to one
+        correct: false
+      - text: Each column sums to one
+        correct: false
+    explanation: |
+      The diagonal element Qii is defined as the negative sum of all off-diagonal elements in
+      that row: Qii = −Σ(j≠i) Qij. This ensures each row sums to zero, which is the mathematical
+      requirement for a valid rate matrix (generator matrix) of a continuous-time Markov chain —
+      total probability is conserved.
+
+  - question: "Adding +I (invariant sites) to a model accounts for:"
+    options:
+      - text: Sites with extremely high substitution rates
+        correct: false
+      - text: A proportion of sites that never change over evolutionary time
+        correct: true
+      - text: Rate variation following a normal distribution
+        correct: false
+      - text: Compositional heterogeneity across lineages
+        correct: false
+    explanation: |
+      +I allows a fraction of sites to have rate = 0 (completely invariable), while the
+      remaining sites evolve at rates modeled by the base substitution model. It is often
+      combined with +Γ (e.g. GTR+Γ+I) to separately model truly invariant sites and
+      among-site rate variation in variable sites.
+
+  - question: "In codon models, ω > 1 at a specific site indicates:"
+    options:
+      - text: Purifying selection — harmful mutations are being removed
+        correct: false
+      - text: Neutral evolution — mutations accumulate at the same rate as synonymous changes
+        correct: false
+      - text: Positive selection — nonsynonymous changes accumulate faster than synonymous ones
+        correct: true
+      - text: Relaxed selection — the gene has lost its functional constraint
+        correct: false
+    explanation: |
+      ω = dN/dS > 1 means nonsynonymous substitutions are accumulating faster than synonymous
+      ones — more amino acid changes than expected under neutrality. This indicates positive
+      (Darwinian) selection driving the fixation of advantageous amino acid changes. ω < 1 is
+      purifying selection; ω = 1 is neutral evolution.
+
+  # LESSON 08 — Maximum Likelihood & Concatenation
+  - question: In ML phylogenetics, why is log-likelihood preferred over raw likelihood?
+    options:
+      - text: Log-likelihood is always a positive number, making interpretation easier
+        correct: false
+      - text: It converts products of very small probabilities into computationally manageable sums
+        correct: true
+      - text: It removes the need for a substitution model
+        correct: false
+      - text: Log-likelihood is only defined for ML, not Bayesian inference
+        correct: false
+    explanation: |
+      The joint likelihood of an alignment is a product of per-site likelihoods — each a very
+      small number (probability). This product underflows computationally. Taking the log
+      converts the product into a sum of log-probabilities, which is numerically stable and
+      much faster to compute and optimize.
+
+  - question: "Felsenstein's pruning algorithm (tree-pruning algorithm) in ML computes site likelihoods by:"
+    options:
+      - text: Assigning a single ancestral state to each internal node
+        correct: false
+      - text: Summing over all possible ancestral states at internal nodes using conditional likelihoods
+        correct: true
+      - text: Only considering the most likely state at each internal node
+        correct: false
+      - text: Using parsimony to assign states before likelihood computation
+        correct: false
+    explanation: |
+      The key insight of Felsenstein's algorithm is that internal node states are unknown.
+      Rather than fixing them, it computes conditional likelihoods for each possible state at
+      every internal node and sums over all of them. This naturally incorporates ancestral
+      state uncertainty into the overall tree likelihood.
+
+  - question: "The AIC (Akaike Information Criterion) penalizes models by:"
+    options:
+      - text: Dividing the likelihood by the sample size
+        correct: false
+      - text: Adding a penalty proportional to the number of parameters
+        correct: true
+      - text: Comparing models only when they are nested
+        correct: false
+      - text: Requiring that all parameters be statistically significant
+        correct: false
+    explanation: |
+      AIC = -2×lnL + 2×k, where k is the number of free parameters. Adding parameters always
+      improves the likelihood, so AIC penalizes model complexity. Lower AIC is better. BIC uses
+      a stronger penalty (ln(n)×k) and tends to favor simpler models. Both are used for
+      partition merging and model selection.
+
+  # LESSON 09 — Bayesian Inference
+  - question: "In Bayesian phylogenetics, the Markov chain is said to have converged when:"
+    options:
+      - text: The tree topology stops changing at every step
+        correct: false
+      - text: The chain has reached the stationary distribution and independent runs give consistent results
+        correct: true
+      - text: The burn-in phase has been completed
+        correct: false
+      - text: The ESS for all parameters exceeds 1000
+        correct: false
+    explanation: |
+      Convergence means the MCMC chain is sampling from the true posterior (stationary
+      distribution), not still climbing toward it. The practical test is reproducibility: two
+      independent runs started from different random points should produce consistent parameter
+      estimates and posterior distributions. Burn-in removal helps but doesn't guarantee convergence.
+
+  - question: "Heated chains in Metropolis-Coupled MCMC (MC³) help by:"
+    options:
+      - text: Running faster than cold chains due to fewer computations
+        correct: false
+      - text: Flattening the likelihood surface so the chain can explore unlikely regions and escape local optima
+        correct: true
+      - text: Estimating the marginal likelihood directly
+        correct: false
+      - text: Ensuring all topologies are sampled equally
+        correct: false
+    explanation: |
+      Heated chains raise the likelihood to the power 1/T (T > 1), which flattens the
+      posterior surface — making moves to less probable states more acceptable. This allows
+      heated chains to explore the full tree space more broadly. When they find a better region,
+      they can swap states with the cold chain (which targets the true posterior), helping
+      escape local optima.
+
+  - question: "The Effective Sample Size (ESS) in MCMC measures:"
+    options:
+      - text: The total number of MCMC iterations completed
+        correct: false
+      - text: The number of independent samples, corrected for autocorrelation between consecutive samples
+        correct: true
+      - text: The number of unique tree topologies sampled
+        correct: false
+      - text: The fraction of the posterior distribution that has been sampled
+        correct: false
+    explanation: |
+      Because consecutive MCMC samples are correlated (autocorrelation), they do not represent
+      independent draws from the posterior. ESS estimates how many truly independent samples are
+      contained in the chain. ESS < 100 is generally considered poor; ESS > 200 is acceptable
+      for most parameters. Low ESS means the posterior estimate is unreliable.
+
+  - question: "Bayesian posterior probabilities (PPs) compared to bootstrap proportions (BPs) tend to be:"
+    options:
+      - text: Lower and more conservative
+        correct: false
+      - text: Higher and potentially overconfident under model misspecification
+        correct: true
+      - text: Identical when the same model is used
+        correct: false
+      - text: Lower for well-supported nodes and higher for weakly supported nodes
+        correct: false
+    explanation: |
+      Bayesian PPs are typically higher than non-parametric bootstrap proportions for the same
+      nodes. They can reach 1.0 (100%) even for moderately supported relationships. PPs are
+      sensitive to prior choice and model misspecification — if the model is wrong, PPs can
+      be strongly overconfident (supporting an incorrect topology with PP=1.0).
+
+  # LESSON 10 — Support Metrics
+  - question: The Transfer Bootstrap Expectation (TBE) was designed to address which limitation of standard bootstrap?
+    options:
+      - text: Standard bootstrap is too slow for large datasets
+        correct: false
+      - text: Standard bootstrap uses binary scoring that penalizes large clades when even one rogue taxon moves
+        correct: true
+      - text: Standard bootstrap cannot be applied to Bayesian inference
+        correct: false
+      - text: Standard bootstrap systematically underestimates support for short branches
+        correct: false
+    explanation: |
+      Standard bootstrap scores a clade as either present (1) or absent (0) in each replicate.
+      For large trees, even if 999 of 1000 taxa are correctly grouped but one rogue taxon jumps
+      to the wrong side, the whole clade scores zero. TBE uses a gradual transfer distance
+      metric that gives partial credit — it measures how close a replicate clade is to the
+      reference clade, not just whether it is identical.
+
+  - question: "The approximate Likelihood Ratio Test (aLRT) evaluates branch support by comparing:"
+    options:
+      - text: The best tree against all possible collapsed trees
+        correct: false
+      - text: The likelihood of the best tree against the likelihood with the second-best NNI topology around that branch
+        correct: true
+      - text: Trees inferred from bootstrap replicates against the reference tree
+        correct: false
+      - text: Prior and posterior distributions of the branch length
+        correct: false
+    explanation: |
+      aLRT approximates the standard LRT by using 2(L1 – L2), where L1 is the log-likelihood
+      of the best ML tree and L2 is the log-likelihood of the best alternative NNI configuration
+      around the branch of interest. This avoids the computational cost of collapsing the branch
+      and re-optimizing, focusing only on the four branches surrounding the branch being tested.
+
+  # LESSON 11 — Complex Models
+  - question: Which partition model is generally recommended as the best balance between biological realism and over-parameterization?
+    options:
+      - text: Edge-equal partition model (shared branch lengths)
+        correct: false
+      - text: Edge-unlinked partition model (independent branch lengths per partition)
+        correct: false
+      - text: Edge-proportional partition model (scaled branch lengths per partition)
+        correct: true
+      - text: Mixture model with CAT profiles
+        correct: false
+    explanation: |
+      The edge-equal model is unrealistically restrictive. The edge-unlinked model estimates
+      completely independent branch lengths for each partition — this can overfit when partitions
+      are short and have few informative sites. The edge-proportional model is the recommended
+      compromise: each partition has a scaler applied to a shared set of branch lengths, allowing
+      rate differences between partitions without full independent estimation.
+
+  - question: The GHOST model specifically addresses which type of evolutionary heterogeneity?
+    options:
+      - text: Compositional heterogeneity across taxa
+        correct: false
+      - text: Heterotachy — the same site evolving at different rates on different branches
+        correct: true
+      - text: Rate variation across sites drawn from a Gamma distribution
+        correct: false
+      - text: Variation in transition/transversion bias across lineages
+        correct: false
+    explanation: |
+      Heterotachy occurs when a site's evolutionary rate varies across branches — fast in some
+      lineages, slow in others. Standard +Γ models assume a fixed rate category per site.
+      GHOST (General Heterogeneous evolution On a Single Topology) assigns sites probabilistically
+      to classes, each with its own branch lengths and rate matrix, without requiring a priori
+      partitioning — specifically designed to model heterotachy.
+
+  # LESSON 12 — ILS and the Coalescent
+  - question: "Under the multispecies coalescent, the most frequent gene tree topology for any given quartet:"
+    options:
+      - text: Always differs from the species tree due to ILS
+        correct: false
+      - text: Matches the species tree topology
+        correct: true
+      - text: Is equally frequent as the two discordant topologies
+        correct: false
+      - text: Depends on the effective population size alone
+        correct: false
+    explanation: |
+      The MSC predicts that gene tree discordance due to ILS is random — the two discordant
+      quartet topologies are equally probable and always less frequent than the concordant one.
+      Therefore, the most common quartet topology across loci should be the one matching the
+      species tree. This is the statistical basis for ASTRAL and other quartet-based coalescent
+      methods.
+
+  - question: "ILS is most pronounced when:"
+    options:
+      - text: Effective population size is small and speciation events are widely spaced
+        correct: false
+      - text: Effective population size is large and speciation events are closely spaced in time
+        correct: true
+      - text: Mutation rate is low and generation time is long
+        correct: false
+      - text: Sequences are long and gene trees are well resolved
+        correct: false
+    explanation: |
+      ILS requires ancestral polymorphisms to persist across speciation events. Large Nₑ means
+      more ancestral variation, and closely spaced speciations leave little time for lineages
+      to coalesce before the next split. These two conditions together push the system into the
+      "anomaly zone" where ILS is rampant.
+
+  - question: "In coalescent theory, branch lengths in ASTRAL output are expressed in:"
+    options:
+      - text: Nucleotide substitutions per site
+        correct: false
+      - text: Millions of years
+        correct: false
+      - text: Coalescent units (proportional to 2Nₑ generations)
+        correct: true
+      - text: Number of informative sites supporting the branch
+        correct: false
+    explanation: |
+      Coalescent units (CU) are the natural unit for coalescent-based methods. One coalescent
+      unit equals 2Nₑ generations. Branch lengths in CU reflect the amount of "coalescent
+      opportunity" — longer CU branches mean more time for lineages to coalesce and less chance
+      of ILS. This scaling allows comparisons across populations of different sizes.
+
+  - question: "The Robinson-Foulds (RF) distance between two trees measures:"
+    options:
+      - text: The sum of branch length differences between the two trees
+        correct: false
+      - text: The number of bipartitions present in one tree but not the other (symmetric difference)
+        correct: true
+      - text: The average branch support difference between the two trees
+        correct: false
+      - text: The probability that one tree is a better fit to the data than the other
+        correct: false
+    explanation: |
+      RF distance counts bipartitions (splits) in tree A but not in tree B, plus bipartitions
+      in tree B but not in tree A. It is often normalized to [0,1]. RF = 0 means the two trees
+      are topologically identical; RF = 1 (maximum) means completely different. All differences
+      are treated equally, regardless of biological significance.
+
+  # LESSON 13 — Biases
+  - question: Which of the following is an example of a SYSTEMATIC bias in phylogenetics?
+    options:
+      - text: Wrong topology due to only 5 genes being analyzed
+        correct: false
+      - text: Incorrect grouping of GC-rich taxa due to compositional heterogeneity
+        correct: true
+      - text: Poor bootstrap support due to short alignment
+        correct: false
+      - text: Polytomy due to a rapid radiation
+        correct: false
+    explanation: |
+      Systematic bias arises from model violations and PERSISTS (or worsens) with more data.
+      Compositional heterogeneity (varying GC content across lineages) causes taxa with similar
+      base composition to cluster together regardless of true ancestry — a systematic error not
+      corrected by adding more data. Errors from few genes or short alignments are stochastic —
+      they diminish as data increase.
+
+  - question: Which approach BEST mitigates saturation in deep phylogenomic analyses?
+    options:
+      - text: Using more RADseq markers
+        correct: false
+      - text: Using amino acid sequences or applying nucleotide recoding (e.g. RY coding)
+        correct: true
+      - text: Increasing bootstrap replicates
+        correct: false
+      - text: Using a strict molecular clock
+        correct: false
+    explanation: |
+      Saturation occurs when multiple substitutions at the same site obscure the true signal —
+      especially at third codon positions with fast mutation rates. Amino acid sequences are less
+      saturated (20 states, slower effective rate). RY recoding (purines = R, pyrimidines = Y)
+      reduces the nucleotide alphabet to two states, eliminating fast transitions but retaining
+      slower transversions. Both approaches reduce signal loss from saturation.
+
+  - question: "SRH assumptions in substitution models stand for:"
+    options:
+      - text: Substitution, Reversibility, Homoplasy
+        correct: false
+      - text: Stationarity, Reversibility, Homogeneity
+        correct: true
+      - text: Saturation, Rate variation, Heterotachy
+        correct: false
+      - text: Symmetry, Rate constancy, Homoplasy
+        correct: false
+    explanation: |
+      SRH = Stationarity (base frequencies constant over time), Reversibility (process looks
+      the same forward and backward in time at equilibrium), and Homogeneity (the same model
+      applies across all branches). Violations of SRH assumptions are common in real data and
+      lead to systematic biases including compositional attraction and model-based artifacts.
+
+  # LESSON 14 — Divergence Time Analysis
+  - question: "In node dating, fossils typically provide:"
+    options:
+      - text: Both a hard minimum and a hard maximum age constraint
+        correct: false
+      - text: A minimum age constraint (hard bound), with soft maximum bounds often specified via prior distributions
+        correct: true
+      - text: A precise point estimate of the node age
+        correct: false
+      - text: Maximum age constraints only, because fossils are always older than the true divergence
+        correct: false
+    explanation: |
+      The age of a fossil gives a MINIMUM bound for the divergence of the clade it belongs to —
+      the divergence must have occurred at least as far back as the fossil's age. Fossils cannot
+      provide true maximum bounds directly. Soft maxima are incorporated through prior
+      distributions (lognormal, exponential, uniform) that assign diminishing probability to
+      ages beyond a geologically or biogeographically justified upper limit.
+
+  - question: "A relaxed uncorrelated molecular clock model assumes that:"
+    options:
+      - text: All branches evolve at the same rate
+        correct: false
+      - text: Substitution rates on each branch are drawn independently from a statistical distribution
+        correct: true
+      - text: Rates in daughter branches are constrained to be similar to parent branch rates
+        correct: false
+      - text: Rate variation follows a local clock pattern with fixed groups of lineages
+        correct: false
+    explanation: |
+      Uncorrelated relaxed clock models assign each branch its own rate drawn independently
+      from a distribution (commonly lognormal or exponential). This contrasts with
+      autocorrelated clocks where daughter branches inherit rates close to their parent, and
+      with local clocks where predefined groups share a common rate. BEAST implements
+      uncorrelated relaxed clocks as the standard for divergence time analysis.
+
+  # LESSON 15 — Inferring Selection
+  - question: "A branch-site model tests for:"
+    options:
+      - text: Positive selection acting uniformly across all branches and all sites
+        correct: false
+      - text: Positive selection on specific codon sites in specific foreground lineages
+        correct: true
+      - text: Rate heterogeneity among synonymous substitutions
+        correct: false
+      - text: Differences in synonymous rates between lineages
+        correct: false
+    explanation: |
+      Branch-site models are the most targeted tool for detecting natural selection. They allow
+      ω to vary both across sites (some sites under positive selection, others under purifying)
+      AND across branches (foreground branches vs. background). This lets you test whether
+      adaptive evolution occurred at specific amino acid positions along a specific lineage — for
+      example, during a host-pathogen arms race in a particular taxonomic group.
+
+  - question: "A global dN/dS > 1 estimated for an entire gene across all lineages most likely indicates:"
+    options:
+      - text: Strong positive selection acting on most sites of the gene
+        correct: false
+      - text: A potential artifact such as pseudogenization, misalignment, or incorrect orthology assignment
+        correct: true
+      - text: That the gene is evolving under relaxed purifying selection
+        correct: false
+      - text: That the gene is involved in immune defense or sensory perception
+        correct: false
+    explanation: |
+      A dN/dS > 1 averaged over an entire gene is considered biologically unrealistic — it would
+      imply most codons accumulate twice as many amino acid changes as synonymous ones genome-wide,
+      which is not expected even for genes under strong positive selection. More likely causes
+      are pseudogenization (loss of functional constraint), alignment errors, or inclusion of
+      paralogous sequences. This is useful as a quality filter in phylogenomic pipelines.
+
+  # LESSON 16 — Trait Evolution
+  - question: "Blomberg's K statistic for phylogenetic signal:"
+    options:
+      - text: Ranges from -1 to +1 and measures correlation between trait and phylogeny
+        correct: false
+      - text: Compares observed trait variance to variance expected under Brownian motion; K > 1 means stronger conservatism than BM predicts
+        correct: true
+      - text: Is equivalent to Pagel's λ and measures internal branch scaling
+        correct: false
+      - text: Only applies to discrete characters analyzed with the Mk model
+        correct: false
+    explanation: |
+      Blomberg's K compares the observed pattern of trait variance to what is expected under
+      Brownian motion evolution. K ≈ 1: fits BM. K > 1: trait is MORE conserved than BM
+      predicts — strong phylogenetic signal. K < 1: trait is LESS conserved than BM, suggesting
+      rapid evolution, convergence, or weak phylogenetic signal. Pagel's λ is a different metric
+      based on rescaling internal branch lengths.
+
+  - question: "Phylogenetically Independent Contrasts (PIC) assumes that traits evolve under:"
+    options:
+      - text: Ornstein-Uhlenbeck (stabilizing selection) model
+        correct: false
+      - text: Brownian Motion (random walk) model
+        correct: true
+      - text: Mk model (Markov discrete character evolution)
+        correct: false
+      - text: GTR model of nucleotide substitution
+        correct: false
+    explanation: |
+      PIC (Felsenstein 1985) mathematically derives contrasts that are statistically independent
+      under the assumption of Brownian Motion evolution. Under BM, the expected covariance
+      between species equals their shared branch length, which PIC uses to standardize contrasts.
+      If traits evolve under a different model (e.g. OU), PGLS with the appropriate correlation
+      structure is more appropriate.
+
+  - question: "The Mk model is used for:"
+    options:
+      - text: Continuous character evolution with stabilizing selection
+        correct: false
+      - text: Discrete character evolution as a Markov process with k states
+        correct: true
+      - text: Codon substitution with synonymous/nonsynonymous distinction
+        correct: false
+      - text: Amino acid substitution using empirical rate matrices
+        correct: false
+    explanation: |
+      The Mk model (M = Markov, k = number of states) is the standard model for discrete
+      character evolution on phylogenies. It models transitions between k character states
+      using a continuous-time Markov process — analogous to nucleotide models but for
+      morphological or other discrete traits. Parameterizations include ER (equal rates),
+      SYM (symmetric), and ARD (all rates different).
+
+  - question: Which of the following is the CORRECT hierarchical relationship among these disciplines?
+    options:
+      - text: Phylogenetics > Systematics > Cladistics
+        correct: false
+      - text: Cladistics > Phylogenetics > Systematics
+        correct: false
+      - text: Systematics > Phylogenetics > Cladistics
+        correct: true
+      - text: Taxonomy > Systematics > Phylogenetics
+        correct: false
+    explanation: |
+      Systematics is the broadest field, encompassing taxonomy (identification, naming, and
+      classification) and phylogenetics (reconstructing evolutionary relationships). Cladistics
+      is a specific approach within phylogenetics that focuses on shared derived characters and
+      common ancestry. Therefore: Systematics > Phylogenetics > Cladistics. All cladistics is
+      phylogenetics, but not all phylogenetics is cladistics.
+
+  - question: Which of the following sequencing approaches provides the LOWEST cost per sample but is limited to closely related taxa?
+    options:
+      - text: Chromosome-level whole genome sequencing
+        correct: false
+      - text: Transcriptomics (RNAseq)
+        correct: false
+      - text: Ultraconserved Elements (UCEs)
+        correct: false
+      - text: RADseq / GBS
+        correct: true
+    explanation: |
+      RADseq (€100–300) and GBS (€50–200) are the cheapest methods, producing thousands of
+      short SNP-based markers. However, they do not provide full genes — only SNPs — making
+      them suitable only for population genomics or shallow phylogenies of closely related
+      species. UCEs and transcriptomes are more expensive but applicable over greater
+      evolutionary distances.
