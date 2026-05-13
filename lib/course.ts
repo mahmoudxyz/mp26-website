@@ -90,11 +90,18 @@ export function getAvailablePageIds(lectureId: string): Set<string> {
 
 // ── Questions ─────────────────────────────────────────────────
 
+export interface FillInBlankQuestion {
+  question: string;
+  answers: string[];
+}
 export interface OralQuestion { q: string; a: string; }
 export interface MCQOption { text: string; correct: boolean; }
 export interface MCQQuestion { question: string; options: MCQOption[]; explanation?: string; }
-export interface QuestionFile { oral?: OralQuestion[]; mcq?: MCQQuestion[]; }
-
+export interface QuestionFile {
+  oral?: OralQuestion[];
+  mcq?: MCQQuestion[];
+  fill_in_blank?: FillInBlankQuestion[];   
+}
 export function getQuestions(id: string): QuestionFile {
   const p = path.join(process.cwd(), "content", "questions", `${id}.yaml`);
   if (!fs.existsSync(p)) return {};

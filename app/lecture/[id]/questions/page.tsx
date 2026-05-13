@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getLectureById, getAllLectures, getQuestions } from "@/lib/course";
 import OralAccordion from "@/components/OralAccordion";
 import MCQBlock from "@/components/MCQBlock";
+import FillInBlankBlock from "@/components/FillInBlankBlock";
 
 export async function generateStaticParams() {
   return getAllLectures().map(l => ({ id: l.id }));
@@ -19,10 +20,18 @@ export default function QuestionsPage({ params }: { params: { id: string } }) {
   if (!lec) notFound();
 
   const questions = getQuestions(params.id);
-  const oral = questions.oral ?? [];
-  const mcq  = questions.mcq  ?? [];
+  const oral = questions.oral          ?? [];
+  const mcq  = questions.mcq           ?? [];
+  const fib  = questions.fill_in_blank ?? [];
 
-  if (oral.length === 0 && mcq.length === 0) notFound();
+  if (oral.length === 0 && mcq.length === 0 && fib.length === 0) notFound();
+
+  // Count sections to handle spacing between them
+  const sections = [
+    oral.length > 0 && "oral",
+    mcq.length  > 0 && "mcq",
+    fib.length  > 0 && "fib",
+  ].filter(Boolean);
 
   return (
     <div style={s.wrapper}>
@@ -44,6 +53,7 @@ export default function QuestionsPage({ params }: { params: { id: string } }) {
           <div style={s.chips}>
             {oral.length > 0 && <span style={s.chip}>{oral.length} oral</span>}
             {mcq.length  > 0 && <span style={s.chip}>{mcq.length} MCQ</span>}
+            {fib.length  > 0 && <span style={s.chip}>{fib.length} fill-in-blank</span>}
           </div>
         </header>
 
@@ -51,7 +61,7 @@ export default function QuestionsPage({ params }: { params: { id: string } }) {
 
         {/* Oral */}
         {oral.length > 0 && (
-          <section style={s.section}>
+          <section>
             <h2 style={s.sectionTitle}>Oral Questions</h2>
             <p style={s.sectionSub}>Click any question to reveal the model answer.</p>
             <OralAccordion questions={oral} />
@@ -60,12 +70,24 @@ export default function QuestionsPage({ params }: { params: { id: string } }) {
 
         {/* MCQ */}
         {mcq.length > 0 && (
-          <section style={{ ...s.section, marginTop: oral.length > 0 ? "3.5rem" : 0 }}>
+          <section style={sections.indexOf("mcq") > 0 ? s.sectionGap : undefined}>
             <h2 style={s.sectionTitle}>MCQ Practice</h2>
             <p style={s.sectionSub}>
               Use <em>Instant</em> for immediate feedback, or <em>Quiz</em> to score yourself at the end.
             </p>
             <MCQBlock questions={mcq} />
+          </section>
+        )}
+
+        {/* Fill in the blank */}
+        {fib.length > 0 && (
+          <section style={sections.indexOf("fib") > 0 ? s.sectionGap : undefined}>
+            <h2 style={s.sectionTitle}>Fill in the Blank</h2>
+            <p style={s.sectionSub}>
+              Type your answers into the blanks. Use <em>Instant</em> to check each question,
+              or <em>Quiz</em> to submit everything at once.
+            </p>
+            <FillInBlankBlock questions={fib} />
           </section>
         )}
 
@@ -107,7 +129,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--amber-4)",
   },
   rule: { border: "none", borderTop: "1px solid var(--rule)", marginBottom: "2.5rem" },
-  section: {},
+  sectionGap: { marginTop: "3.5rem" },
   sectionTitle: {
     fontFamily: "var(--font-display)", fontSize: "1.7rem",
     fontWeight: 400, fontStyle: "italic",

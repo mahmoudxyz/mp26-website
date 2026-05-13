@@ -1,0 +1,417 @@
+# LESSON 02 — Tree Thinking (expanded exam-style questions)
+
+oral:
+  - q: >
+      What is the difference between a synapomorphy, a symplesiomorphy,
+      and an autapomorphy? Why is only one of them useful for defining clades?
+    a: |
+      A synapomorphy is a shared derived trait inherited from the most recent
+      common ancestor of a clade — it is the only type that provides positive
+      evidence for grouping taxa, because it marks the origin of a specific clade.
+      A symplesiomorphy is a shared ancestral trait inherited from a more distant
+      ancestor, predating the focal clade — it is misleading because it groups taxa
+      that may not be closely related (e.g. four limbs in mammals and amphibians).
+      An autapomorphy is a derived trait unique to a single taxon — it distinguishes
+      that lineage but says nothing about relationships with other taxa.
+
+  - q: >
+      Explain why adjacency of two taxa at the tips of a phylogeny does NOT
+      imply they are more closely related than non-adjacent taxa.
+    a: |
+      Relatedness in a phylogeny is determined by the branching pattern — specifically
+      by which node is the most recent common ancestor of two taxa — not by their
+      visual order at the tips. Any internal node can be rotated 180° without changing
+      the tree topology at all; the tips simply rearrange visually. Therefore, two
+      taxa that appear side by side may share a common ancestor no more recently
+      than two taxa that are on opposite ends of the tree.
+
+  - q: >
+      What is a polytomy, and what are the two different biological
+      or analytical interpretations of it?
+    a: |
+      A polytomy is a node in a phylogenetic tree from which more than two
+      descendant lineages emerge simultaneously, making the tree multifurcating
+      rather than fully dichotomous.
+      A soft polytomy is an analytical artifact: the available data are insufficient
+      to resolve the branching order among those lineages — the true history is
+      dichotomous but we cannot recover it.
+      A hard polytomy represents a true biological event: multiple lineages diverged
+      so rapidly and nearly simultaneously (e.g. during a rapid radiation) that the
+      multifurcation reflects reality. Distinguishing the two requires additional data.
+
+  - q: >
+      What is the role of the outgroup in phylogenetic analysis?
+      Name both functions it serves.
+    a: |
+      The outgroup is a taxon assumed a priori to lie outside the monophyly of
+      the focal ingroup. It serves two key roles:
+      1. Rooting: it provides an external reference point that determines the
+         direction of evolution and identifies the root — the most recent common
+         ancestor of all taxa in the analysis.
+      2. Polarity: it allows us to distinguish ancestral (plesiomorphic) from derived
+         (apomorphic) character states, because any state shared with the outgroup
+         is likely ancestral relative to the ingroup.
+
+  - q: >
+      A student says "this fish is more primitive than that mammal because it sits
+      lower on the phylogeny." What is wrong with this statement?
+    a: |
+      This reflects "ladder thinking" (scala naturae), one of the classic
+      misconceptions in phylogenetics. All tips of a phylogeny represent lineages
+      that have been evolving for the same total amount of time since the root —
+      none is more "primitive" or "advanced" than another. A fish and a mammal
+      are both equally derived relative to their common ancestor; the fish simply
+      retained more ancestral morphological features. Vertical position on a drawn
+      tree is a display convention with no evolutionary meaning.
+
+  - q: >
+      What is the difference between a rooted and an unrooted tree?
+      What information does rooting add?
+    a: |
+      An unrooted tree shows the topological branching relationships among taxa
+      but does not specify which lineage is the most ancestral — it has no
+      direction of evolution. A rooted tree adds a root node representing the most
+      recent common ancestor of all taxa, giving the tree directionality: it specifies
+      which character states are ancestral versus derived and establishes the
+      temporal order of branching events. Rooting is typically achieved by including
+      an outgroup or by midpoint rooting.
+
+
+mcq:
+  # — Character types —
+  - question: Which type of character provides evidence FOR grouping taxa into a clade?
+    options:
+      - text: Plesiomorphy
+        correct: false
+      - text: Autapomorphy
+        correct: false
+      - text: Synapomorphy
+        correct: true
+      - text: Symplesiomorphy
+        correct: false
+    explanation: |
+      Only synapomorphies — shared derived traits inherited from the most recent
+      common ancestor of a clade — provide positive evidence for monophyly.
+      Plesiomorphies and symplesiomorphies are ancestral and shared broadly;
+      autapomorphies are unique to one taxon and say nothing about inter-taxon
+      relationships.
+
+  - question: "The presence of a backbone (vertebral column) shared by fish, amphibians,
+      reptiles, and mammals is, for the clade Tetrapoda, a:"
+    options:
+      - text: Synapomorphy
+        correct: false
+      - text: Autapomorphy
+        correct: false
+      - text: Symplesiomorphy
+        correct: true
+      - text: Apomorphy unique to tetrapods
+        correct: false
+    explanation: |
+      The vertebral column evolved in the ancestor of all vertebrates — long before
+      tetrapods diverged. It is therefore an ancestral trait predating the focal clade
+      (Tetrapoda), making it a symplesiomorphy for that group. It cannot define
+      tetrapods as a clade because it is shared with the outgroups (fish).
+
+  - question: "An autapomorphy is useful for:"
+    options:
+      - text: Defining monophyletic groups containing multiple taxa
+        correct: false
+      - text: Distinguishing a single lineage from all others, but not for grouping
+        correct: true
+      - text: Identifying the outgroup of a clade
+        correct: false
+      - text: Establishing the root position of a tree
+        correct: false
+    explanation: |
+      An autapomorphy is a derived trait unique to a single taxon. It is diagnostic
+      for that one lineage but provides no information about its relationships with
+      other taxa, because no other group shares the trait.
+
+  # — Monophyly, paraphyly, polyphyly —
+  - question: '"Reptilia" in the traditional sense (lizards, snakes, turtles, crocodiles —
+      but excluding birds) is paraphyletic because:'
+    options:
+      - text: It includes taxa from two separate common ancestors
+        correct: false
+      - text: It contains the common ancestor but excludes some of its descendants (birds)
+        correct: true
+      - text: It contains all descendants of the common ancestor of reptiles
+        correct: false
+      - text: Birds and reptiles share no common ancestor
+        correct: false
+    explanation: |
+      A paraphyletic group contains a common ancestor and SOME but not all of its
+      descendants. Traditional Reptilia excludes birds, which are derived archosaurs
+      — they share the common ancestor of all reptiles. Excluding birds makes the
+      group paraphyletic. To be monophyletic, Reptilia would need to include birds.
+
+  - question: '"Warm-blooded vertebrates" grouping birds and mammals is polyphyletic
+      because:'
+    options:
+      - text: Birds and mammals are not related at all
+        correct: false
+      - text: Their most recent common ancestor (an ectothermic amniote) is not
+          included in the group
+        correct: true
+      - text: Endothermy is a plesiomorphy shared with fish
+        correct: false
+      - text: The group contains an ancestor and all its descendants
+        correct: false
+    explanation: |
+      A polyphyletic group assembles taxa from separate lineages whose most recent
+      common ancestor is NOT included in the group. Birds and mammals both evolved
+      endothermy independently from an ectothermic amniote ancestor. The ancestor
+      that would unite them is an ectotherm — excluded from the "warm-blooded"
+      grouping — making it polyphyletic.
+
+  - question: Which of the following is a monophyletic group?
+    options:
+      - text: '"Invertebrates" (all animals except vertebrates)'
+        correct: false
+      - text: '"Fish" (all aquatic vertebrates)'
+        correct: false
+      - text: Mammals (all descendants of the last common mammalian ancestor)
+        correct: true
+      - text: '"Reptiles" excluding birds'
+        correct: false
+    explanation: |
+      Mammals form a true clade: they include the last common mammalian ancestor
+      and every single one of its descendants, with no exclusions. "Invertebrates"
+      is polyphyletic; "fish" and "reptiles excluding birds" are both paraphyletic.
+
+  # — Tree components —
+  - question: "In a phylogenetic tree, an internal node biologically represents:"
+    options:
+      - text: A living species sampled for the study
+        correct: false
+      - text: A hypothetical common ancestor of the lineages descending from it
+        correct: true
+      - text: An extinct species always found in the fossil record
+        correct: false
+      - text: A branch length proportional to evolutionary change
+        correct: false
+    explanation: |
+      Internal nodes represent ancestors — either real or hypothetical — at the
+      point where lineages diverged. They are not directly observed; they are
+      inferred from the data. Tips (terminal nodes) represent the taxa we actually
+      sampled.
+
+  - question: "You rotate an internal node of a phylogenetic tree 180°. The result is:"
+    options:
+      - text: A completely different tree topology
+        correct: false
+      - text: The same tree topology with tips in a different visual order
+        correct: true
+      - text: A tree with different branch lengths
+        correct: false
+      - text: A rooted tree converted to an unrooted one
+        correct: false
+    explanation: |
+      Rotating a node changes only the visual display of the tree — the branching
+      pattern (topology) and all evolutionary relationships remain identical.
+      This is why adjacency of tips is NOT a reliable indicator of relatedness.
+
+  # — Tree types —
+  - question: "A scale bar reading '0.05 substitutions per site' would appear on a:"
+    options:
+      - text: Cladogram
+        correct: false
+      - text: Chronogram
+        correct: false
+      - text: Phylogram
+        correct: true
+      - text: Rooted consensus tree
+        correct: false
+    explanation: |
+      A phylogram has branch lengths proportional to the amount of evolutionary
+      change (substitutions per site), and always includes a scale bar. A cladogram
+      has no quantitative branch lengths. A chronogram uses time as the branch
+      length unit (e.g. millions of years).
+
+  - question: "A chronogram differs from a phylogram in that:"
+    options:
+      - text: It shows more taxa
+        correct: false
+      - text: Its branch lengths represent absolute time rather than evolutionary change
+        correct: true
+      - text: It is always unrooted
+        correct: false
+      - text: It does not require a substitution model
+        correct: false
+    explanation: |
+      A chronogram (timetree) encodes time along its branches — produced by a
+      divergence time analysis — and carries a time scale (e.g. millions of years).
+      A phylogram encodes the amount of sequence change. Both are rooted trees
+      and both require substitution models.
+
+  # — Outgroup and rooting —
+  - question: Why does adding an outgroup to a phylogenetic analysis allow us to
+      determine polarity of character states?
+    options:
+      - text: The outgroup always has the most derived character states
+        correct: false
+      - text: Character states shared with the outgroup are likely ancestral for
+          the ingroup
+        correct: true
+      - text: The outgroup forces the tree to be ultrametric
+        correct: false
+      - text: The outgroup provides more sequences for alignment
+        correct: false
+    explanation: |
+      Because the outgroup lies outside the ingroup, any character state shared
+      between the outgroup and some ingroup members likely predates the ingroup
+      diversification — making it ancestral (plesiomorphic). States unique to
+      ingroup members relative to the outgroup are therefore derived (apomorphic).
+
+  - question: "Midpoint rooting places the root:"
+    options:
+      - text: At the node with the highest bootstrap support
+        correct: false
+      - text: At the midpoint of the longest path between any two tips
+        correct: true
+      - text: On the branch leading to the outgroup taxon
+        correct: false
+      - text: At the node closest to the fossil record
+        correct: false
+    explanation: |
+      Midpoint rooting assumes a molecular clock and places the root at the
+      midpoint of the longest path between any two taxa in the tree, equidistant
+      from both ends. It does not require an outgroup, but its accuracy depends
+      on rate constancy across lineages.
+
+  # — Quartets and topology counting —
+  - question: For 4 taxa, how many distinct UNROOTED bifurcating tree topologies exist?
+    options:
+      - text: 1
+        correct: false
+      - text: 3
+        correct: true
+      - text: 15
+        correct: false
+      - text: 4
+        correct: false
+    explanation: |
+      For 4 taxa (a, b, c, d), exactly 3 unrooted bifurcating topologies exist:
+      ab|cd, ac|bd, and ad|bc. This is why the quartet is the fundamental unit
+      in methods like ASTRAL. For 5 taxa there are 15, for 6 there are 105 — the
+      number grows super-exponentially.
+
+  - question: Why does the number of possible tree topologies make exhaustive
+      tree searching impossible for large datasets?
+    options:
+      - text: Computers cannot store more than 1000 trees
+        correct: false
+      - text: The number of topologies grows super-exponentially with the number of taxa
+        correct: true
+      - text: All topologies have the same likelihood score
+        correct: false
+      - text: Alignments become too short as more taxa are added
+        correct: false
+    explanation: |
+      For n taxa, the number of unrooted bifurcating topologies is
+      (2n−5)!! (double factorial), which grows super-exponentially. Already for
+      ~20 taxa the number exceeds what any computer could evaluate in a lifetime.
+      This is why heuristic tree search methods (NNI, SPR, TBR) are necessary.
+
+  # — Misconceptions —
+  - question: "A student claims that the species at the 'bottom' of a phylogeny are
+      more ancient or primitive. This is incorrect because:"
+    options:
+      - text: All tips represent lineages that have evolved for the same total
+          time since the root
+        correct: true
+      - text: Species at the bottom always have more derived traits
+        correct: false
+      - text: The root is always placed at the most recently diverged lineage
+        correct: false
+      - text: Phylogenies are always read from right to left
+        correct: false
+    explanation: |
+      Every tip in a phylogeny represents a lineage that has had the same total
+      evolutionary time since the common root ancestor. "Top" and "bottom"
+      positions are arbitrary display conventions. No extant lineage is more
+      "primitive" than another — each has been evolving continuously.
+
+  - question: Which statement correctly describes the relationship between
+      Systematics, Phylogenetics, and Cladistics?
+    options:
+      - text: They are three independent fields with no hierarchical relationship
+        correct: false
+      - text: Cladistics > Phylogenetics > Systematics (from broadest to narrowest)
+        correct: false
+      - text: Systematics > Phylogenetics > Cladistics (from broadest to narrowest)
+        correct: true
+      - text: Taxonomy is a subfield of Phylogenetics
+        correct: false
+    explanation: |
+      Systematics is the broadest discipline, encompassing taxonomy (naming and
+      classification) and phylogenetics (reconstructing evolutionary relationships).
+      Cladistics is a specific approach within phylogenetics that focuses on
+      shared derived characters. Therefore: Systematics > Phylogenetics > Cladistics.
+
+
+fill_in_blank:
+  - question: >
+      A monophyletic group contains a common ancestor and _______________ of its
+      descendants, whereas a paraphyletic group contains a common ancestor and
+      _______________ of its descendants.
+    answers:
+      - "all"
+      - "some (but not all)"
+
+  - question: >
+      In a phylogenetic tree, the _______________ is the internal node representing
+      the most recent common ancestor of ALL taxa in the analysis, and it defines
+      the _______________ of evolution.
+    answers:
+      - "root"
+      - "direction"
+
+  - question: >
+      A _______________ is a tree where branch lengths represent evolutionary change
+      (substitutions per site), whereas a _______________ is a tree where branch
+      lengths represent time.
+    answers:
+      - "phylogram"
+      - "chronogram"
+
+  - question: >
+      A node with more than two descendant lineages is called a _______________.
+      When this reflects insufficient data rather than a true biological event,
+      it is called a _______________ polytomy.
+    answers:
+      - "polytomy"
+      - "soft"
+
+  - question: >
+      The outgroup serves two purposes in phylogenetic analysis: it roots the tree
+      by defining the _______________, and it allows determination of character state
+      _______________ by distinguishing ancestral from derived states.
+    answers:
+      - "root (direction of evolution / most recent common ancestor of all taxa)"
+      - "polarity"
+
+  - question: >
+      A trait shared by multiple taxa that was inherited from a distant ancestor
+      predating the focal clade is called a _______________.
+      If this trait is unique to a single taxon, it is instead called an _______________.
+    answers:
+      - "symplesiomorphy (or plesiomorphy)"
+      - "autapomorphy"
+
+  - question: >
+      For 4 taxa, there are exactly _______________ possible unrooted bifurcating
+      topologies. The 4-taxon case is known as a _______________ and forms the
+      basis of coalescent summary methods like ASTRAL.
+    answers:
+      - "3"
+      - "quartet"
+
+  - question: >
+      In phylogenetics, _______________ is the broadest field and encompasses both
+      taxonomy and phylogenetics, while _______________ is a specific approach within
+      phylogenetics that focuses on shared derived characters and common ancestry.
+    answers:
+      - "Systematics"
+      - "Cladistics"
