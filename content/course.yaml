@@ -19,7 +19,7 @@ course:
 
 resources:
   recordings: 'https://drive.google.com/drive/folders/1uBJ5eLK1M396rmwWbZuh0R_xj33mioAR'
-  exam_sample: "/exam/exam.md"
+  exam_sample: "lecture/17/sample-exam1"
   single_slides_pack: /slides/total.pdf
 
 data:
@@ -244,4 +244,9 @@ weeks:
         title: "TOTAL"
         slides: "/slides/total.pdf"
         pages:
+          - id: sample-exam1
+            label: Sample Exam 1
+            icon: "📝📚🙆🏻‍♀️"
+
+
           
