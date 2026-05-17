@@ -1,0 +1,434 @@
+# LESSON 05 — Sequence Alignment and Filtering
+
+oral:
+  - q: >
+      What is the goal of multiple sequence alignment, and why is it a
+      prerequisite for phylogenetic inference?
+    a: |
+      The goal of alignment is to arrange sequences so that each column
+      contains nucleotides or amino acids that are homologous — sharing the
+      same evolutionary origin through descent from a common ancestral position.
+      Only homologous positions can be meaningfully compared: if position 5 in
+      species A evolved independently from position 5 in species B, comparing
+      them generates noise rather than phylogenetic signal.
+      Alignment is a prerequisite for phylogenetics because phylogenetic
+      methods (parsimony, likelihood, Bayesian) evaluate character states
+      column by column. If columns are misaligned, the inferred substitution
+      events are fictitious, branch lengths are distorted, and the reconstructed
+      topology can be wrong. Essentially, alignment transforms raw sequences
+      into a hypothesis about which sites share common ancestry — and that
+      hypothesis directly determines what the tree inference sees.
+
+  - q: >
+      Explain the difference between linear and affine gap penalties.
+      Why is the affine model generally preferred in biological alignments?
+    a: |
+      Linear gap penalty: the cost of a gap of length g is c = −d × g, where d
+      is a constant penalty per gap position. Every extended position costs the
+      same as opening a new gap — there is no distinction between starting and
+      continuing a gap.
+      Affine gap penalty: the cost is c = −d − (g − 1) × e, where d is the gap
+      opening penalty and e is the gap extension penalty (typically d >> e,
+      e.g. d = 10, e = 0.1). Opening a new gap is expensive, but extending an
+      existing gap is cheap.
+      The affine model is biologically preferred because insertions and deletions
+      in real sequences tend to occur as single evolutionary events that produce
+      contiguous blocks of gaps, not multiple independent single-position events.
+      A five-position deletion is one event, not five. The affine model rewards
+      this biological reality by penalizing the opening heavily but allowing
+      extension cheaply, resulting in fewer, longer gaps that are more consistent
+      with actual indel biology.
+
+  - q: >
+      What is the difference between global and local pairwise alignment?
+      Give a biological scenario where each is more appropriate.
+    a: |
+      Global alignment (Needleman-Wunsch): aligns two sequences end-to-end
+      across their entire length. Every position in both sequences must be
+      assigned — either matched to a homologous position or gapped.
+      Local alignment (Smith-Waterman): finds the highest-scoring region of
+      similarity between two sequences, ignoring the rest. It identifies the best
+      local match rather than forcing a full-length comparison.
+      Global is appropriate when sequences are of similar length and expected to
+      be homologous across their entire length — for example, aligning full-length
+      orthologous coding sequences from closely related species for phylogenomics.
+      Local is appropriate when sequences are globally dissimilar but share
+      conserved motifs or domains — for example, finding a conserved kinase domain
+      shared between two otherwise very different proteins, or identifying a
+      conserved gene segment within a longer genomic sequence. Local alignment
+      is also the basis of BLAST database searches.
+
+  - q: >
+      Why is it sometimes necessary to trim a multiple sequence alignment
+      before phylogenetic inference? What risks does over-trimming introduce?
+    a: |
+      Not all regions of a multiple sequence alignment are equally reliable.
+      Some positions may be ambiguously aligned — particularly in rapidly
+      evolving regions, regions flanking long indels, or regions at the ends of
+      sequences where fewer taxa overlap. Including poorly aligned regions
+      introduces non-homologous comparisons: the software treats misaligned
+      positions as if they were homologous, generating spurious character
+      conflict, inflated branch lengths, and biased topology estimates.
+      Trimming tools (Gblocks, Aliscore, BMGE) remove these ambiguous regions
+      before analysis.
+      Over-trimming risks: removing too many positions reduces the total amount
+      of phylogenetic information. If conserved but slow-evolving regions are
+      also removed, the alignment loses signal needed to resolve deep divergences.
+      Extreme trimming can leave alignments so short that stochastic error
+      dominates. The goal is to balance removal of noise against retention of
+      genuine phylogenetic signal.
+
+  - q: >
+      Describe how sequences evolve on a tree, distinguishing between
+      substitutions, insertions, and deletions. Why does this mean the
+      "true" alignment may never be fully recoverable?
+    a: |
+      Sequences evolve along all branches of a tree simultaneously. At any site:
+      Substitutions replace one nucleotide with another (A→G, C→T, etc.),
+      leaving the sequence length unchanged. They are the primary signal used
+      in most phylogenetic models.
+      Insertions add new nucleotides into the sequence, increasing its length.
+      Deletions remove nucleotides, shortening the sequence. Both insertions and
+      deletions are represented as gaps in an alignment.
+      The fundamental problem is that the same observed gap in an alignment can
+      arise from many different combinations of insertions and deletions along
+      different branches. Once a deletion has occurred, the information about
+      what was there before is permanently lost. Multiple overlapping indels
+      at the same region across different lineages create ambiguity that cannot
+      be resolved from the sequences alone — we only observe the present-day
+      sequences, not the intermediate ancestors. This means the "true" alignment
+      — where every column maps to exactly one ancestral position — may have
+      multiple equally valid interpretations from the same data, and software
+      heuristics choose among them based on scoring assumptions that may not
+      reflect the actual evolutionary history.
+
+
+mcq:
+  # — Alignment fundamentals —
+  - question: >
+      In a multiple sequence alignment, what does a gap character (–)
+      biologically represent?
+    options:
+      - text: A sequencing error at that position
+        correct: false
+      - text: An insertion in one lineage or a deletion in another, relative
+          to the common ancestor
+        correct: true
+      - text: A position where the nucleotide is unknown
+        correct: false
+      - text: A hypervariable site that should be excluded from analysis
+        correct: false
+    explanation: |
+      A gap in an alignment represents an indel event — an insertion in one
+      lineage or a deletion in another. From the perspective of any given column,
+      a gap in one taxon means that taxon either lost the nucleotide (deletion)
+      or that others gained one (insertion relative to that taxon). Gaps are not
+      sequencing errors or missing data in the biological sense — they represent
+      real evolutionary events, though their direction (insertion vs deletion)
+      is ambiguous from the alignment alone.
+
+  - question: >
+      A site in a multiple sequence alignment where all five taxa share the
+      same nucleotide (e.g. all have A) is:
+    options:
+      - text: A synapomorphy defining all five taxa as a clade
+        correct: false
+      - text: Phylogenetically uninformative because it does not discriminate
+          among any tree topology
+        correct: true
+      - text: A parsimony-informative site because it supports the most
+          parsimonious tree
+        correct: false
+      - text: Always the result of purifying selection
+        correct: false
+    explanation: |
+      A parsimony-informative site must have at least two different character
+      states, each present in at least two taxa. An invariant site — all taxa
+      sharing the same state — scores equally for all possible tree topologies
+      and contributes zero discriminating power. It cannot be a synapomorphy
+      unless we compare it to an outgroup where the state differs.
+
+  - question: >
+      The Needleman-Wunsch algorithm is to global alignment as Smith-Waterman
+      is to:
+    options:
+      - text: Multiple sequence alignment
+        correct: false
+      - text: Local alignment
+        correct: true
+      - text: Distance matrix construction
+        correct: false
+      - text: Phylogenetic tree scoring
+        correct: false
+    explanation: |
+      Needleman-Wunsch performs global alignment by aligning entire sequences
+      end-to-end, optimizing score across the full length. Smith-Waterman
+      performs local alignment, finding the highest-scoring subsequence match
+      and ignoring regions of low similarity. Local alignment underlies tools
+      like BLAST and is used when sequences share conserved domains but differ
+      broadly elsewhere.
+
+  - question: >
+      In progressive multiple sequence alignment, the order of alignment
+      is determined by:
+    options:
+      - text: Random selection of sequence pairs
+        correct: false
+      - text: A guide tree built from pairwise sequence distances, aligning
+          closest sequences first
+        correct: true
+      - text: Alphabetical order of species names
+        correct: false
+      - text: The length of the sequences, shortest first
+        correct: false
+    explanation: |
+      Progressive MSA first computes all pairwise distances, uses them to
+      build a guide tree (typically via NJ or UPGMA), then aligns sequences
+      starting from the most similar pairs and progressively adding more
+      divergent sequences. Aligning closest sequences first minimizes errors
+      because closely related sequences are easier to align accurately. The
+      guide tree is used only to determine alignment order — it is not the
+      final phylogenetic tree.
+
+  # — Gap penalties —
+  - question: >
+      Using affine gap penalties with d = 10 (opening) and e = 0.1 (extension),
+      what is the cost of a gap of length 5?
+    options:
+      - text: −50
+        correct: false
+      - text: −10.4
+        correct: true
+      - text: −0.5
+        correct: false
+      - text: −14.1
+        correct: false
+    explanation: |
+      Affine gap cost: c = −d − (g − 1) × e = −10 − (5 − 1) × 0.1 =
+      −10 − 0.4 = −10.4. The opening is penalized once (−10) and each
+      extension beyond the first adds −0.1. This makes long contiguous gaps
+      much less costly than five separate single-position gaps, which would
+      cost 5 × (−10) = −50 under linear scoring — correctly reflecting that
+      a contiguous deletion is one biological event.
+
+  - question: >
+      Alignment scoring penalizes gaps more heavily than mismatches
+      (e.g. d = 10 vs mismatch = −1) primarily because:
+    options:
+      - text: Gaps are always sequencing errors and should be removed
+        correct: false
+      - text: Indels are rarer evolutionary events than nucleotide substitutions,
+          so introducing a gap should be a last resort in the alignment
+        correct: true
+      - text: Gaps always represent missing data rather than real biology
+        correct: false
+      - text: Mismatches carry more phylogenetic information than gaps
+        correct: false
+    explanation: |
+      Insertions and deletions are generally less frequent per site per generation
+      than point substitutions. Heavy gap opening penalties reflect this rarity:
+      the aligner should prefer an alignment with a mismatch over one that
+      introduces a spurious gap. This prevents over-gapping of regions that are
+      genuinely diverged rather than truly indel-containing. Gap penalties are
+      a modeling choice that encodes prior beliefs about indel rates relative
+      to substitution rates.
+
+  # — Distances from alignments —
+  - question: >
+      The Hamming distance between two aligned sequences differs from
+      pairwise distance in that:
+    options:
+      - text: Hamming distance accounts for insertions and deletions;
+          pairwise distance does not
+        correct: false
+      - text: Hamming distance counts only substitutions (mismatches) and
+          ignores gaps; pairwise distance accounts for both substitutions
+          and indels
+        correct: true
+      - text: Hamming distance uses a substitution model; pairwise distance
+          does not
+        correct: false
+      - text: They are identical measures applied to different data types
+        correct: false
+    explanation: |
+      Hamming distance is the raw count of mismatched positions between two
+      sequences of the same length, ignoring gaps entirely. Pairwise distance
+      is a more general measure that can incorporate gaps (indels) as well as
+      substitutions. Neither corrects for multiple substitutions at the same
+      site — that correction requires a substitution model (e.g. Jukes-Cantor,
+      Kimura-2-parameter, GTR), producing an expected or model-corrected distance.
+
+  - question: >
+      Model-corrected distances (e.g. Jukes-Cantor distance) are preferred
+      over p-distance (observed distance) in phylogenetics because:
+    options:
+      - text: They are always smaller than p-distance
+        correct: false
+      - text: They correct for multiple substitutions at the same site that
+          are invisible in the raw comparison, giving a better estimate of
+          the true number of evolutionary changes
+        correct: true
+      - text: They eliminate the need for sequence alignment
+        correct: false
+      - text: They are easier to compute than p-distance
+        correct: false
+    explanation: |
+      P-distance counts only the differences observable in the current
+      alignment. When multiple substitutions occur at the same site over time
+      (multiple hits), some are erased and the site appears unchanged or shows
+      only the final change. This causes p-distance to underestimate the true
+      evolutionary distance, especially for divergent sequences. Substitution
+      models correct for this saturation effect by estimating the expected total
+      number of substitutions given the observed pattern.
+
+  # — Alignment trimming —
+  - question: >
+      Which of the following best describes why alignment trimming tools
+      such as Gblocks or BMGE are applied before phylogenetic inference?
+    options:
+      - text: They remove all gap-containing columns to reduce alignment length
+        correct: false
+      - text: They remove ambiguously aligned regions where homology of
+          positions is uncertain, preventing non-homologous comparisons
+          from misleading tree inference
+        correct: true
+      - text: They correct for multiple substitutions at saturated sites
+        correct: false
+      - text: They identify and eliminate paralogous sequences
+        correct: false
+    explanation: |
+      Trimming tools target regions where the alignment is unreliable —
+      flanking indel-rich zones, highly variable regions where many alternative
+      arrangements are equally likely, or regions with excessive gaps. These
+      positions are dangerous because if the columns do not represent homologous
+      sites, the inferred character states are biologically meaningless. Including
+      them introduces noise and can bias topology, branch lengths, and support
+      values. Trimming is NOT about removing all gaps — well-supported gapped
+      columns should be retained.
+
+  - question: >
+      A researcher trims 80% of their alignment using Gblocks with strict
+      parameters. The remaining 20% produces a tree with very low bootstrap
+      support at all nodes. The most likely explanation is:
+    options:
+      - text: The remaining sequences are all paralogs
+        correct: false
+      - text: Over-trimming removed too much genuine phylogenetic signal,
+          leaving too few informative sites to resolve the tree reliably
+        correct: true
+      - text: Gblocks automatically removes all parsimony-informative sites
+        correct: false
+      - text: The bootstrap method is incompatible with trimmed alignments
+        correct: false
+    explanation: |
+      Aggressive trimming can discard genuine phylogenetic signal along with
+      noise. If 80% of the alignment is removed, the remaining 20% may contain
+      too few informative sites — particularly for resolving deeper divergences.
+      Low bootstrap support across all nodes reflects high stochastic error
+      from insufficient data, not necessarily wrong topology. The appropriate
+      trimming threshold requires balancing noise removal against information
+      retention, and in many modern analyses, less aggressive trimming or no
+      trimming at all is preferred.
+
+  - question: >
+      Sequences evolve on a tree. Which statement correctly describes the
+      consequence of this for alignment?
+    options:
+      - text: All sequences from the same clade will have identical alignments
+        correct: false
+      - text: Insertions and deletions accumulate along branches, so the same
+          gap in an alignment may have arisen from multiple different combinations
+          of evolutionary events
+        correct: true
+      - text: Substitutions are the only changes that need to be represented
+          in an alignment
+        correct: false
+      - text: Sequences from more divergent species are always shorter due
+          to accumulated deletions
+        correct: false
+    explanation: |
+      Because sequences evolve independently along every branch of the tree,
+      multiple independent indels can occur in overlapping positions in
+      different lineages. A gap observed in the final alignment for a given
+      taxon could represent a deletion in that lineage, an insertion in all
+      others, or some complex combination of both. This ambiguity means the
+      "true" alignment — the one where each column perfectly maps to a single
+      ancestral position — may be unreachable from present-day sequences alone.
+
+
+fill_in_blank:
+  - question: >
+      The goal of sequence alignment is to arrange positions so that each
+      column contains _______________ sites — those that share the same
+      evolutionary _______________ through common descent.
+    answers:
+      - "homologous"
+      - "origin (history)"
+
+  - question: >
+      In affine gap scoring, the total cost of a gap of length g is calculated
+      as _______________, where d is the _______________ penalty and e is the
+      _______________ penalty.
+    answers:
+      - "−d − (g − 1) × e"
+      - "gap opening"
+      - "gap extension"
+
+  - question: >
+      The _______________ algorithm performs global pairwise alignment by
+      aligning sequences end-to-end, while the _______________ algorithm
+      performs local alignment by finding the highest-scoring subregion of
+      similarity between two sequences.
+    answers:
+      - "Needleman-Wunsch"
+      - "Smith-Waterman"
+
+  - question: >
+      The raw proportion of positions at which two sequences differ is called
+      the _______________ or observed distance. It _______________ the true
+      number of substitutions because multiple changes at the same site are
+      invisible, a phenomenon known as _______________.
+    answers:
+      - "p-distance (Hamming distance)"
+      - "underestimates"
+      - "saturation (multiple hits)"
+
+  - question: >
+      In progressive MSA, pairwise distances are first computed, then a
+      _______________ tree is built to determine alignment order. The most
+      _______________ sequences are aligned first, and progressively more
+      divergent sequences are added.
+    answers:
+      - "guide"
+      - "similar (closely related)"
+
+  - question: >
+      Three commonly used alignment trimming tools are _______________,
+      _______________, and _______________. They are applied before
+      phylogenetic inference to remove _______________ regions where
+      column homology is uncertain.
+    answers:
+      - "Gblocks"
+      - "Aliscore"
+      - "BMGE"
+      - "ambiguously aligned (poorly aligned)"
+
+  - question: >
+      _______________ distance counts only mismatched positions and ignores gaps,
+      while _______________ distance is a broader measure that accounts for both
+      substitutions and insertions or deletions. Neither corrects for _______________
+      substitutions at the same site — that requires a substitution model.
+    answers:
+      - "Hamming"
+      - "pairwise"
+      - "multiple (multiple hits)"
+
+  - question: >
+      Sequences from the same alignment can be aligned at the nucleotide level
+      or at the _______________ level. When aligning protein-coding sequences
+      as nucleotides, insertions and deletions must involve multiples of
+      _______________ nucleotides to preserve the _______________ frame.
+    answers:
+      - "amino acid (protein)"
+      - "three"
+      - "reading"

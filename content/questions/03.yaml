@@ -1,0 +1,387 @@
+# LESSON 03 — Molecular Phylogenetics: Characters & Molecular Evolution
+
+oral:
+  - q: >
+      What are the six criteria a character should possess to be useful in
+      phylogenetic inference? Briefly justify each.
+    a: |
+      Heritable: the trait must be genetically or developmentally inherited so
+      its distribution reflects historical descent, not independent acquisition.
+      Independent: characters should vary independently; correlated or redundant
+      characters overweight a single signal and bias the analysis.
+      Informative: must vary among taxa but not so fast that the signal is
+      overwhelmed by noise — neither invariant nor hypervariable.
+      Clear: must be defined unambiguously and coded into discrete states
+      (e.g. present/absent) to avoid subjective interpretation.
+      Homologous: similarity must stem from shared ancestry, not independent
+      origin — homology is the prerequisite for meaningful comparison.
+      Non-homoplasious: characters prone to convergence or reversal mislead
+      reconstruction; less homoplasy means the character better tracks true
+      relationships.
+
+  - q: >
+      Define homoplasy. Describe its two main forms and explain how each
+      can mislead phylogenetic reconstruction.
+    a: |
+      Homoplasy is similarity between taxa that does not stem from a common
+      ancestor — it arises through independent evolutionary pathways.
+      Convergent evolution: unrelated lineages independently evolve similar
+      traits (e.g. wings in bats, birds, and insects). If treated as a synapomorphy,
+      it falsely groups taxa that are not closely related.
+      Evolutionary reversal: a derived trait reverts to the ancestral state (e.g.
+      loss of limbs in snakes). This creates apparent similarity with outgroups or
+      distantly related taxa, generating character conflict.
+      Both inflate the apparent similarity between non-sister taxa and introduce
+      incongruence among characters, making tree inference harder and less accurate.
+
+  - q: >
+      Distinguish homology from analogy, and explain how analogy relates
+      to the broader concept of homoplasy.
+    a: |
+      Homology is similarity due to shared ancestry — characters in different taxa
+      that derive from the same structure in a common ancestor (e.g. forelimbs
+      of humans, whales, bats, and cats built from the same bones).
+      Analogy is similarity in function but not in evolutionary origin — structures
+      that perform the same role but evolved independently (e.g. wings of birds
+      and insects).
+      Analogy is a specific type of homoplasy. Homoplasy is the broader concept
+      encompassing any similarity not inherited from a common ancestor, including
+      convergence, parallelism, and reversal. Analogy specifically emphasizes
+      functional equivalence arising from parallel or convergent evolution.
+      Phylogenetics requires homologous, not analogous, characters.
+
+  - q: >
+      What is the molecular clock hypothesis? What does neutral theory
+      contribute to justifying it, and what are the main biological reasons
+      it is often violated?
+    a: |
+      The molecular clock hypothesis proposes that genetic changes accumulate
+      at a roughly constant rate over long evolutionary timescales, allowing
+      divergence times between species to be estimated from sequence differences.
+      Neutral theory (Kimura) provides the justification: most molecular changes
+      are selectively neutral and fixed by genetic drift at a rate equal to the
+      neutral mutation rate — if mutation rates are stable, accumulation of neutral
+      changes is approximately clock-like.
+      Violations arise because:
+      — Mutation rates differ among genes, species, and genomic regions due to
+        generation time, metabolic rate, and DNA repair efficiency.
+      — Selection (purifying or positive) can accelerate or decelerate fixation
+        rates at different loci or lineages, decoupling the molecular rate from
+        a strict clock.
+      — These deviations require fossil calibrations or rate-smoothing models to
+        produce accurate divergence time estimates.
+
+  - q: >
+      Why is molecular data generally preferred over morphological data
+      for phylogenetic inference today? Name at least four reasons.
+    a: |
+      Abundant and inexpensive: a single genome yields millions of characters
+      and sequencing costs continue to decline, enabling large-scale analyses.
+      Objective: a nucleotide is unambiguously A, T, G, or C — molecular coding
+      is less subject to observer interpretation than morphological scoring.
+      Multiple resolutions: different molecular markers evolve at different rates,
+      allowing resolution of both recent and ancient divergences.
+      Standardized: computational tools, substitution models, and public databases
+      are well-developed, making analyses reproducible and comparable across labs.
+      Additionally, molecular data is abundant even in morphologically simple
+      organisms (e.g. bacteria) where informative morphological characters are few.
+
+
+mcq:
+  # — Character criteria —
+  - question: >
+      A researcher proposes using GC content (proportion of G and C bases)
+      as a phylogenetic character across distantly related bacteria. Which
+      criterion does this most seriously violate?
+    options:
+      - text: Heritability
+        correct: false
+      - text: Non-homoplasy
+        correct: false
+      - text: Independence from selective and environmental pressures
+        correct: false
+      - text: Homology — GC content is a genome-wide compositional property
+          driven by many independent forces, not a discrete homologous character
+        correct: true
+    explanation: |
+      GC content reflects genome-wide mutational biases, selection, and
+      environmental pressures (e.g. thermophily increases GC). It is not a
+      discrete, clearly homologous character: similar GC content in two
+      lineages need not reflect shared ancestry but can arise independently
+      from similar selective regimes. It violates the clarity, homology, and
+      non-homoplasy criteria simultaneously — but the deepest violation is
+      that it is not a homologous character coding a single evolutionary event.
+
+  - question: >
+      A character is invariant across all taxa in an alignment. For parsimony,
+      this site is:
+    options:
+      - text: Highly informative because it confirms shared ancestry
+        correct: false
+      - text: Uninformative because it cannot discriminate among competing topologies
+        correct: true
+      - text: A synapomorphy for the entire ingroup
+        correct: false
+      - text: Evidence of purifying selection and therefore excluded automatically
+        correct: false
+    explanation: |
+      Parsimony uses only informative sites — those with at least two different
+      character states each present in at least two taxa. An invariant site
+      supports all topologies equally and contributes no discriminating power.
+      It is not a synapomorphy because it defines no subset of the ingroup.
+
+  # — Homoplasy —
+  - question: >
+      Echolocation evolved independently in bats and toothed whales.
+      This is an example of:
+    options:
+      - text: Symplesiomorphy
+        correct: false
+      - text: Synapomorphy
+        correct: false
+      - text: Convergent evolution — a form of homoplasy
+        correct: true
+      - text: Paralogy
+        correct: false
+    explanation: |
+      Echolocation in bats and cetaceans evolved independently in separate
+      lineages from ancestors that did not echolocate. This is convergent
+      evolution, a subtype of homoplasy. If naively coded as a shared character,
+      it would incorrectly group bats and whales as sister taxa, misleading
+      phylogenetic reconstruction.
+
+  - question: >
+      An evolutionary reversal differs from convergent evolution in that:
+    options:
+      - text: It only occurs in marine lineages
+        correct: false
+      - text: It produces a derived state in both lineages
+        correct: false
+      - text: It returns a lineage to an ancestral character state rather than
+          producing a new independent origin of a similar state
+        correct: true
+      - text: It always produces a synapomorphy
+        correct: false
+    explanation: |
+      A reversal occurs when a derived state reverts back to the ancestral
+      condition in a lineage (e.g. loss of limbs re-evolving limblessness).
+      Convergence involves independent evolution of a similar derived state in
+      separate lineages from a different ancestral state. Both are forms of
+      homoplasy, but the direction of change differs.
+
+  - question: >
+      Homoplasious characters are especially problematic in phylogenetics
+      because:
+    options:
+      - text: They are always excluded by alignment software automatically
+        correct: false
+      - text: They create character conflict — different characters support
+          different and incompatible topologies
+        correct: true
+      - text: They violate the molecular clock assumption
+        correct: false
+      - text: They only affect morphological, not molecular, datasets
+        correct: false
+    explanation: |
+      When homoplasious characters are present, they support different trees
+      than non-homoplasious characters, generating character incongruence.
+      In a perfectly homoplasy-free dataset, all characters would support the
+      same tree. Homoplasy is common in molecular data too — it is not
+      restricted to morphology — and software does not remove it automatically.
+
+  # — Genetic distance and molecular clock —
+  - question: >
+      The genetic distance between two species is defined as:
+    options:
+      - text: The number of differences observed directly between their sequences
+        correct: false
+      - text: The sum of the branch lengths from each species back to their
+          most recent common ancestor
+        correct: true
+      - text: The proportion of invariant sites shared between two alignments
+        correct: false
+      - text: The number of synapomorphies dividing the two species
+        correct: false
+    explanation: |
+      Distance = (SP0→SP1) + (SP0→SP2), i.e. the sum of substitutions
+      accumulated along both lineages back to their common ancestor.
+      The raw observed proportion of differences (p-distance) underestimates
+      this because multiple substitutions at the same site go undetected.
+
+  - question: >
+      Under a strict molecular clock, two lineages that diverged more
+      recently will have:
+    options:
+      - text: More sequence differences than two lineages that diverged earlier
+        correct: false
+      - text: The same sequence differences regardless of divergence time
+        correct: false
+      - text: Fewer sequence differences than two lineages that diverged earlier
+        correct: true
+      - text: No sequence differences, since they share a recent ancestor
+        correct: false
+    explanation: |
+      Under a constant rate of molecular evolution, less time since divergence
+      means fewer accumulated substitutions. Genetic distance is therefore a
+      proxy for elapsed time. This is the foundation of the molecular clock:
+      d = rate × time, so d is smaller for more recent divergences.
+
+  - question: >
+      Neutral theory (Kimura) is relevant to molecular phylogenetics because:
+    options:
+      - text: It proves that all mutations are selectively neutral
+        correct: false
+      - text: Neutral substitutions accumulate at a rate roughly equal to
+          the neutral mutation rate, providing the theoretical basis for
+          the molecular clock
+        correct: true
+      - text: It shows that phenotypic traits evolve faster than molecular ones
+        correct: false
+      - text: It eliminates the need for substitution models
+        correct: false
+    explanation: |
+      Under neutrality, the fixation rate of neutral mutations equals the
+      neutral mutation rate (μ), regardless of population size. If mutation
+      rates are relatively constant across lineages, neutral molecular changes
+      accumulate at an approximately constant rate — this is the mechanistic
+      basis for clock-like molecular evolution. Selection still shapes
+      phenotypic traits, but most molecular changes are neutral.
+
+  # — First molecular phylogenies —
+  - question: >
+      Nuttall's 1904 immunological study was significant in the history
+      of phylogenetics because:
+    options:
+      - text: It was the first to sequence DNA to reconstruct a phylogeny
+        correct: false
+      - text: It provided early molecular evidence that humans are most closely
+          related to great apes, ahead of other primates
+        correct: true
+      - text: It introduced the concept of the molecular clock
+        correct: false
+      - text: It demonstrated that morphological and molecular trees always conflict
+        correct: false
+    explanation: |
+      Using serological cross-reactions — stronger reactions indicate closer
+      relatedness — Nuttall reconstructed phylogenetic relationships among
+      animal groups. His results placed humans closest to great apes, then Old
+      World monkeys, New World monkeys, and prosimians. This was early molecular
+      evidence supporting evolutionary theory, decades before DNA sequencing.
+
+  # — Why molecular phylogenetics —
+  - question: >
+      Which of the following is a genuine disadvantage of using mitochondrial
+      genomes compared to nuclear genomes for phylogenomics?
+    options:
+      - text: They are too expensive to sequence
+        correct: false
+      - text: Maternal inheritance means they reflect only one parental lineage,
+          and high substitution rates can cause saturation for deep divergences
+        correct: true
+      - text: They cannot be assembled without a reference genome
+        correct: false
+      - text: They contain more genes than nuclear genomes
+        correct: false
+    explanation: |
+      Mitochondrial genomes are maternally inherited, so they tell only half
+      the genealogical story. Their high substitution rates make them useful
+      for shallow divergences but lead to saturation and homoplasy for deep
+      phylogenies. They also offer a limited number of genes (~15 in most
+      animals) compared to nuclear genomes with thousands of single-copy loci.
+
+  - question: >
+      A researcher studying insect phylogenomics chooses transcriptomes
+      over whole genomes. The most important trade-off they accept is:
+    options:
+      - text: Higher cost but better ortholog identification
+        correct: false
+      - text: More markers but risk of missing data because transcriptomes
+          represent a snapshot of gene expression at one time point
+        correct: true
+      - text: Fewer markers but immunity to misassembly
+        correct: false
+      - text: No need for fresh tissue but poor phylogenetic signal
+        correct: false
+    explanation: |
+      Transcriptomes provide large numbers of markers cheaply and without a
+      reference genome. However, because RNA-seq captures expression at a
+      specific moment and tissue, genes not expressed at sampling are absent —
+      generating missing data across the matrix. Fresh tissue is still required,
+      and chimeric transcripts from misassembly are a real risk.
+
+
+fill_in_blank:
+  - question: >
+      Similarity due to _______________ is called homology, whereas
+      similarity due to _______________ is called analogy. Only _______________
+      characters are valid for phylogenetic inference.
+    answers:
+      - "shared ancestry"
+      - "shared function but independent origin"
+      - "homologous"
+
+  - question: >
+      Homoplasy encompasses three main phenomena: independent evolution of
+      the same trait in separate lineages (_______________ evolution),
+      return of a derived trait to the ancestral state (evolutionary _______________),
+      and related lineages independently evolving similar traits (_______________ evolution).
+    answers:
+      - "convergent"
+      - "reversal"
+      - "parallel"
+
+  - question: >
+      Under the molecular clock hypothesis, genetic distance is proportional
+      to _______________. The theoretical justification for this comes from
+      _______________ theory, which predicts that neutral mutations are fixed
+      at a rate equal to the _______________ rate.
+    answers:
+      - "elapsed time (divergence time)"
+      - "neutral (Kimura's neutral theory)"
+      - "neutral mutation"
+
+  - question: >
+      The _______________ distance counts only directly observed differences
+      between two sequences, and therefore _______________ the true number of
+      substitutions because multiple hits at the same site are invisible.
+    answers:
+      - "p-distance (observed / Hamming)"
+      - "underestimates"
+
+  - question: >
+      Nuttall (1904) used _______________ cross-reactions to reconstruct
+      phylogenetic relationships, finding that humans are most closely related
+      to _______________, followed in decreasing order by Old World monkeys,
+      New World monkeys, and prosimians.
+    answers:
+      - "serological (immunological)"
+      - "great apes"
+
+  - question: >
+      A phylogenetically informative site must contain at least _______________
+      different character states, each present in at least _______________ taxa.
+      A site where only one taxon differs from all others is called a _______________.
+    answers:
+      - "two"
+      - "two"
+      - "singleton (uninformative / autapomorphic site)"
+
+  - question: >
+      The molecular clock is often violated because _______________ rates differ
+      among genes, species, and genomic regions, and because _______________
+      selection can accelerate or decelerate the fixation of mutations beyond
+      neutral expectations.
+    answers:
+      - "mutation"
+      - "positive or purifying (natural)"
+
+  - question: >
+      Among sequencing strategies, _______________ is the cheapest option and
+      uses restriction sites to sample short markers, but is limited to
+      _______________ genomics and closely related species because it provides
+      no full genes. By contrast, a chromosome-level genome can cost
+      between _______________ per sample.
+    answers:
+      - "RAD-Seq (or GBS)"
+      - "population"
+      - "€10,000 – €20,000"
