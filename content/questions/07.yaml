@@ -1,0 +1,429 @@
+# LESSON 07 — Models of Sequence Evolution
+
+oral:
+  - q: >
+      What is a substitution model? What three key assumptions do most
+      nucleotide models share, and what is the biological implication of each?
+    a: |
+      A substitution model is a mathematical framework — specifically a
+      continuous-time Markov model — that describes the probabilities of
+      nucleotide (or amino acid, or codon) changes over evolutionary time.
+      It defines instantaneous rates of substitution, is used to estimate
+      evolutionary distances and score trees under likelihood or Bayesian
+      frameworks, and implicitly corrects for multiple substitutions at
+      the same site.
+      Three key assumptions:
+      1. Markov property (memorylessness): the probability of changing from
+         state i to state j depends only on the current state, not on prior
+         history. Biologically: past states of a site do not influence its
+         future trajectory — violated by context-dependent mutation (e.g.
+         CpG hypermutability).
+      2. Time-homogeneity: substitution rates are constant over time — the
+         same Q-matrix governs all branches. Violated when selective pressures
+         or mutational biases shift across lineages (heterotachy, heterogeneity).
+      3. Stationarity: nucleotide frequencies are at equilibrium and do not
+         drift over time. Violated in endosymbionts, parasites, and thermophiles
+         with strong unidirectional mutational biases.
+      Together these are part of the SRH assumptions (Stationarity,
+      Reversibility, Homogeneity). Violations lead to systematic bias in
+      topology and branch-length estimation.
+
+  - q: >
+      Describe the hierarchy of nucleotide substitution models from JC69
+      to GTR, stating what each new model adds over its predecessor.
+      Why does this hierarchy matter for inference?
+    a: |
+      JC69 (Jukes-Cantor 1969): equal base frequencies (25% each) and one
+      equal rate for all six substitution types. Simplest possible model.
+      K80 (Kimura 2-parameter 1980): adds a Ti/Tv distinction via ratio κ —
+      separate rates for transitions (A↔G, C↔T) and transversions. Equal
+      base frequencies maintained.
+      F81 (Felsenstein 1981): allows unequal base frequencies (πA, πC, πG, πT)
+      while keeping all substitution rates equal.
+      K3P (Kimura 3-parameter 1981): extends K80 with two distinct transversion
+      rates; equal base frequencies.
+      HKY85 (Hasegawa-Kishino-Yano 1985): combines unequal base frequencies
+      (like F81) with a Ti/Tv distinction (like K80). Practical workhorse.
+      TN93 (Tamura-Nei 1993): two distinct transition rates (A↔G ≠ C↔T) plus
+      one transversion rate; unequal base frequencies.
+      GTR (General Time Reversible, Tavaré 1986): six free substitution rate
+      parameters (one per nucleotide pair) plus four base frequencies. The most
+      general fully reversible model — all simpler models are special cases
+      with certain rates constrained equal.
+      The hierarchy matters because model selection criteria (AIC, BIC, LRT)
+      identify the model that best balances fit against complexity, avoiding
+      overfitting (wasted parameters) and underfitting (systematic bias from
+      incorrect assumptions).
+
+  - q: >
+      What is the Q-matrix? Define its off-diagonal and diagonal elements
+      and explain the mathematical constraint it must satisfy and why.
+    a: |
+      The Q-matrix (instantaneous rate matrix) is the core specification of
+      a substitution model. Element Q(i,j) gives the instantaneous rate of
+      change from nucleotide i to nucleotide j.
+      Off-diagonal elements (i ≠ j): Q(i,j) = rate_parameter(i→j) × π(j),
+      where rate_parameter is the relative substitution rate for that pair
+      (e.g. α for A↔G in GTR) and π(j) is the equilibrium frequency of the
+      destination state. Scaling by destination frequency ensures the model
+      converges to the correct stationary distribution.
+      Example: Q(A,C) = β × πC; Q(A,G) = α × πG.
+      Diagonal elements: Q(i,i) = −Σ(j≠i) Q(i,j), i.e. the negative sum
+      of all off-diagonal elements in the same row.
+      Constraint — each row sums to zero: this is the probability conservation
+      requirement for any continuous-time Markov process. It ensures the total
+      rate of leaving state i equals the magnitude of the diagonal, so the
+      sum of probabilities across all states always equals 1.
+      From Q, the transition probability matrix P(t) = e^(Qt) gives the
+      probability of observing state j at time t given state i at t=0.
+      Time-reversibility (detailed balance): π(i)×Q(i,j) = π(j)×Q(j,i)
+      for all pairs — the process looks identical forward or backward in time,
+      making root placement irrelevant to likelihood computation.
+
+  - q: >
+      What are synonymous and nonsynonymous substitutions? How do MG94
+      and GY94 use them, and what does ω = dN/dS tell us about selection?
+    a: |
+      Synonymous substitutions change a codon without changing the encoded
+      amino acid, due to the degeneracy of the genetic code. Their rate dS
+      is assumed to reflect largely neutral evolution.
+      Nonsynonymous substitutions change both the codon and the amino acid.
+      Their rate dN reflects the selective regime acting on the protein.
+      MG94 (Muse & Gaut 1994): models dS and dN as separate absolute rates,
+      allowing estimation of the actual rate of each substitution class.
+      GY94 (Goldman & Yang 1994): parameterizes selection via the ratio ω = dN/dS:
+        ω < 1 — purifying (negative) selection: amino acid changes are harmful
+                 and removed; protein is under functional constraint.
+        ω = 1 — neutral evolution: nonsynonymous and synonymous changes
+                 accumulate at equal rates; no net selection on protein sequence.
+        ω > 1 — positive (adaptive) selection: amino acid changes are beneficial
+                 and fixed faster than synonymous changes.
+      Both models incorporate a Ti/Tv bias (κ) and codon frequency parameters.
+      Both laid the foundation for site-specific, branch-specific, and
+      branch-site models that detect where and when selection acts.
+      Important caveat: ω > 1 for a whole gene is biologically unrealistic —
+      positive selection is transient and site-specific. Gene-wide ω > 1 more
+      likely indicates pseudogenization, chimeric transcripts, or paralogy errors.
+
+  - q: >
+      Distinguish empirical from mechanistic substitution models. Give one
+      amino acid example of each and explain what their parameters represent.
+    a: |
+      Mechanistic models: parameters are estimated de novo from the focal
+      dataset by ML or Bayesian methods. They explicitly describe the
+      biological process (Ti/Tv bias, base composition, rate heterogeneity).
+      All nucleotide models (JC69, HKY85, GTR) are mechanistic — parameters
+      like κ and πA–πT are fitted to the specific alignment being analyzed.
+      Empirical models: the substitution rate matrix is pre-estimated from
+      large curated protein databases and held fixed during phylogenetic
+      analysis. Only ancillary parameters (e.g. dataset-specific amino acid
+      frequencies) may be re-estimated.
+      Amino acid examples:
+      JTT (Jones-Taylor-Thornton 1992): derived by counting observed replacements
+      in a large curated database of globular protein alignments. The 20×20
+      matrix encodes relative amino acid replacement rates reflecting chemical
+      similarity and functional constraint. Parameters are fixed from training.
+      WAG (Whelan & Goldman 2001): estimated by maximum likelihood on a broad
+      protein family database — more statistically rigorous than count-based
+      approaches. Parameters also fixed from training data.
+      Key distinction: mechanistic parameters are dataset-specific and estimated
+      each run; empirical parameters are externally fixed. Choosing the
+      appropriate empirical matrix (nuclear vs mitochondrial, globular vs
+      membrane protein) is critical for accurate inference.
+
+
+mcq:
+  - question: >
+      The Markov property in substitution models means:
+    options:
+      - text: All substitution rates are equal across the tree
+        correct: false
+      - text: The probability of a substitution at a site depends only on
+          the current nucleotide state, not on how the site reached that state
+        correct: true
+      - text: Multiple substitutions at the same site cannot occur
+        correct: false
+      - text: Base frequencies are constant and equal across taxa
+        correct: false
+    explanation: |
+      Memorylessness: the future state of a site depends only on its present
+      state, not on past states. This makes the mathematics tractable via
+      P(t) = e^(Qt), but ignores known context-dependencies such as CpG
+      hypermutability. It is a simplifying assumption, not a biological law.
+
+  - question: >
+      In any continuous-time Markov substitution model, the diagonal element
+      Q(i,i) is defined as:
+    options:
+      - text: Zero, because a nucleotide cannot change to itself
+        correct: false
+      - text: The equilibrium frequency of nucleotide i
+        correct: false
+      - text: The negative sum of all off-diagonal elements in row i,
+          so that each row sums to zero
+        correct: true
+      - text: The fastest off-diagonal rate in the model
+        correct: false
+    explanation: |
+      Q(i,i) = −Σ(j≠i) Q(i,j). The row-sum-to-zero constraint ensures
+      probability conservation: the total rate of leaving state i equals
+      the magnitude of the diagonal, so all state probabilities always sum
+      to 1. Without this, the model would violate basic probability axioms.
+
+  - question: >
+      A researcher finds strong Ti/Tv bias AND AT-rich composition in insect
+      mitochondrial sequences. The minimum model capturing both features is:
+    options:
+      - text: JC69
+        correct: false
+      - text: K80
+        correct: false
+      - text: F81
+        correct: false
+      - text: HKY85
+        correct: true
+    explanation: |
+      JC69: equal rates and equal frequencies — captures neither feature.
+      K80: captures Ti/Tv bias but forces equal frequencies — one feature only.
+      F81: allows unequal frequencies but equal rates — the other feature only.
+      HKY85: combines unequal base frequencies AND a Ti/Tv rate distinction —
+      the minimum model capturing both simultaneously. TN93 or GTR would also
+      work but add parameters not required by the stated observations.
+
+  - question: >
+      GTR is called the most general fully reversible nucleotide model because:
+    options:
+      - text: It assumes all rates are equal to avoid overfitting
+        correct: false
+      - text: It has a free rate parameter for every nucleotide pair and
+          free base frequencies; all simpler models are GTR with certain
+          rates constrained equal
+        correct: true
+      - text: It automatically corrects for multiple substitutions
+        correct: false
+      - text: It requires the fewest parameters of all models
+        correct: false
+    explanation: |
+      GTR: six free substitution rate parameters (A↔C, A↔G, A↔T, C↔G,
+      C↔T, G↔T) plus four base frequencies (one constrained by the others).
+      JC69 constrains all six rates and all frequencies equal; K80 constrains
+      all four frequencies equal and groups rates into two; F81 constrains
+      all rates equal. All are nested within GTR. Extending beyond GTR while
+      remaining reversible is mathematically impossible.
+
+  - question: >
+      Transitions are more frequent than transversions in most organisms because:
+    options:
+      - text: There are twice as many possible transition substitution types
+        correct: false
+      - text: Purines and pyrimidines are structurally more similar within
+          their own chemical class, making within-class changes less disruptive
+        correct: true
+      - text: Transitions are always synonymous; transversions always nonsynonymous
+        correct: false
+      - text: The Q-matrix is mathematically constrained to produce higher
+          transition rates
+        correct: false
+    explanation: |
+      Transitions (A↔G both two-ring purines; C↔T both one-ring pyrimidines)
+      substitute within the same structural class — a smaller chemical change.
+      Transversions cross classes. Note the paradox: only 2 transition types
+      exist but 4 transversion types — if all rates were equal, transversions
+      would be doubly frequent by count. The structural bias more than
+      compensates, making transitions predominant in most real datasets.
+
+  - question: >
+      The +Γ (Gamma) modifier adds to a base model:
+    options:
+      - text: A fixed proportion of invariable sites
+        correct: false
+      - text: A distribution of rates across sites drawn from a Gamma
+          distribution with shape parameter α
+        correct: true
+      - text: Rate variation among branches but not among sites
+        correct: false
+      - text: Separate substitution matrices for each codon position
+        correct: false
+    explanation: |
+      +Γ adds one parameter α: small α (<1) gives highly variable site rates
+      (many near-invariable, a few hypervariable); large α (>10) approaches
+      uniform rates. In practice, the Gamma distribution is discretized into
+      4–8 rate categories for computation. This modifier substantially improves
+      model fit for most real datasets where sites differ in functional
+      constraint. +I (invariable sites) is distinct — it adds a fraction
+      p-inv of sites with exactly zero rate.
+
+  - question: >
+      Which amino acid substitution model is most appropriate for vertebrate
+      mitochondrial protein phylogenomics?
+    options:
+      - text: LG
+        correct: false
+      - text: WAG
+        correct: false
+      - text: MtREV
+        correct: true
+      - text: BLOSUM62
+        correct: false
+    explanation: |
+      MtREV (Adachi & Hasegawa 1996) was derived specifically from vertebrate
+      mitochondrial protein alignments, capturing the unique substitution biases
+      of the mitochondrial genetic system: AT-rich composition, a different
+      genetic code, and bioenergetic functional constraints. LG and WAG were
+      trained on nuclear protein databases and would impose inappropriate
+      substitution biases. BLOSUM62 is designed for database similarity search,
+      not phylogenetic likelihood scoring.
+
+  - question: >
+      An ω = dN/dS of 0.03 for histone H4 indicates:
+    options:
+      - text: Strong positive selection
+        correct: false
+      - text: Neutral evolution
+        correct: false
+      - text: Extremely strong purifying selection — virtually no amino acid
+          changes are tolerated
+        correct: true
+      - text: Violation of the molecular clock
+        correct: false
+    explanation: |
+      ω = 0.03 means nonsynonymous changes accumulate at only 3% the rate
+      of synonymous ones — extreme functional constraint. Histone H4 interacts
+      precisely with DNA and other histones; almost every amino acid substitution
+      is incompatible with function and lethal. It is indeed one of the most
+      conserved proteins in eukaryotes, consistent with ω near zero.
+
+  - question: >
+      A gene-wide ω > 1 averaged across all branches is considered
+      biologically unrealistic because:
+    options:
+      - text: No gene can ever evolve under positive selection
+        correct: false
+      - text: Positive selection acts transiently on specific sites and
+          lineages; averaging over all codons and branches dilutes it,
+          so gene-wide ω > 1 more likely signals pseudogenization or
+          data errors such as paralogy or misalignment
+        correct: true
+      - text: dN is always smaller than dS by mathematical definition
+        correct: false
+      - text: GY94 does not permit ω > 1 in its parameterization
+        correct: false
+    explanation: |
+      Most codons in any gene remain under purifying selection even in genes
+      experiencing episodes of positive selection at a few sites. When averaged
+      across all codons and all branches, the purifying signal dominates and
+      the mean ω is typically well below 1. A gene-wide ω > 1 almost always
+      reflects pseudogenization (all constraint lost), frameshifts from
+      misalignment, or inclusion of paralogous sequences — not widespread
+      adaptive evolution across every position.
+
+  - question: >
+      Time-reversibility (detailed balance) in a substitution model means:
+    options:
+      - text: All branches of the tree evolve at the same substitution rate
+        correct: false
+      - text: π(i) × Q(i,j) = π(j) × Q(j,i) — the process looks identical
+          whether read forward or backward in time
+        correct: true
+      - text: The model produces an ultrametric tree
+        correct: false
+      - text: Transition rates equal transversion rates
+        correct: false
+    explanation: |
+      Detailed balance: π(i)×Q(i,j) = π(j)×Q(j,i) for all pairs i, j.
+      The practical consequence is that the likelihood of the tree is identical
+      regardless of where the root is placed — the process is statistically
+      indistinguishable in both temporal directions. This is why most ML
+      software produces unrooted trees by default and requires an outgroup
+      or midpoint rooting to orient the tree. Non-reversible models can
+      estimate the root position from sequence data alone.
+
+
+fill_in_blank:
+  - question: >
+      A substitution model is a continuous-time _______________ model. The
+      three SRH assumptions violated most often in real data are _______________,
+      _______________, and _______________.
+    answers:
+      - "Markov"
+      - "Stationarity (equilibrium frequencies constant over time)"
+      - "Reversibility (detailed balance)"
+      - "Homogeneity (same substitution process across all branches)"
+
+  - question: >
+      In the Q-matrix, off-diagonal elements Q(i,j) = _______________ ×
+      _______________. Diagonal elements Q(i,i) equal the _______________
+      of all off-diagonal elements in row i, ensuring each row sums to _______________.
+    answers:
+      - "rate parameter (α, β, etc.)"
+      - "equilibrium frequency of the destination nucleotide (πj)"
+      - "negative sum"
+      - "zero"
+
+  - question: >
+      JC69 → K80 adds a _______________ / _______________ rate distinction.
+      K80 → HKY85 adds _______________ base frequencies.
+      HKY85 → TN93 adds a second distinct _______________ rate.
+      TN93 → GTR adds _______________ free rate parameters covering all
+      nucleotide pairs.
+    answers:
+      - "transition"
+      - "transversion"
+      - "unequal"
+      - "transition (A↔G ≠ C↔T)"
+      - "six"
+
+  - question: >
+      The +Γ modifier adds a _______________ parameter α controlling the
+      shape of site-rate variation. The +I modifier adds the proportion
+      of _______________ sites p-inv. Combined with GTR: _______________.
+    answers:
+      - "Gamma shape"
+      - "invariable"
+      - "GTR+Γ+I (or GTR+I+G, any valid example)"
+
+  - question: >
+      In codon models ω = _______________. Values below 1 indicate
+      _______________ selection, values equal to 1 indicate _______________
+      evolution, and values above 1 indicate _______________ selection.
+      A gene-wide ω >> 1 is more likely evidence of _______________.
+    answers:
+      - "dN/dS"
+      - "purifying (negative)"
+      - "neutral"
+      - "positive (adaptive)"
+      - "pseudogenization or alignment / orthology errors"
+
+  - question: >
+      Empirical amino acid models _______________ their rate matrices from
+      large protein databases before the analysis; examples include
+      _______________, _______________, and _______________. Nucleotide
+      models are _______________ — parameters are estimated from each
+      focal alignment.
+    answers:
+      - "pre-estimate (fix)"
+      - "JTT"
+      - "WAG"
+      - "LG (or PAM, MtREV, BLOSUM)"
+      - "mechanistic"
+
+  - question: >
+      Saturation occurs when multiple _______________ at the same site erase
+      earlier changes, causing the _______________ distance to plateau while
+      the true distance grows. This causes _______________ of divergence
+      and increases _______________ between unrelated taxa.
+    answers:
+      - "substitutions (hits)"
+      - "observed (p-distance)"
+      - "underestimation"
+      - "homoplasy (apparent similarity)"
+
+  - question: >
+      The MtREV amino acid model is preferred over WAG for mitochondrial
+      data because it was derived from _______________ sequences and captures
+      their unique _______________ biases and _______________ constraints not
+      present in nuclear protein databases.
+    answers:
+      - "vertebrate mitochondrial protein"
+      - "compositional (AT-rich, substitution)"
+      - "functional (bioenergetic)"

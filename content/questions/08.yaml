@@ -1,0 +1,462 @@
+# LESSON 08 — Maximum Likelihood and Concatenation
+
+oral:
+  - q: >
+      What does Maximum Likelihood mean in phylogenetics? Define likelihood
+      formally and explain why the log-likelihood is used in practice.
+    a: |
+      Maximum Likelihood (ML) is a statistical method that finds the parameter
+      values — including tree topology, branch lengths, and substitution model
+      parameters — that maximize the probability of observing the data given
+      the model: P(D|M). This quantity is called the likelihood.
+      Formally: Likelihood = P(data | substitution model, tree topology,
+      branch lengths, model parameters). The ML tree is the tree for which
+      this probability is highest across all possible topologies and parameter
+      combinations.
+      Why log-likelihood:
+      1. Numerical stability: raw likelihood values are products of tiny
+         per-site probabilities (e.g. 10^−10000 for a large alignment), which
+         underflow computer floating-point representations. Logarithms convert
+         these tiny products into manageable negative sums.
+      2. Computational efficiency: log converts products into sums, which are
+         faster to compute and differentiate (important for optimizing parameters).
+      3. Model comparison: log-likelihoods allow the Likelihood Ratio Test
+         (LRT) — 2(lnL1 − lnL0) follows a chi-squared distribution —
+         and information criteria (AIC = −2lnL + 2k; BIC = −2lnL + k·lnN)
+         for model selection.
+      Note that likelihood is NOT a probability of the tree being correct —
+      it is a probability of the data given the tree. This distinction is
+      fundamental and often misunderstood.
+
+  - q: >
+      How is the likelihood of a phylogenetic tree computed for a single
+      alignment site? Describe Felsenstein's pruning algorithm and explain
+      why it is necessary.
+    a: |
+      For a single site, the likelihood is computed by summing over all possible
+      ancestral states at every internal node — because we observe only the
+      tip states, and internal states are unobserved.
+      Felsenstein's pruning algorithm (1981) computes conditional likelihoods
+      efficiently by working upward from tips to root:
+      At tip nodes: the conditional likelihood of the observed state is 1,
+      and 0 for all other states. This is the boundary condition.
+      At each internal node v with children u and w:
+      L_v(s) = [Σ_x P(x|s, t_u) × L_u(x)] × [Σ_y P(y|s, t_w) × L_w(y)]
+      where P(x|s, t) is the transition probability from state s to state x
+      along a branch of length t (from the Q-matrix), and the sum is over
+      all possible states x, y at the child nodes.
+      The key insight: internal nodes are NOT assigned a single state. Instead,
+      the algorithm evaluates every possible state at every internal node and
+      sums over all of them — this integration naturally handles uncertainty
+      about ancestral states.
+      At the root, the site likelihood is:
+      L_site = Σ_s π(s) × L_root(s)
+      where π(s) is the equilibrium frequency of root state s.
+      The total tree likelihood is the product across all sites (or sum of
+      log-likelihoods): lnL = Σ_i ln(L_site_i), assuming sites evolve
+      independently.
+      The algorithm is necessary because naive enumeration of all internal
+      state combinations is exponential (4^n for n internal nodes), while
+      Felsenstein's dynamic programming reduces this to linear in the number
+      of nodes.
+
+  - q: >
+      What is concatenation (supermatrix approach) in phylogenomics?
+      What are its main advantages and what are its key pitfalls?
+    a: |
+      Concatenation combines multiple gene alignments (orthogroups) into a
+      single large supermatrix, then infers one tree from this combined dataset
+      using ML or BI. The implicit assumption is that all genes share the same
+      evolutionary history — a single tree.
+      Advantages:
+      — Increases total alignment length → reduces stochastic error from
+        limited sequence data.
+      — More characters provide stronger phylogenetic signal, improving
+        resolution of deep or difficult nodes.
+      — Computationally tractable: one tree inference run handles all genes.
+      — Compatible with partitioned models where each gene gets its own
+        substitution model.
+      Key pitfalls:
+      — Heterotachy and model violations: evolutionary rates can vary among
+        genes and among taxa within genes; a single set of branch lengths
+        misrepresents genes with different tempo.
+      — Gene tree incongruence: genes can have genuinely different histories
+        due to incomplete lineage sorting (ILS), hybridization, or horizontal
+        transfer. Concatenation ignores this conflict and can statistically
+        support the wrong species tree with high confidence when ILS is
+        pervasive — a known failure mode in rapid radiations.
+      — Partitioning strategy: decided a priori and can affect results;
+        over-partitioning overfits, under-partitioning misses heterogeneity.
+      — Matrix occupancy: genes missing from some species (missing data) must
+        be handled — choosing a minimum occupancy threshold affects which
+        genes are included and thus the signal available.
+
+  - q: >
+      What is partitioning in a concatenated analysis? Describe the
+      three partition model types (edge-linked equal, proportional, unlinked)
+      and justify which is generally recommended.
+    a: |
+      Partitioning divides the supermatrix into subsets (partitions), each
+      evolving under its own substitution model and, optionally, its own
+      branch lengths. This accounts for heterogeneity among genes in
+      substitution process and tempo.
+      Edge-linked equal (shared branch lengths): all partitions share exactly
+      the same branch lengths. One topology, one set of branch lengths, separate
+      substitution models. Typically unrealistic — assumes every gene records
+      the same absolute amount of change along each branch, which is only true
+      under a strict clock with equal rates.
+      Edge-linked proportional (proportional branch lengths): each partition
+      scales a shared reference set of branch lengths by a partition-specific
+      multiplier. One topology, ~one set of branch lengths (rescaled per
+      partition), separate substitution models. This allows genes to evolve
+      at different overall rates while preserving the relative branching pattern.
+      A good biological compromise.
+      Edge-unlinked (independent branch lengths): each partition has a completely
+      independent set of branch lengths. One topology, separate branch lengths
+      and substitution models per partition. Most parameter-rich — risks
+      overfitting when partitions are short and contain insufficient data to
+      estimate their own branch lengths reliably.
+      Recommendation: edge-proportional is generally preferred as the best
+      tradeoff between biological realism (genes do evolve at different rates)
+      and parameter economy (avoids the overfitting risk of full unlinking).
+
+  - q: >
+      What is matrix occupancy in a phylogenomic concatenation analysis?
+      How does the choice of minimum occupancy threshold affect the analysis,
+      and what is the tradeoff involved?
+    a: |
+      Matrix occupancy refers to the proportion of species that have sequence
+      data for a given gene in the concatenated supermatrix. If a gene is
+      present in only 30% of species, its occupancy is 30%. Missing entries
+      in the matrix appear as gaps or missing data for those species.
+      Minimum occupancy threshold: a filter that requires each gene to be
+      present in at least X% of species to be included in the supermatrix.
+      Effect of a strict threshold (e.g. 100% occupancy — all species present):
+      — Only genes universal across all sampled species are retained.
+      — Produces a complete matrix with no missing data.
+      — Dramatically reduces the number of genes included, shrinking the
+        supermatrix and reducing total phylogenetic signal.
+      Effect of a relaxed threshold (e.g. 0% — any gene included):
+      — Maximizes the number of genes and total sequence data.
+      — Produces a highly incomplete matrix with abundant missing data.
+      — Modern ML/BI methods handle missing data reasonably well, but extreme
+        sparsity can still reduce signal for the most data-poor species.
+      Tradeoff: strict thresholds give complete data but sacrifice signal;
+      relaxed thresholds maximize signal but introduce missing data.
+      Common practice uses intermediate thresholds (50–70%) to balance the
+      two concerns, retaining most genes while avoiding extreme sparsity.
+
+
+mcq:
+  - question: >
+      In Maximum Likelihood phylogenetics, the quantity being maximized is:
+    options:
+      - text: P(tree | data) — the probability the tree is correct
+        correct: false
+      - text: P(data | model, tree) — the probability of observing the
+          alignment given the model and tree
+        correct: true
+      - text: The number of parsimony-informative sites
+        correct: false
+      - text: The posterior probability of the model parameters
+        correct: false
+    explanation: |
+      ML maximizes the likelihood: P(D|M) = P(alignment | substitution model,
+      tree, branch lengths, model parameters). This is NOT the probability
+      that the tree is correct — that is the posterior probability P(M|D),
+      computed in Bayesian inference. ML and BI are conceptually distinct:
+      ML finds the parameter values that make the data most probable; BI
+      finds the probability distribution over trees given the data.
+
+  - question: >
+      The total likelihood of a tree across all sites assumes that sites
+      evolve independently. This means the total likelihood is:
+    options:
+      - text: The sum of per-site likelihoods
+        correct: false
+      - text: The product of per-site likelihoods (or equivalently, the
+          sum of per-site log-likelihoods)
+        correct: true
+      - text: The average per-site likelihood divided by alignment length
+        correct: false
+      - text: The maximum per-site likelihood across all columns
+        correct: false
+    explanation: |
+      Under site independence, the total likelihood is the product of per-site
+      likelihoods: L_total = ∏_i L_site_i. Because these products become
+      astronomically small for large alignments, the log-likelihood is used:
+      lnL_total = Σ_i ln(L_site_i). This site-independence assumption is
+      known to be violated by codon contexts (e.g. adjacent base dependencies)
+      and recombination, but it is computationally necessary and generally
+      a good approximation for most analyses.
+
+  - question: >
+      In Felsenstein's pruning algorithm, internal nodes are handled by:
+    options:
+      - text: Assigning the most common state among descendant tips
+        correct: false
+      - text: Summing the conditional likelihoods over all possible states
+          at each internal node, integrating out uncertainty about
+          ancestral states
+        correct: true
+      - text: Using parsimony to assign the most parsimonious state
+        correct: false
+      - text: Leaving internal nodes unassigned and evaluating only tips
+        correct: false
+    explanation: |
+      The pruning algorithm computes, for each internal node v and each
+      possible state s, the conditional likelihood L_v(s) = probability of
+      observing all tip data below v, given v is in state s. It never forces
+      a single ancestral state — it sums over all possibilities weighted by
+      transition probabilities. This integration is the key reason ML handles
+      ancestral uncertainty correctly, unlike parsimony which commits to one
+      reconstruction.
+
+  - question: >
+      The log-likelihood is preferred over raw likelihood in phylogenetics
+      primarily because:
+    options:
+      - text: Log-likelihood values are always positive, making comparison easier
+        correct: false
+      - text: Products of tiny per-site probabilities underflow computer
+          arithmetic; logarithms convert these products into manageable
+          sums and enable model comparison via AIC and BIC
+        correct: true
+      - text: Log-likelihood is easier to interpret biologically
+        correct: false
+      - text: Log-likelihood is always larger than raw likelihood
+        correct: false
+    explanation: |
+      Log-likelihood solves two problems. Numerically: a product of thousands
+      of probabilities each ~10^-3 gives ~10^-3000, which underflows double
+      precision. Log converts this to a sum of negative numbers (~-3000×ln(10)
+      ≈ -6907) — easily stored. Computationally: log turns products into sums,
+      simplifying gradient computation for parameter optimization. For model
+      comparison: AIC = -2lnL + 2k and BIC = -2lnL + k·ln(N) both use lnL
+      directly.
+
+  - question: >
+      Concatenation can produce a highly supported but WRONG species tree when:
+    options:
+      - text: Too many genes are included in the supermatrix
+        correct: false
+      - text: Gene tree discordance due to incomplete lineage sorting is
+          pervasive — concatenation averages conflicting signals and can
+          statistically support the most common wrong topology
+        correct: true
+      - text: The substitution model is too complex
+        correct: false
+      - text: Matrix occupancy is set to 100%
+        correct: false
+    explanation: |
+      In the anomaly zone — rapid radiations where internal branches are very
+      short — the most common gene tree topology is NOT the species tree
+      topology (due to ILS). Concatenation sums signal across genes; if the
+      plurality of genes support the wrong topology (due to ILS), concatenation
+      will confidently support that wrong tree with high bootstrap values.
+      This is a fundamental statistical inconsistency of concatenation under
+      the multispecies coalescent model and is one key motivation for
+      coalescent-based summary methods like ASTRAL.
+
+  - question: >
+      In a partitioned concatenated analysis, the edge-proportional model
+      differs from edge-unlinked in that:
+    options:
+      - text: Each partition has its own substitution model in edge-proportional
+          but not in edge-unlinked
+        correct: false
+      - text: Edge-proportional scales a shared set of branch lengths by a
+          partition-specific multiplier; edge-unlinked estimates completely
+          independent branch lengths per partition
+        correct: true
+      - text: Edge-proportional assumes a molecular clock; edge-unlinked does not
+        correct: false
+      - text: Edge-unlinked uses fewer parameters than edge-proportional
+        correct: false
+    explanation: |
+      Edge-proportional: one reference set of branch lengths × one scalar per
+      partition → different overall rates per gene, same relative branching
+      pattern. Edge-unlinked: fully separate branch length sets per partition →
+      each gene can have a completely different tempo and pattern. Edge-unlinked
+      is the most realistic but most parameter-heavy; it risks overfitting when
+      partitions contain few informative sites. Edge-proportional is the
+      recommended compromise.
+
+  - question: >
+      Setting minimum matrix occupancy to 100% in a phylogenomic study means:
+    options:
+      - text: Every gene must be present in at least one species
+        correct: false
+      - text: Only genes present in every single species are included,
+          producing a complete but potentially small supermatrix
+        correct: true
+      - text: Missing data is imputed for absent taxa
+        correct: false
+      - text: All genes are included regardless of taxon coverage
+        correct: false
+    explanation: |
+      100% occupancy means every gene must have sequence data for every species
+      — no missing entries allowed. This guarantees a complete matrix but
+      dramatically reduces the number of genes retained, particularly in large
+      multi-species studies where no gene is sequenced across all taxa. The
+      result is a very complete but possibly very small supermatrix that may
+      lack sufficient phylogenetic signal. Most studies choose 50–70% as a
+      pragmatic threshold.
+
+  - question: >
+      Phylogenomics is done on a single alignment (supermatrix). The main
+      reason concatenation still improves on single-gene analyses even when
+      the clock-like assumption is violated is:
+    options:
+      - text: It eliminates all gene tree discordance
+        correct: false
+      - text: It reduces stochastic error — more total sequence data means
+          random sampling noise averages out, even if systematic biases remain
+        correct: true
+      - text: It automatically applies the best substitution model
+        correct: false
+      - text: It is faster to compute than single-gene analyses
+        correct: false
+    explanation: |
+      Stochastic error arises from insufficient data: a single gene may have
+      too few informative sites to confidently distinguish alternative topologies.
+      Concatenating many genes averages out random fluctuations in signal,
+      improving resolution and branch support. However, this only addresses
+      random (stochastic) noise — systematic biases (model misspecification,
+      compositional heterogeneity, ILS-driven conflict) are not resolved and
+      can be amplified by the increased data if the assumptions are violated.
+
+  - question: >
+      Why must phylogenetic tree inference be treated as a tree-scoring
+      problem rather than a tree-finding problem?
+    options:
+      - text: Because all trees have identical scores
+        correct: false
+      - text: Because the number of possible topologies grows super-exponentially,
+          making exhaustive evaluation impossible — heuristic search explores
+          a subset of trees and scores each to find the best
+        correct: true
+      - text: Because ML always finds the globally optimal tree
+        correct: false
+      - text: Because distance methods already identify the correct tree
+        correct: false
+    explanation: |
+      For n taxa, the number of unrooted bifurcating topologies is (2n-5)!!.
+      For 50 taxa this exceeds 10^74 — impossible to evaluate exhaustively.
+      Instead, ML inference combines tree scoring (computing lnL for a given
+      topology) with heuristic search (NNI, SPR, TBR) that proposes topology
+      changes and accepts improvements. The result is the best tree found by
+      the search, which may not be the globally optimal tree — a fundamental
+      limitation acknowledged by running multiple independent searches from
+      different starting trees.
+
+  - question: >
+      In the pruning algorithm, the site likelihood at the root is computed as:
+    options:
+      - text: The maximum conditional likelihood across all root states
+        correct: false
+      - text: The sum of conditional likelihoods at the root, each weighted
+          by the equilibrium frequency of that root state
+        correct: true
+      - text: The product of conditional likelihoods at all internal nodes
+        correct: false
+      - text: The conditional likelihood of the most common root state
+        correct: false
+    explanation: |
+      L_site = Σ_s π(s) × L_root(s), where π(s) is the equilibrium frequency
+      of state s and L_root(s) is the conditional likelihood at the root given
+      state s. The root state is unknown, so we integrate over all possible
+      root states weighted by their prior probability (equilibrium frequency).
+      This ensures the site likelihood is not conditioned on any assumed
+      ancestral state, consistent with the stationary assumption.
+
+
+fill_in_blank:
+  - question: >
+      ML maximizes _______________ = P(_______________ | model, tree),
+      which is the probability of the _______________ given the model.
+      This is conceptually distinct from the Bayesian posterior
+      P(_______________ | data).
+    answers:
+      - "likelihood"
+      - "data (alignment)"
+      - "observed data (alignment)"
+      - "tree (model)"
+
+  - question: >
+      The log-likelihood is preferred over raw likelihood for three reasons:
+      numerical _______________ (products of tiny numbers underflow),
+      computational _______________ (products become sums), and ease of
+      _______________ via criteria such as _______________ and _______________.
+    answers:
+      - "stability"
+      - "efficiency"
+      - "model comparison (model selection)"
+      - "AIC"
+      - "BIC"
+
+  - question: >
+      Felsenstein's _______________ algorithm computes the likelihood by
+      working from _______________ to root. At each internal node, it
+      _______________ over all possible states rather than assigning a
+      single ancestral state, integrating out _______________ about ancestry.
+    answers:
+      - "pruning (tree-pruning)"
+      - "tips (terminal nodes)"
+      - "sums (integrates)"
+      - "uncertainty"
+
+  - question: >
+      The total tree likelihood across all sites is the _______________ of
+      per-site likelihoods (equivalently the _______________ of per-site
+      log-likelihoods), assuming sites evolve _______________.
+    answers:
+      - "product"
+      - "sum"
+      - "independently"
+
+  - question: >
+      Concatenation can produce a highly supported but incorrect tree when
+      _______________ is pervasive, because it averages conflicting gene
+      signals and may statistically support the most frequent _______________
+      topology rather than the true species tree. The alternative approach
+      is _______________ -based species tree inference.
+    answers:
+      - "incomplete lineage sorting (ILS)"
+      - "gene tree"
+      - "coalescent"
+
+  - question: >
+      Three partition model types in concatenation differ in how they treat
+      branch lengths: edge-_______________ shares exactly one set of branch
+      lengths; edge-_______________ scales a shared set by a gene-specific
+      multiplier; edge-_______________ estimates fully independent branch
+      lengths per partition. The _______________ model is generally recommended.
+    answers:
+      - "linked (equal)"
+      - "proportional"
+      - "unlinked"
+      - "edge-proportional"
+
+  - question: >
+      Matrix occupancy is the proportion of _______________ that have data
+      for a given gene in the supermatrix. Setting a threshold of 100%
+      includes only _______________ genes but produces a _______________
+      matrix. A threshold of 0% maximizes _______________ but introduces
+      abundant _______________.
+    answers:
+      - "species (taxa)"
+      - "universally present"
+      - "complete (no missing data)"
+      - "phylogenetic signal (number of genes)"
+      - "missing data"
+
+  - question: >
+      In a partitioned analysis with 3 partitions, the edge-proportional
+      model uses _______________ set(s) of branch lengths scaled by
+      _______________ partition-specific multipliers, while the edge-unlinked
+      model uses _______________ completely independent sets of branch lengths.
+    answers:
+      - "one (1)"
+      - "three (3)"
+      - "three (3)"
