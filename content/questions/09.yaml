@@ -1,0 +1,461 @@
+# LESSON 09 — Bayesian Inference
+
+oral:
+  - q: >
+      What is Bayesian inference in phylogenetics? State Bayes' theorem
+      formally in a phylogenetic context and define each term.
+    a: |
+      Bayesian inference (BI) is a statistical framework that estimates the
+      probability that a phylogenetic tree (and its parameters) is correct
+      given the observed sequence data — the posterior probability P(M|D).
+      This contrasts with ML, which estimates the probability of the data
+      given a model: P(D|M).
+      Bayes' theorem in a phylogenetic context:
+      P(tree | data) = [ P(data | tree) × P(tree) ] / P(data)
+      where:
+      P(tree | data) — posterior probability: the probability that a given
+        tree topology and parameter set are correct given the alignment.
+        This is what we want to estimate.
+      P(data | tree) — likelihood: the probability of observing the alignment
+        given the tree and substitution model. Same quantity maximized in ML.
+      P(tree) — prior probability: our belief about which trees or parameter
+        values are more probable before seeing the data. Often set to flat
+        (uniform) priors over topologies or parameter ranges.
+      P(data) — marginal likelihood: the probability of the data averaged
+        over all possible trees and parameter combinations. Acts as a
+        normalizing constant. Computing it directly requires integrating
+        over all possible trees and model parameters — practically impossible
+        — which is why MCMC is used to approximate the posterior instead.
+
+  - q: >
+      Why is direct computation of the marginal likelihood impossible in
+      Bayesian phylogenetics, and how does MCMC solve this problem?
+    a: |
+      The marginal likelihood P(data) = ∫ P(data|tree) × P(tree) d(tree)
+      requires integrating over all possible tree topologies and all possible
+      parameter values (branch lengths, substitution rates, base frequencies,
+      etc.) simultaneously. The number of tree topologies alone grows
+      super-exponentially with taxa — for 50 taxa it exceeds 10^74. Combined
+      with continuous parameter spaces for branch lengths and model parameters,
+      this integral is computationally intractable.
+      MCMC (Markov Chain Monte Carlo) solves this by sampling from the posterior
+      distribution without computing P(data) explicitly. It constructs a Markov
+      chain whose stationary distribution matches the target posterior P(tree|data).
+      The Metropolis-Hastings algorithm at the core of Bayesian phylogenetics:
+      1. Start at an arbitrary point in parameter space (tree + parameters).
+      2. Propose a new state (e.g. NNI move + small branch length change).
+      3. Compute R = P(proposed state) / P(current state).
+         — If R ≥ 1 (proposed has higher posterior): always accept.
+         — If R < 1 (proposed has lower posterior): accept with probability R.
+      4. Store the accepted state; repeat for millions of iterations.
+      After convergence, the frequency with which each tree topology or
+      parameter value appears in the stored samples approximates its posterior
+      probability. The marginal likelihood cancels in the ratio R and never
+      needs to be computed directly.
+
+  - q: >
+      What is MCMC convergence, and what diagnostics are used to assess it?
+      What is burn-in and why is it removed?
+    a: |
+      Convergence means the MCMC chain has reached its stationary distribution —
+      the target posterior — and is sampling from it reproducibly. Before
+      convergence, the chain is still "climbing" toward the high-probability
+      region of parameter space and its samples do not represent the posterior.
+      Diagnostics:
+      1. Trace plots: visual inspection of log-likelihood and parameter values
+         over iterations. A converged chain shows a stable "fuzzy caterpillar"
+         pattern around a plateau, not a trend.
+      2. Effective Sample Size (ESS): estimates the number of effectively
+         independent samples in the chain. Because consecutive MCMC samples are
+         autocorrelated (similar to their neighbors), 10,000 stored states may
+         yield an ESS of only 500 independent samples. ESS < 100 is considered
+         weak; ESS > 200 is acceptable; ESS > 1,000 is robust. Low ESS means
+         the chain has not adequately explored parameter space.
+      3. Independent runs convergence: the gold-standard check — running two
+         or more completely independent chains from different starting points.
+         If they converge to the same distribution (same topology frequencies,
+         same parameter estimates), confidence in convergence is warranted.
+         The Average Standard Deviation of Split Frequencies (ASDSF) in MrBayes
+         should fall below 0.01.
+      Burn-in: the initial portion of an MCMC run (typically 10–25%) is
+      discarded because the chain has not yet reached stationarity — it is
+      still moving toward the high-probability region from its arbitrary
+      starting point. Burn-in samples are biased toward the starting conditions
+      and would distort posterior estimates if retained.
+
+  - q: >
+      What is Effective Sample Size (ESS) in MCMC? Why does autocorrelation
+      reduce it, and how can it be improved?
+    a: |
+      ESS (Effective Sample Size) estimates the number of independent samples
+      represented by the correlated MCMC chain. Because each proposed state
+      is derived from the previous one, consecutive samples are statistically
+      dependent — the chain tends to stay near where it has been. This
+      autocorrelation means that N stored states provide far fewer than N
+      independent pieces of information about the posterior.
+      Formula concept: ESS ≈ N / (1 + 2 × Σ_k ρ_k), where ρ_k is the
+      autocorrelation at lag k. High autocorrelation (chain moves slowly)
+      gives high ρ_k and low ESS.
+      Thresholds: ESS < 100 — weak, parameter estimates unreliable.
+                  ESS > 200 — acceptable for most parameters.
+                  ESS > 1,000 — robust; chasing ESS > 10,000 wastes computation.
+      Not all parameters need equal ESS: key parameters (likelihood, tree
+      topology, branch lengths) should have high ESS; parameters that mix
+      quickly may have lower ESS without consequence.
+      Improving ESS:
+      1. Run longer chains — more iterations eventually yield more independent
+         samples regardless of autocorrelation.
+      2. Better proposal distributions — smarter moves that explore more of
+         parameter space per step reduce autocorrelation.
+      3. Heated chains (see Metropolis-coupled MCMC below).
+      4. Thinning — storing every k-th sample reduces storage without changing
+         ESS (it doesn't increase it, but reduces file size).
+
+  - q: >
+      What is Metropolis-coupled MCMC (MC^3) and why is it used?
+      Describe the role of cold and heated chains. How are posterior trees
+      summarized after MCMC?
+    a: |
+      Standard MCMC can get trapped in local optima: if the posterior landscape
+      has multiple peaks separated by low-probability valleys, the chain may
+      stay on one peak and never discover others, giving a biased posterior.
+      MC^3 runs multiple chains simultaneously at different "temperatures":
+      Cold chain (T = 1): the standard MCMC chain — samples from the true
+        posterior P(tree|data) exactly. This is the chain whose samples are
+        retained for inference.
+      Heated chains (T > 1): the likelihood is raised to the power 1/T,
+        flattening the posterior landscape. Flattened posteriors have smaller
+        differences between peaks and valleys, so the chain can move more
+        freely across low-probability regions and explore the full parameter
+        space without getting trapped. Multiple heated chains run at increasing
+        temperatures.
+      At intervals, adjacent chains swap states via a Metropolis criterion.
+      A heated chain that has found a distant high-probability region can swap
+      with the cold chain, transferring that discovery to the inference chain.
+      Cold chains refine; heated chains explore. Together they improve mixing.
+      Summarizing posterior trees:
+      After MCMC (post burn-in), thousands of trees are stored. Three summary
+      methods:
+      1. Majority-rule consensus tree: a clade appears in the summary if it
+         is present in >50% of posterior trees. Its posterior probability is
+         the fraction of trees containing it.
+      2. Maximum Clade Credibility (MCC) tree: the single tree from the
+         posterior sample with the highest product of clade posterior probabilities.
+         Sensitive to any single poorly supported clade.
+      3. Maximum Sum of Clade Credibilities (MSCC) tree: the tree with the
+         highest sum of clade posterior probabilities — less sensitive to
+         individual low-probability clades than MCC.
+
+
+mcq:
+  - question: >
+      Bayesian inference in phylogenetics estimates:
+    options:
+      - text: P(data | tree) — the probability of the data given the tree
+        correct: false
+      - text: P(tree | data) — the posterior probability that the tree
+          is correct given the observed sequence alignment
+        correct: true
+      - text: The minimum number of substitutions explaining the data
+        correct: false
+      - text: The tree topology with the highest likelihood ratio
+        correct: false
+    explanation: |
+      ML estimates P(D|M): the probability of the data given the model.
+      Bayesian inference estimates P(M|D): the probability that the model
+      (tree + parameters) is correct given the data — the posterior.
+      This distinction is fundamental: ML gives a point estimate of the best
+      parameters; BI gives a full probability distribution over trees and
+      parameters, naturally quantifying uncertainty.
+
+  - question: >
+      In Bayes' theorem for phylogenetics, the marginal likelihood P(data)
+      acts as:
+    options:
+      - text: The probability of the best tree topology
+        correct: false
+      - text: A normalizing constant ensuring the posterior sums to 1
+          across all possible trees and parameter values
+        correct: true
+      - text: The prior probability of the substitution model
+        correct: false
+      - text: The likelihood evaluated at the ML tree
+        correct: false
+    explanation: |
+      P(data) = ∫ P(data|tree) × P(tree) d(tree) — the probability of the
+      data averaged over all trees and all parameter combinations. It ensures
+      that posterior probabilities across all possible trees sum to 1 — a
+      proper probability distribution. Computing it requires integration over
+      the entire parameter space, which is why MCMC is necessary: in the
+      Metropolis-Hastings ratio R, P(data) cancels and never needs to be
+      computed explicitly.
+
+  - question: >
+      In the Metropolis-Hastings algorithm, a proposed state with lower
+      posterior probability than the current state is:
+    options:
+      - text: Always rejected to ensure the chain moves uphill
+        correct: false
+      - text: Always accepted to ensure full exploration of parameter space
+        correct: false
+      - text: Accepted with probability equal to R = proposed / current,
+          allowing occasional downhill moves to escape local optima
+        correct: true
+      - text: Accepted only if the proposed state has higher likelihood than
+          the prior
+        correct: false
+    explanation: |
+      The Metropolis-Hastings rule:
+      — Uphill (R ≥ 1): always accept.
+      — Slightly downhill (e.g. R = 0.92): accept with probability 0.92 —
+        usually accepted, allowing exploration of nearby lower-probability states.
+      — Sharply downhill (e.g. R = 0.02): accept only 2% of the time —
+        nearly always rejected.
+      This stochastic acceptance of downhill moves is what allows the chain
+      to escape local optima and eventually converge on the global posterior
+      distribution, unlike greedy hill-climbing which gets trapped.
+
+  - question: >
+      Burn-in in Bayesian MCMC refers to:
+    options:
+      - text: The process of heating chains in MC^3
+        correct: false
+      - text: The initial portion of the MCMC run discarded because the chain
+          has not yet reached stationarity and its samples are biased toward
+          the arbitrary starting conditions
+        correct: true
+      - text: The phase where the chain samples the prior distribution
+        correct: false
+      - text: The minimum number of trees needed for a consensus
+        correct: false
+    explanation: |
+      At the start of an MCMC run, the chain begins at an arbitrary point
+      in parameter space (often a random or NJ tree) and progressively moves
+      toward high-probability regions. During this "burn-in" phase, samples
+      reflect the starting conditions rather than the posterior distribution.
+      Typically 10–25% of iterations are discarded, though the exact amount
+      is determined by convergence diagnostics (trace plots, ASDSF). Retaining
+      burn-in samples would bias posterior probability estimates.
+
+  - question: >
+      An MCMC run produces ESS = 50 for the tree topology parameter.
+      This means:
+    options:
+      - text: The chain has sampled 50 unique trees
+        correct: false
+      - text: Only approximately 50 effectively independent samples of the
+          tree topology were obtained — insufficient for reliable posterior
+          estimation
+        correct: true
+      - text: The chain should be run for exactly 50 more iterations
+        correct: false
+      - text: The topology has 50% posterior probability
+        correct: false
+    explanation: |
+      ESS < 100 is considered weak. ESS = 50 for topology means that despite
+      potentially storing thousands of trees, autocorrelation in the chain is
+      so high that only ~50 are effectively independent samples of the topology
+      distribution. Posterior probability estimates will be unreliable —
+      the chain is not exploring topology space adequately. Solutions: run
+      longer, improve proposals, add heated chains (MC^3).
+
+  - question: >
+      In Metropolis-coupled MCMC (MC^3), heated chains serve to:
+    options:
+      - text: Compute the marginal likelihood exactly
+        correct: false
+      - text: Flatten the posterior landscape so the chain can cross
+          low-probability valleys and discover distant high-probability
+          regions of tree space
+        correct: true
+      - text: Increase the ESS of the cold chain by averaging samples
+        correct: false
+      - text: Reduce computation time by running fewer iterations
+        correct: false
+    explanation: |
+      In a heated chain with temperature T > 1, the likelihood is raised to
+      1/T. This flattens the posterior — differences between peaks and valleys
+      become smaller — allowing the chain to traverse low-probability regions
+      it would otherwise reject. At swap intervals, heated chains can transfer
+      their explorations to the cold chain via Metropolis-criterion swaps.
+      Cold chain refines; heated chains explore. Together they prevent the
+      cold chain from becoming trapped in local optima.
+
+  - question: >
+      The Maximum Clade Credibility (MCC) tree is the tree from the posterior
+      sample that:
+    options:
+      - text: Has the highest likelihood among all sampled trees
+        correct: false
+      - text: Has the highest product of posterior probabilities across all
+          its clades — the single best-supported tree in the posterior
+        correct: true
+      - text: Contains only clades with posterior probability > 0.95
+        correct: false
+      - text: Appears most frequently in the posterior sample
+        correct: false
+    explanation: |
+      MCC selects the single tree from the posterior distribution whose
+      combined clade support (product of all clade posterior probabilities)
+      is maximized. It is not necessarily the most frequent tree topology —
+      it is the tree whose set of clades collectively has the highest support.
+      Drawback: a single poorly-supported clade can dramatically reduce the
+      product, making MCC sensitive to any low-probability node. MSCC (sum
+      instead of product) is less sensitive to individual weak clades.
+
+  - question: >
+      Posterior probabilities (PPs) as branch support values represent:
+    options:
+      - text: The bootstrap proportion of trees containing a given branch
+        correct: false
+      - text: The frequency with which a given clade appears in the post
+          burn-in posterior sample of MCMC trees
+        correct: true
+      - text: The probability that the branch length is greater than zero
+        correct: false
+      - text: The likelihood ratio between the tree with and without that branch
+        correct: false
+    explanation: |
+      A PP of 0.97 on a branch means that branch appeared in 97% of the
+      post-burn-in MCMC trees. PPs are often higher than bootstrap proportions
+      for the same data — they incorporate prior information and integrate over
+      model parameter uncertainty rather than assessing robustness to data
+      resampling. PPs are sensitive to prior choice and model misspecification,
+      which can inflate them relative to bootstrap values.
+
+  - question: >
+      Which summary method for posterior trees is LEAST sensitive to
+      individual low-probability clades?
+    options:
+      - text: Maximum Clade Credibility (MCC) tree
+        correct: false
+      - text: Maximum Sum of Clade Credibilities (MSCC) tree
+        correct: true
+      - text: Majority-rule consensus tree
+        correct: false
+      - text: Strict consensus tree
+        correct: false
+    explanation: |
+      MCC uses the PRODUCT of clade PPs — one low-probability clade
+      (e.g. PP = 0.1) multiplied in can collapse the entire tree score.
+      MSCC uses the SUM — a low-probability clade contributes positively
+      but modestly to the total. MSCC is therefore less sensitive to
+      individual weak clades. However MSCC tends to favour trees with more
+      clades, since each additional clade contributes positively. Majority-rule
+      consensus can represent a topology not explicitly sampled in the posterior.
+
+  - question: >
+      Comparing ML and BI: which statement is correct?
+    options:
+      - text: ML provides a probability distribution over trees; BI gives
+          a single best tree
+        correct: false
+      - text: BI provides a posterior distribution over trees and parameters,
+          naturally quantifying uncertainty; ML gives point estimates of
+          the best-fit tree and parameters
+        correct: true
+      - text: BI always produces higher bootstrap support than ML
+        correct: false
+      - text: ML incorporates prior information about tree topology; BI does not
+        correct: false
+    explanation: |
+      ML: finds the single tree and parameter set maximizing P(D|M) — a point
+      estimate. Uncertainty is quantified separately via bootstrapping.
+      BI: samples from the full posterior distribution P(M|D) — every sampled
+      tree and parameter set comes with a probability. Uncertainty is naturally
+      integrated: posterior probabilities on branches, credible intervals on
+      parameters. BI incorporates prior beliefs; ML does not — this is a
+      fundamental philosophical and practical difference.
+
+
+fill_in_blank:
+  - question: >
+      Bayes' theorem in phylogenetics: P(tree | data) = [ _______________ ×
+      _______________ ] / _______________. The term that is practically
+      impossible to compute directly is the _______________, which is why
+      MCMC is used.
+    answers:
+      - "P(data | tree) — likelihood"
+      - "P(tree) — prior"
+      - "P(data) — marginal likelihood"
+      - "marginal likelihood P(data)"
+
+  - question: >
+      MCMC builds a Markov chain whose _______________ distribution matches
+      the _______________ distribution. The _______________ algorithm decides
+      whether to accept or reject each proposed state by computing
+      R = _______________ / _______________.
+    answers:
+      - "stationary"
+      - "posterior (target)"
+      - "Metropolis-Hastings"
+      - "posterior probability of proposed state"
+      - "posterior probability of current state"
+
+  - question: >
+      In Metropolis-Hastings: uphill steps (R ≥ 1) are _______________ accepted.
+      Sharply downhill steps (R ≈ 0.02) are accepted with probability
+      _______________ — meaning nearly always _______________. Slightly
+      downhill steps (R ≈ 0.92) are accepted with probability _______________
+      — meaning usually _______________.
+    answers:
+      - "always"
+      - "0.02 (2%)"
+      - "rejected"
+      - "0.92 (92%)"
+      - "accepted"
+
+  - question: >
+      Burn-in is the _______________ portion of MCMC iterations that is
+      discarded because the chain has not yet reached _______________. Typically
+      _______________% of iterations are removed, though convergence diagnostics
+      determine the exact amount.
+    answers:
+      - "initial"
+      - "stationarity (the posterior / target distribution)"
+      - "10–25"
+
+  - question: >
+      ESS (Effective Sample Size) estimates the number of _______________ samples
+      in the MCMC chain. It is reduced by _______________ between consecutive
+      samples. ESS < _______________ is considered weak; ESS > _______________
+      is generally acceptable for reliable inference.
+    answers:
+      - "effectively independent"
+      - "autocorrelation"
+      - "100"
+      - "200"
+
+  - question: >
+      In MC^3, _______________ chains run simultaneously. Heated chains raise
+      the likelihood to the power of _______________ (where T > 1), which
+      _______________ the posterior landscape. At intervals, adjacent chains
+      can _______________ states via a Metropolis criterion, transferring
+      exploration from hot chains to the _______________ chain.
+    answers:
+      - "multiple"
+      - "1/T"
+      - "flattens"
+      - "swap"
+      - "cold"
+
+  - question: >
+      Three methods to summarize posterior trees are: the _______________
+      consensus (clades in >50% of trees); the _______________ tree (highest
+      product of clade PPs); and the _______________ tree (highest sum of
+      clade PPs, less sensitive to individual weak clades).
+    answers:
+      - "majority-rule"
+      - "Maximum Clade Credibility (MCC)"
+      - "Maximum Sum of Clade Credibilities (MSCC)"
+
+  - question: >
+      Posterior probabilities (PPs) tend to be _______________ than bootstrap
+      proportions for the same data. They are sensitive to _______________ choice
+      and can be inflated by model _______________. A PP of 0.95 means the
+      clade appeared in _______________% of post-burn-in trees.
+    answers:
+      - "higher"
+      - "prior"
+      - "misspecification"
+      - "95"
