@@ -1,0 +1,427 @@
+# LESSON 12 — Discordance, ILS & the Coalescent
+
+oral:
+  - q: >
+      What is the difference between a species tree and a gene tree?
+      Why can they genuinely differ, and what are the main biological causes?
+    a: |
+      The species tree represents the evolutionary history of species —
+      the sequence and timing of speciation events (cladogenesis). It is what
+      phylogenetics ultimately aims to recover.
+      A gene tree traces the evolutionary history of a single locus or gene
+      copy. Because individual genes are inherited as units and can have
+      histories that deviate from the species history, gene trees and species
+      trees can differ.
+      Main biological causes of genuine discordance:
+      Incomplete Lineage Sorting (ILS): ancestral polymorphisms persist across
+      speciation events. Alleles present in an ancestor can sort differently
+      into descendant species, so different genes may coalesce in different
+      ancestral populations, producing gene trees that contradict the species
+      tree. ILS is most likely when effective population size is large and
+      speciation events are closely spaced in time (short internal branches).
+      Horizontal Gene Transfer (HGT): genetic material transferred between
+      unrelated lineages — common in prokaryotes but also occurring in
+      eukaryotes. The transferred gene reflects the history of transfer, not
+      descent.
+      Hybridization and introgression: gene flow between species after
+      divergence introduces alleles across lineage boundaries. Genes affected
+      by introgression track a different history from the species tree.
+      These represent TRUE biological conflict — different regions of the
+      genome genuinely have different evolutionary histories, not analytical
+      artifacts.
+
+  - q: >
+      Describe Kingman's coalescent. What are its key assumptions and
+      what does it predict about the probability of coalescence?
+    a: |
+      Kingman's coalescent (1982) is a probabilistic model of how gene lineages
+      sampled from a present-day population trace back to a common ancestor
+      over time. It is a retrospective model — it looks backward in time.
+      Key assumptions:
+      — Constant effective population size (Ne) — no demographic change.
+      — Random mating — all gene copies have equal chance of sharing a parent.
+      — No selection — all alleles are neutral; drift is the only force.
+      — No migration — closed population with no gene flow.
+      — Non-overlapping generations.
+      — No recombination within loci.
+      — Infinite sites or infinite alleles model (no recurrent mutation).
+      Coalescence probability:
+      For two gene copies in a diploid population of Ne individuals, there are
+      2Ne possible parental gene copies. The probability they share a parent
+      (coalesce) in the immediately preceding generation is 1/(2Ne).
+      The probability of NOT coalescing in one generation is 1 − 1/(2Ne).
+      The probability of first coalescing exactly t generations ago:
+      P(T = t) = [1 − 1/(2Ne)]^(t−1) × 1/(2Ne)
+      This is a geometric distribution, approximated by an exponential with
+      mean 2Ne generations. Larger populations delay coalescence; smaller
+      populations cause rapid coalescence.
+
+  - q: >
+      What is Incomplete Lineage Sorting (ILS) and under what conditions
+      is it most likely? How does it cause gene tree / species tree discordance?
+    a: |
+      ILS occurs when ancestral polymorphism — multiple alleles segregating
+      in an ancestral population — persists across one or more speciation events.
+      When a speciation event occurs, the ancestral population splits, but
+      alleles present at that moment are distributed randomly into the daughter
+      lineages. If the alleles have not yet coalesced to a single copy before
+      the next speciation event, different alleles can end up in different
+      descendant species, and these alleles may coalesce in a different ancestral
+      population than the speciation history would predict. This produces a
+      gene tree topology that contradicts the species tree.
+      ILS is most likely when:
+      — Effective population size (Ne) is large: more ancestral alleles persist
+        longer, increasing the chance they span multiple speciation events.
+      — Internal branch lengths are short (closely spaced speciation events):
+        less time for alleles to coalesce before the next split. The probability
+        that ILS produces a discordant gene tree for a given internal branch is
+        approximately (2/3) × e^(−t/(2Ne)) where t is the branch length in
+        generations — this approaches 2/3 as t→0.
+      Consequence for phylogenomics: under ILS, the most common gene tree
+      topology is the species tree topology — but the two discordant topologies
+      are equally probable and can collectively outnumber the concordant
+      topology (the anomaly zone), causing concatenation to support the wrong
+      species tree confidently.
+
+  - q: >
+      How do coalescent-based summary methods such as ASTRAL work?
+      What statistical property of the multispecies coalescent do they exploit?
+    a: |
+      ASTRAL and similar summary methods exploit a key prediction of the
+      multispecies coalescent (MSC): for any four taxa (a quartet), the most
+      frequent gene tree topology across independent loci matches the species
+      tree topology. The two discordant quartet topologies are equally probable
+      and together less frequent than the concordant one — as long as the
+      internal branch is not in the anomaly zone.
+      How ASTRAL works:
+      1. Estimate individual gene trees from each orthogroup alignment using
+         ML or Bayesian methods.
+      2. Break each gene tree into all possible quartets (all combinations of
+         four taxa).
+      3. For each quartet, determine which of the three possible unrooted
+         topologies the gene tree supports.
+      4. Count which quartet topology is most frequent across all gene trees
+         for every possible set of four taxa.
+      5. Assemble the species tree as the topology most consistent with the
+         maximum number of quartet topologies — this is the ASTRAL optimization
+         criterion (maximizing quartet score).
+      ASTRAL does not simulate the coalescent or estimate Ne directly. Its
+      statistical consistency depends entirely on the MSC prediction: plurality
+      quartet topology = true species tree quartet. It is therefore statistically
+      consistent under the MSC but assumes gene trees are estimated without error
+      — noisy gene trees can reduce its accuracy.
+
+  - q: >
+      What is the Robinson-Foulds (RF) distance and how is it computed?
+      What are its main limitations as a tree comparison metric?
+    a: |
+      The Robinson-Foulds distance measures topological disagreement between
+      two phylogenetic trees with the same set of taxa. It counts the number
+      of bipartitions (splits) that are present in one tree but absent in the
+      other — the symmetric difference of their bipartition sets.
+      Computation:
+      For each tree, list all bipartitions (each internal branch defines a
+      split of taxa into two groups). The RF distance = |bipartitions in tree A
+      not in tree B| + |bipartitions in tree B not in tree A|.
+      RF = 0: trees are identical. RF = maximum (2n−6 for n taxa): trees share
+      no internal bipartitions. Often normalized to [0,1].
+      Main limitations:
+      — Equal weighting: RF treats all bipartitions as equally important —
+        a difference at a deep node (affecting many taxa) counts the same as
+        a difference at a shallow tip node. This ignores the biological
+        significance of conflicts.
+      — Binary: a branch is either present or absent — small rearrangements
+        affecting a few taxa count as fully different. This is the same
+        insensitivity that motivated TBE over Felsenstein BP.
+      — No branch length information: RF considers only topology, ignoring
+        branch lengths. Two trees can have RF = 0 but very different branch
+        lengths.
+      — Not metric in some generalizations: the normalized RF is a metric,
+        but extensions for comparing trees with different taxon sets lose
+        metric properties.
+
+
+mcq:
+  - question: >
+      ILS (Incomplete Lineage Sorting) is most likely to cause gene tree
+      discordance when:
+    options:
+      - text: Ne is small and internal branches are long
+        correct: false
+      - text: Ne is large and internal branches are short
+        correct: true
+      - text: The substitution rate is very high
+        correct: false
+      - text: Outgroup rooting is used
+        correct: false
+    explanation: |
+      ILS probability ≈ (2/3) × e^(−t/(2Ne)) where t is the internal branch
+      length in generations. Large Ne means ancestral alleles persist longer;
+      short t means less time to coalesce before the next split. Both factors
+      maximize the chance that ancestral polymorphism spans a speciation event,
+      producing discordant gene trees.
+
+  - question: >
+      In the multispecies coalescent, the most frequent gene tree topology
+      across independent loci is predicted to be:
+    options:
+      - text: The topology with the fewest ILS events
+        correct: false
+      - text: Always fully discordant with the species tree
+        correct: false
+      - text: The species tree topology, for any quartet outside the anomaly zone
+        correct: true
+      - text: A random topology independent of the species tree
+        correct: false
+    explanation: |
+      A fundamental prediction of the MSC: for any quartet, the species tree
+      topology is the most frequent gene tree topology. The two discordant
+      topologies occur with equal probability and their combined frequency is
+      less than the concordant one — except in the anomaly zone where internal
+      branches are so short that discordant topologies dominate. ASTRAL exploits
+      this property by plurality voting on quartet topologies.
+
+  - question: >
+      The Robinson-Foulds distance counts:
+    options:
+      - text: The number of shared bipartitions between two trees
+        correct: false
+      - text: The symmetric difference of bipartition sets — splits present
+          in one tree but absent in the other
+        correct: true
+      - text: The total branch length difference between two trees
+        correct: false
+      - text: The number of taxa placed differently between two trees
+        correct: false
+    explanation: |
+      RF = |A \ B| + |B \ A| where A and B are the bipartition sets of the
+      two trees. Each internal branch defines a bipartition; if a branch is
+      present in tree A but absent in tree B it contributes 1 to the distance
+      from both sides. RF = 0 means identical topologies; maximum RF = 2(n−3)
+      for n taxa means no shared internal bipartitions.
+
+  - question: >
+      ASTRAL infers the species tree by:
+    options:
+      - text: Concatenating all gene alignments into a supermatrix
+        correct: false
+      - text: Jointly estimating gene trees and species tree under full coalescent
+        correct: false
+      - text: Maximizing the number of quartet topologies from individual
+          gene trees that are consistent with the species tree
+        correct: true
+      - text: Minimizing the Robinson-Foulds distance to each gene tree
+        correct: false
+    explanation: |
+      ASTRAL breaks gene trees into quartets, tallies which of three topologies
+      each gene tree supports for every set of four taxa, and finds the species
+      tree that maximizes the total quartet score — the number of input quartet
+      topologies consistent with it. This exploits the MSC prediction that the
+      plurality quartet topology matches the species tree. It is statistically
+      consistent under the MSC and computationally tractable for large datasets.
+
+  - question: >
+      In coalescent theory, the expected time to coalescence for two gene
+      copies in a diploid population is:
+    options:
+      - text: Ne generations
+        correct: false
+      - text: 4Ne generations
+        correct: false
+      - text: 2Ne generations
+        correct: true
+      - text: 1/(2Ne) generations
+        correct: false
+    explanation: |
+      For two gene copies, the probability of coalescence per generation is
+      1/(2Ne). The waiting time follows a geometric distribution with mean
+      2Ne generations. This is the fundamental timescale of the coalescent.
+      Larger populations delay coalescence, increasing the probability that
+      ancestral alleles persist across multiple speciation events and cause ILS.
+
+  - question: >
+      Horizontal Gene Transfer (HGT) causes gene tree discordance because:
+    options:
+      - text: It accelerates the substitution rate of transferred genes
+        correct: false
+      - text: Transferred genes reflect the history of the donor lineage
+          rather than the recipient species' vertical descent
+        correct: true
+      - text: It creates long branches in the gene tree that attract each other
+        correct: false
+      - text: It violates the infinite sites model assumed by the coalescent
+        correct: false
+    explanation: |
+      HGT moves genetic material between lineages that are not in a
+      parent-offspring relationship. The transferred gene carries the
+      evolutionary history of the donor, not the recipient. Including
+      HGT-affected genes in a species tree analysis introduces a gene
+      tree whose topology reflects lateral transfer history, conflicting
+      with the vertical inheritance history of the rest of the genome.
+
+  - question: >
+      Branch lengths in ASTRAL are expressed in:
+    options:
+      - text: Substitutions per site
+        correct: false
+      - text: Millions of years
+        correct: false
+      - text: Coalescent units (scaled by effective population size)
+        correct: true
+      - text: Number of informative sites
+        correct: false
+    explanation: |
+      Coalescent units = t/(2Ne), where t is time in generations. One
+      coalescent unit equals 2Ne generations. This scaling allows comparison
+      of coalescent dynamics across populations of different sizes. Branches
+      in coalescent units reflect the expected number of coalescent events —
+      short branches in coalescent units mean high ILS probability; long
+      branches mean low ILS probability.
+
+  - question: >
+      The anomaly zone in the multispecies coalescent refers to conditions where:
+    options:
+      - text: The coalescent model produces more ILS than biologically possible
+        correct: false
+      - text: Internal branches are so short that a discordant gene tree
+          topology is more frequent than the species tree topology
+        correct: true
+      - text: ASTRAL cannot compute a quartet score
+        correct: false
+      - text: Concatenation and ASTRAL produce identical results
+        correct: false
+    explanation: |
+      In the anomaly zone (very short internal branches, large Ne), the
+      probability that both discordant quartet topologies together exceed the
+      concordant topology. The most common gene tree is NOT the species tree.
+      ASTRAL's plurality-voting criterion then recovers the wrong species tree —
+      it is statistically inconsistent in the anomaly zone. The anomaly zone
+      is particularly relevant in rapid radiations (e.g. bird orders, cichlid
+      fishes) where many speciation events occurred in a short time.
+
+  - question: >
+      Gene tree summary methods such as ASTRAL differ from Bayesian
+      co-estimation methods such as StarBEAST2 in that:
+    options:
+      - text: Summary methods are more statistically rigorous
+        correct: false
+      - text: Summary methods first estimate gene trees independently then
+          summarize them, while co-estimation methods jointly infer gene
+          trees and species tree under a full coalescent model
+        correct: true
+      - text: Summary methods require more computational resources
+        correct: false
+      - text: Co-estimation methods cannot handle more than 10 taxa
+        correct: false
+    explanation: |
+      Summary methods (ASTRAL, ASTRID, MP-EST): estimate gene trees first
+      (e.g. by ML), then summarize into a species tree using coalescent
+      properties. Fast and scalable to hundreds of taxa and thousands of genes.
+      Co-estimation (StarBEAST2, RevBayes): jointly estimate gene trees,
+      species tree, Ne, and divergence times under a full probabilistic coalescent
+      model. Most statistically rigorous but computationally expensive — limited
+      to smaller datasets (tens of taxa, hundreds of genes at most).
+
+  - question: >
+      The Local Posterior Probability (LPP) in ASTRAL is computed using:
+    options:
+      - text: The Metropolis-Hastings acceptance ratio from MCMC
+        correct: false
+      - text: Quartet frequencies and a Dirichlet prior with pseudocount
+          of 1 per topology
+        correct: true
+      - text: The bootstrap proportion from resampled gene trees
+        correct: false
+      - text: The Robinson-Foulds distance to alternative topologies
+        correct: false
+    explanation: |
+      LPP estimates the probability that each branch in the ASTRAL species tree
+      is correct, based on the observed quartet frequencies around that branch.
+      A Dirichlet prior adds a pseudocount of 1 to each of the three possible
+      quartet topologies (preventing zero probabilities), then the posterior
+      probability is computed from the observed quartet counts. LPP ranges 0–1
+      and tends to be higher than bootstrap for well-supported branches.
+
+
+fill_in_blank:
+  - question: >
+      A species tree represents the history of _______________ events, while a
+      gene tree traces the history of a single _______________. The three main
+      biological causes of genuine discordance between them are _______________,
+      _______________, and _______________.
+    answers:
+      - "speciation (cladogenesis)"
+      - "locus (gene)"
+      - "ILS (incomplete lineage sorting)"
+      - "HGT (horizontal gene transfer)"
+      - "hybridization / introgression"
+
+  - question: >
+      ILS probability for a given internal branch is approximately _______________,
+      where t is the branch length in generations and Ne is the _______________
+      population size. This probability approaches _______________ as t → 0,
+      and approaches _______________ as t → ∞.
+    answers:
+      - "(2/3) × e^(−t/(2Ne))"
+      - "effective"
+      - "2/3"
+      - "0"
+
+  - question: >
+      In Kingman's coalescent, two gene copies in a diploid population of Ne
+      individuals coalesce with probability _______________ per generation.
+      The expected waiting time to coalescence is _______________ generations.
+    answers:
+      - "1/(2Ne)"
+      - "2Ne"
+
+  - question: >
+      ASTRAL maximizes the _______________ score — the number of input
+      _______________ topologies from gene trees consistent with the species
+      tree. It exploits the MSC prediction that the most _______________ gene
+      tree topology matches the species tree.
+    answers:
+      - "quartet"
+      - "quartet"
+      - "frequent"
+
+  - question: >
+      The Robinson-Foulds distance between two trees counts the _______________
+      difference of their _______________ sets — splits present in one tree
+      but not the other. RF = 0 means trees are _______________, and a
+      limitation is that all differences are weighted _______________.
+    answers:
+      - "symmetric"
+      - "bipartition"
+      - "identical"
+      - "equally"
+
+  - question: >
+      Branch lengths in ASTRAL are in _______________ units, defined as
+      t / (_______________), where t is time in _______________. One unit
+      equals _______________ generations.
+    answers:
+      - "coalescent"
+      - "2Ne"
+      - "generations"
+      - "2Ne"
+
+  - question: >
+      Site-based coalescent methods such as SVDQuartets work directly from
+      _______________ rather than gene trees. Bayesian co-estimation methods
+      such as _______________ jointly infer gene trees and species tree but
+      are limited to _______________ datasets.
+    answers:
+      - "sequence alignments (or SNPs)"
+      - "StarBEAST2"
+      - "smaller"
+
+  - question: >
+      The anomaly zone describes conditions where internal branches are so
+      _______________ that a _______________ gene tree topology is more
+      frequent than the concordant one. In this zone, ASTRAL becomes
+      statistically _______________.
+    answers:
+      - "short"
+      - "discordant"
+      - "inconsistent"

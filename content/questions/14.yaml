@@ -1,0 +1,437 @@
+# LESSON 14 — Divergence Time Analyses
+
+oral:
+  - q: >
+      What is the molecular clock hypothesis? What is the theoretical
+      basis from neutral theory, and why is a strict clock often violated?
+    a: |
+      The molecular clock hypothesis proposes that genetic changes accumulate
+      at an approximately constant rate over evolutionary time, allowing
+      divergence times to be estimated from sequence differences using the
+      relationship: Time = Distance / (2 × rate).
+      Theoretical basis from neutral theory (Kimura): most molecular changes
+      are selectively neutral and are fixed by genetic drift at a rate equal
+      to the neutral mutation rate μ — independent of population size. If μ
+      is constant across lineages, neutral changes accumulate at a constant
+      rate, producing clock-like behaviour.
+      Violations of the strict clock arise because:
+      — Mutation rates differ among lineages due to generation time effects
+        (organisms with shorter generations undergo more cell divisions per
+        unit time, accumulating more replication errors), metabolic rate
+        differences, and variation in DNA repair efficiency.
+      — Selective pressures change across lineages and across time — positive
+        selection accelerates the fixation rate beyond neutral; purifying
+        selection retards it.
+      — Different genes evolve at very different rates depending on their
+        functional constraint.
+      These violations are well-documented: Bergeron et al. (2023) showed
+      substantial variation in germline mutation rates across vertebrates
+      correlated with generation time and metabolic rate, directly refuting
+      a universal strict molecular clock.
+
+  - q: >
+      Compare strict, local, and relaxed molecular clock models. What
+      parameter does each introduce, and what type of rate variation does
+      each allow?
+    a: |
+      Strict molecular clock: assumes a single constant substitution rate
+      across all lineages and all time. Under a strict clock, branch lengths
+      in a tree are directly proportional to time, and all tips are equidistant
+      from the root (ultrametric tree). No additional rate parameters — the
+      rate is a single global constant. Appropriate when rate variation is
+      negligible, but biologically unrealistic for most large or diverse datasets.
+      Local molecular clock: divides the tree into predefined monophyletic
+      groups (clades), each assigned its own constant rate. Within each local
+      clock group, evolution is clock-like; across groups it is not. Requires
+      prior biological justification for where rate shifts occur (e.g. a known
+      metabolic shift). Intermediate complexity — k rate parameters for k
+      local clocks.
+      Relaxed molecular clock: allows rate variation on a branch-by-branch basis
+      without requiring predefined clade groupings. Two main subtypes:
+      Uncorrelated relaxed clock: rates on different branches are drawn
+      independently from a distribution (e.g. lognormal or exponential).
+      No assumption that parent and daughter branches have similar rates.
+      Autocorrelated relaxed clock: rates change gradually along the tree —
+      daughter branches tend to inherit rates similar to their parent branch
+      (rate drift modelled by a lognormal distribution). Captures evolutionary
+      scenarios where metabolic or life-history shifts are inherited.
+      Relaxed clocks are most widely used in Bayesian divergence time analyses
+      as they are biologically realistic without requiring a priori knowledge
+      of where rate shifts occur.
+
+  - q: >
+      Distinguish node dating from tip dating. What type of data does each
+      use to calibrate the molecular clock, and what is the fossil-as-tip
+      advantage?
+    a: |
+      Node dating: calibrations are placed at internal nodes of the phylogeny
+      constructed from extant (living) taxa only. Fossils provide minimum age
+      constraints for the node at which they are assigned — their presence in
+      the fossil record establishes the clade must be at least as old as the
+      fossil. Maximum age constraints are usually softer (geological, biogeographic,
+      or stratigraphic arguments). Node dating requires deciding where in the
+      tree each fossil belongs (crown vs stem) and expressing that placement as
+      a probabilistic prior distribution (exponential, lognormal, normal, or
+      uniform) on node age.
+      Tip dating (total-evidence dating): fossil specimens are included directly
+      as terminal taxa in the phylogenetic analysis alongside living taxa. Morphological
+      and/or molecular data from fossils contribute to tree inference; the fossil's
+      stratigraphic age is used directly as the age of the tip rather than
+      constraining a node. The branching point of the fossil with extant taxa is
+      inferred from the data rather than assumed.
+      Fossil-as-tip advantage: by treating fossils as tips, tip dating avoids the
+      difficult and often arbitrary decision of exactly which node a fossil
+      constrains (crown vs stem assignment). It integrates fossil information
+      directly into the inference and can estimate the age of nodes even without
+      explicit calibration priors, because the dated tips themselves provide
+      temporal information distributed throughout the tree. It is particularly
+      powerful in Bayesian frameworks implementing the Fossilized Birth-Death (FBD)
+      process model, which explicitly models speciation, extinction, and sampling.
+
+  - q: >
+      What are crown and stem groups? Why does the distinction matter
+      critically for fossil calibration in divergence time analysis?
+    a: |
+      Crown group: the crown of a clade consists of all living members of that
+      clade plus their most recent common ancestor and all of its descendants.
+      A crown-group fossil must share all the defining synapomorphies of the living
+      members — it is placed inside the crown, postdating the deepest divergence
+      within the living clade.
+      Stem group: stem taxa are extinct lineages that are more closely related to
+      a given crown group than to any other crown group, but fall outside the crown
+      itself — they lack some of the synapomorphies of the crown. Stem fossils
+      provide a minimum age for the origin of the stem lineage (which predates the
+      crown) but NOT for the crown divergence directly.
+      Why the distinction matters critically:
+      Placing a stem fossil as a crown calibration produces a minimum age estimate
+      that is TOO YOUNG — the crown actually originated before the stem fossil
+      was deposited, so the calibration underestimates crown age. Conversely,
+      placing a crown fossil as a stem calibration produces a minimum age that is
+      TOO OLD relative to the node of interest.
+      Example: Archaeopteryx is a stem bird — it predates the crown (living birds'
+      MRCA) but is not inside it. Using Archaeopteryx to calibrate the crown bird
+      node would give a minimum age for the crown that is too young, because
+      the stem lineage already existed before the crown divergence.
+      Correct fossil placement is therefore one of the most critical and most
+      debated aspects of divergence time analysis.
+
+  - q: >
+      What prior distributions are commonly used for fossil calibrations?
+      Describe the shape and appropriate use of each.
+    a: |
+      Fossil calibrations define prior probability distributions on node ages.
+      The fossil provides a hard minimum age (the specimen's stratigraphic age);
+      the maximum age is usually soft (uncertain).
+      Uniform distribution: equal probability between a specified minimum and
+      maximum age. Simple and non-informative within the bounds, but requires
+      a well-justified maximum bound — rarely appropriate because it implies
+      the node is equally likely to be any age between the bounds. Used only
+      when maximum age is genuinely well-constrained.
+      Exponential distribution: peaks sharply at the minimum age (fossil age)
+      and declines exponentially toward older ages. Appropriate when the fossil
+      is believed to be a close temporal approximation to the actual divergence —
+      divergence is likely not much older than the fossil. Parameterized by a
+      single mean; simple and biologically intuitive.
+      Lognormal distribution: probability concentrated just above the minimum
+      bound with a heavier tail extending to older ages. Reflects the expectation
+      that the true divergence predated the fossil (the fossil is a minimum),
+      but probably not by an arbitrarily large amount. Most commonly used for
+      deep divergences where the clade is expected to predate the fossil record
+      by some margin.
+      Normal distribution: bell-shaped, centered at a hypothesized mean age
+      with spread defined by standard deviation. Requires strong justification
+      for both the center and the uncertainty — more common for geological or
+      biogeographic calibrations where a specific age is well-supported.
+      The lognormal and exponential are most commonly used for fossil calibrations
+      because both respect the hard minimum and allow appropriate uncertainty
+      about how much older the true divergence is.
+
+
+mcq:
+  - question: >
+      Under a strict molecular clock, what is the relationship between
+      genetic distance and time?
+    options:
+      - text: Distance = Time × (2 × rate)
+        correct: true
+      - text: Distance is independent of time and depends only on effective
+          population size and the number of generations between species
+        correct: false
+      - text: Distance = rate only, with time factored out
+        correct: false
+      - text: Distance = Time / rate
+        correct: false
+    explanation: |
+      Under a strict clock: Distance = 2 × rate × Time, therefore
+      Time = Distance / (2 × rate). The factor 2 accounts for substitutions
+      accumulating along both lineages since their common ancestor. This linear
+      relationship is the basis for all molecular clock dating — but it only
+      holds when the rate is truly constant across lineages and over time.
+
+  - question: >
+      Tip dating differs from node dating primarily because:
+    options:
+      - text: It uses only molecular data without morphology
+        correct: false
+      - text: Fossils are included as terminal taxa with stratigraphic ages,
+          rather than placed as constraints on internal nodes
+        correct: true
+      - text: It assumes a strict molecular clock
+        correct: false
+      - text: It cannot estimate divergence times for extant taxa
+        correct: false
+    explanation: |
+      In node dating, fossils impose age priors on internal nodes of a tree
+      built from living taxa. In tip dating, fossils enter the analysis as
+      terminals — their morphological characters contribute to tree inference
+      and their stratigraphic age directly dates the tip. This avoids the
+      arbitrary crown vs stem assignment problem and integrates fossil
+      information more fully into the analysis, especially in total-evidence
+      dating frameworks using the Fossilized Birth-Death model.
+
+  - question: >
+      A fossil assigned to the STEM group of birds provides a minimum age for:
+    options:
+      - text: The divergence between crown birds and their sister group
+        correct: false
+      - text: The origin of the stem bird lineage, not the crown — placing it
+          as a crown calibration would underestimate crown age
+        correct: true
+      - text: The most recent common ancestor of all living birds
+        correct: false
+      - text: The oldest possible age of any bird fossil
+        correct: false
+    explanation: |
+      Stem birds (e.g. Archaeopteryx) are outside the crown — they diverged
+      from the lineage leading to living birds before the living birds' MRCA
+      existed. A stem fossil only tells us the stem lineage is at least that
+      old. The crown divergence must be younger than the stem origin but the
+      fossil gives no direct minimum for the crown. Using a stem fossil as a
+      crown constraint would impose a minimum age that is too young, biasing
+      divergence time estimates toward the present.
+
+  - question: >
+      An uncorrelated relaxed clock differs from an autocorrelated relaxed
+      clock in that:
+    options:
+      - text: Uncorrelated clocks assume a strict rate; autocorrelated do not
+        correct: false
+      - text: Branch rates are drawn independently in uncorrelated clocks;
+          in autocorrelated clocks, daughter branches inherit rates similar
+          to their parent branch
+        correct: true
+      - text: Uncorrelated clocks are only used in ML; autocorrelated in BI
+        correct: false
+      - text: Autocorrelated clocks are simpler and have fewer parameters
+        correct: false
+    explanation: |
+      Uncorrelated relaxed clock (e.g. UCLD — uncorrelated lognormal): each
+      branch draws its rate independently from a distribution. No phylogenetic
+      autocorrelation of rates — parent and daughter can have very different
+      rates. Flexible but may overfit noisy data.
+      Autocorrelated relaxed clock: rates drift gradually along the tree —
+      daughter branches tend to have rates close to their parent's rate,
+      modeling the biological reality that metabolic and life-history changes
+      are heritable and happen gradually.
+
+  - question: >
+      A lognormal prior for a fossil calibration is preferred over a uniform
+      prior because:
+    options:
+      - text: It is easier to parameterize
+        correct: false
+      - text: It enforces a hard maximum age on the calibrated node
+        correct: false
+      - text: It places probability just above the fossil age minimum with
+          a tail toward older ages, reflecting that true divergence likely
+          predated the fossil but not by an unlimited amount
+        correct: true
+      - text: It produces narrower confidence intervals on divergence times
+        correct: false
+    explanation: |
+      A lognormal calibration prior has most of its probability density just
+      above the minimum (fossil) age and a right tail allowing for older
+      divergences — biologically reasonable because the true divergence must
+      be older than the first fossil (fossils are minimums), but probably not
+      indefinitely older. A uniform prior implies equal probability between
+      minimum and maximum bounds, requiring a well-justified maximum, and is
+      less biologically motivated in most cases.
+
+  - question: >
+      Bayesian divergence time inference is preferred over Penalized Maximum
+      Likelihood (PML) or Least Squares Dating (LSD) primarily because:
+    options:
+      - text: It is computationally faster
+        correct: false
+      - text: It requires no fossil calibrations
+        correct: false
+      - text: It provides a fully probabilistic framework quantifying
+          uncertainty in topology, rates, and dates jointly
+        correct: true
+      - text: It always produces older divergence time estimates
+        correct: false
+    explanation: |
+      LSD and PML require a fixed topology and fixed branch lengths as input;
+      they do not propagate uncertainty in tree topology or branch lengths into
+      the divergence time estimates. Bayesian inference simultaneously estimates
+      topology, branch lengths, substitution model parameters, and divergence
+      times, propagating all uncertainty into credible intervals on node ages.
+      It can also implement the Fossilized Birth-Death model and total-evidence
+      dating. The trade-off is high computational cost.
+
+  - question: >
+      The Fossilized Birth-Death (FBD) model is used in divergence time
+      analyses to:
+    options:
+      - text: Estimate the substitution rate using only extant taxa
+        correct: false
+      - text: Model speciation, extinction, and fossil sampling explicitly,
+          allowing fossils to be integrated as tips rather than node constraints
+        correct: true
+      - text: Replace the molecular clock with a parsimony-based approach
+        correct: false
+      - text: Estimate effective population size from fossil morphology
+        correct: false
+    explanation: |
+      The FBD process models three events: lineage birth (speciation), lineage
+      death (extinction), and fossil sampling (preservation and discovery). Under
+      FBD, fossils can be treated as sampled ancestors or as extinct side branches
+      — naturally integrating their temporal information as tip ages rather than
+      forcing them onto specific nodes. This avoids the crown vs stem assignment
+      problem and jointly estimates divergence times, diversification rates, and
+      the position of fossils in the tree.
+
+  - question: >
+      A molecular clock rate estimated from a clade with short generation times
+      will likely OVERESTIMATE divergence times when applied to:
+    options:
+      - text: Other clades with equally short generation times
+        correct: false
+      - text: Clades with longer generation times that accumulate mutations
+          more slowly per unit of absolute time
+        correct: true
+      - text: Fossil-calibrated nodes within the same clade
+        correct: false
+      - text: Synonymous substitution rates, which are unaffected by generation time
+        correct: false
+    explanation: |
+      Generation time effect: organisms with short generations undergo more
+      rounds of DNA replication per unit time and accumulate more mutations
+      per year. If a rate estimated from short-generation organisms is applied
+      to long-generation organisms (which have a slower per-year mutation rate),
+      the same amount of genetic divergence will be interpreted as representing
+      less time — pushing divergence time estimates toward the present (not
+      overestimating, but rather underestimating). Cross-taxa application of
+      molecular clocks requires rate calibration within each lineage or use of
+      a relaxed clock.
+
+  - question: >
+      Least Squares Dating (LSD) is most appropriate when:
+    options:
+      - text: Full uncertainty in topology and branch lengths must be
+          propagated into divergence time estimates
+        correct: false
+      - text: A fast approximate dating of very large, fixed phylogenies
+          is needed without requiring the full Bayesian machinery
+        correct: true
+      - text: Fossil morphology must be included in tree inference
+        correct: false
+      - text: The strict molecular clock assumption must be tested
+        correct: false
+    explanation: |
+      LSD requires a fixed topology and branch lengths as input and applies a
+      least-squares criterion to estimate divergence times. It is extremely fast
+      — scalable to thousands of taxa — and is implemented in IQ-TREE. It is
+      appropriate for exploratory analyses or when computational resources
+      preclude full Bayesian analysis. Its limitation is that it does not
+      propagate uncertainty in the input tree into the time estimates — if the
+      topology or branch lengths are uncertain, LSD will underestimate total
+      dating uncertainty.
+
+
+fill_in_blank:
+  - question: >
+      Under a strict molecular clock: Time = _______________ / (_______________ ×
+      _______________). The factor 2 accounts for substitutions accumulating
+      along _______________ lineages since the common ancestor.
+    answers:
+      - "Distance"
+      - "2"
+      - "rate"
+      - "both"
+
+  - question: >
+      Three types of molecular clock models in order of increasing flexibility
+      are: _______________ clock (one global rate), _______________ clock
+      (different rates per predefined clade), and _______________ clock
+      (branch-specific rates, no predefined groupings).
+    answers:
+      - "strict"
+      - "local"
+      - "relaxed"
+
+  - question: >
+      In an uncorrelated relaxed clock, branch rates are drawn _______________.
+      In an autocorrelated relaxed clock, daughter branch rates tend to
+      _______________ their parent's rate, modelling gradual rate _______________.
+    answers:
+      - "independently (from a distribution, e.g. lognormal)"
+      - "resemble (inherit)"
+      - "drift"
+
+  - question: >
+      Node dating uses fossils to constrain _______________ ages. Tip dating
+      includes fossils as _______________ taxa with stratigraphic _______________.
+      Tip dating avoids the difficult decision of _______________ vs _______________
+      fossil placement.
+    answers:
+      - "internal node"
+      - "terminal (tip)"
+      - "ages (dates)"
+      - "crown"
+      - "stem"
+
+  - question: >
+      The crown group includes the last common ancestor of all _______________
+      members plus all its descendants. The stem group consists of _______________
+      lineages outside the crown but more closely related to it than to any other
+      crown group. Using a _______________ fossil to calibrate a crown node
+      underestimates crown age.
+    answers:
+      - "living (extant)"
+      - "extinct"
+      - "stem"
+
+  - question: >
+      Four prior distribution shapes used for fossil calibrations are:
+      _______________ (peaks at minimum, declines exponentially),
+      _______________ (concentration just above minimum with a right tail),
+      _______________ (equal probability between bounds), and _______________
+      (bell-shaped, requires justification for center and spread).
+    answers:
+      - "exponential"
+      - "lognormal"
+      - "uniform"
+      - "normal"
+
+  - question: >
+      The Fossilized Birth-Death (FBD) model explicitly models _______________
+      (speciation), _______________ (extinction), and _______________ (fossil
+      preservation and discovery), allowing fossils to be treated as
+      _______________ rather than node constraints.
+    answers:
+      - "birth"
+      - "death"
+      - "sampling"
+      - "terminal taxa (tips)"
+
+  - question: >
+      LSD (Least Squares Dating) requires a _______________ topology and
+      branch lengths as input and is implemented in _______________. It is
+      much _______________ than Bayesian dating but does not propagate
+      _______________ in the input tree into final time estimates.
+    answers:
+      - "fixed"
+      - "IQ-TREE"
+      - "faster"
+      - "uncertainty"
