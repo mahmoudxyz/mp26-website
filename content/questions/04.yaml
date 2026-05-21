@@ -1,419 +1,424 @@
-# LESSON 04 — Orthology Inference and Taxon Sampling
-
 oral:
-  - q: >
-      What is the difference between an ortholog, a paralog, and a xenolog?
-      Which category is preferred for species tree inference and why?
-    a: |
-      Orthologs are genes in different species whose most recent common ancestor
-      is a speciation event. Because their divergence tracks species divergence,
-      their gene tree is expected to match the species tree — making them the
-      primary markers for phylogenetic inference.
-      Paralogs are genes whose most recent common ancestor is a gene duplication
-      event. They can exist within the same genome (in-paralogs) or across species
-      (out-paralogs). Because their divergence predates or postdates a given
-      speciation event, they do not necessarily reflect species relationships and
-      can mislead inference.
-      Xenologs are genes whose most recent common ancestor is a horizontal gene
-      transfer event. They reflect transfer history rather than descent and can
-      also confound species tree estimation, especially in prokaryotes.
-      The unifying principle: the category is defined not by sequence similarity
-      but by the nature of the evolutionary mechanism — speciation, duplication,
-      or transfer — at the most recent common ancestor.
-      Orthologs are preferred because only speciation-derived genes track the
-      species tree. As Fitch (1970) stated: "Phylogenies require orthologous,
-      not paralogous, genes."
+  - q: Why does taxon sampling matter in phylogenetics?
+    a: >
+      Poor sampling causes long branch attraction, creates artificial
+      monophyletic groups, reduces phylogenetic signal, and skews
+      evolutionary rate estimates. Broad, representative sampling
+      breaks up long branches and improves tree accuracy.
 
-  - q: >
-      Explain what an orthogroup is, how it differs from a simple ortholog pair,
-      and why it is always defined relative to a reference speciation event.
-    a: |
-      An ortholog pair is defined pairwise between two species: two genes whose
-      MRCA is a speciation event. However, when considering multiple species
-      simultaneously, pairwise comparisons are insufficient because they cannot
-      capture many-to-many relationships across lineages.
-      An orthogroup is a group of homologous genes descending from the MRCA of
-      a defined group of species. It extends the concept of orthology to multiple
-      species and accommodates gene duplications and losses within the group.
-      Critically, an orthogroup is always defined by a reference speciation event:
-      changing the species set changes the orthogroup boundaries. For example,
-      two genes that are in-paralogs within a single clade may be orthologs when
-      compared to a more distantly related outgroup.
-      In phylogenomics, we typically work with single-copy orthogroups — those
-      retaining one copy per species — to avoid including paralogous copies that
-      would mislead tree inference.
+  - q: What is the difference between homology and analogy?
+    a: >
+      Homologous characters share a common ancestry. Analogous characters
+      share the same function but have different evolutionary origins —
+      they are a type of homoplasy.
 
-  - q: >
-      Describe the Reciprocal Best Hit (RBH) method for ortholog inference.
-      What is its main strength and its most important limitation?
-    a: |
-      RBH identifies orthologs between two genomes through bidirectional
-      comparison. First, every gene in species A is queried against the entire
-      genome of species B and the best hit is recorded by e-value or bit score.
-      Then the process is reversed: every gene in species B is queried against
-      species A. A gene pair is called an ortholog only if each gene is the other's
-      best hit in both directions.
-      The bidirectionality is critical: without it, a gene lost in one species could
-      incorrectly map to a paralog, generating false ortholog calls.
-      Main strength: RBH is simple, fast, and scales easily to large genomes.
-      Main limitation: RBH fundamentally fails to detect one-to-many and
-      many-to-many ortholog relationships. In a case where a single gene in
-      species A corresponds to two duplicated copies in species B, RBH picks only
-      one of the two — the other is discarded. This means in-paralog relationships
-      are systematically ignored, and the resulting orthogroup inference is
-      incomplete.
+  - q: Define ortholog, paralog, and xenolog.
+    a: >
+      Orthologs — genes in different species whose last common ancestor
+      was a speciation event; they track the species tree. Paralogs —
+      genes whose last common ancestor was a gene duplication event.
+      Xenologs — genes whose last common ancestor was a horizontal
+      gene transfer event.
 
-  - q: >
-      What is the orthology conjecture, and why has it been challenged?
-      What is the practical implication for phylogenomics?
-    a: |
-      The orthology conjecture, proposed by Nehrt et al. (2011), states that
-      orthologous genes are expected to share the same biological function,
-      while paralogous genes are expected to differ in function — because
-      after speciation, orthologs remain under the same selective constraints,
-      whereas duplicated paralogs are free to subfunctionalize or neofunctionalize.
-      It has been substantially challenged: studies by Stamboulian et al. (2020),
-      Lynch and Conery (2000), and Gout and Lynch (2015) showed that many
-      orthologs differ in function between species, and some paralogs retain
-      identical function. The correlation between orthology and functional
-      equivalence is imperfect.
-      The practical implication for phylogenomics is that ortholog classification
-      must be based strictly on the mechanism of origin — speciation — not on
-      inferred function. Function should not be used as a proxy for orthology,
-      as it introduces circular reasoning and biological noise into the inference.
+  - q: Why do we use orthologs and not paralogs for phylogenetics?
+    a: >
+      Orthologs arise through speciation, so their evolutionary history
+      mirrors the history of the species. Paralogs arise through
+      duplication, so their gene tree does not necessarily reflect
+      the species tree.
 
-  - q: >
-      What are the main consequences of incomplete or biased taxon sampling
-      in phylogenomics? What are the recommended practices to mitigate them?
-    a: |
-      Long branch attraction (LBA): distantly related taxa with long branches
-      cluster erroneously due to missing intermediate taxa that would otherwise
-      break up the branches and reduce convergent substitutions.
-      Artificial clade resolution: missing taxa can create misleading monophyletic
-      groups that reflect absence of data rather than true evolutionary history.
-      Loss of phylogenetic signal: sparse sampling reduces the number of
-      informative sites, leading to unresolved or poorly supported relationships.
-      Model inadequacy: missing intermediate taxa skew branch length estimates
-      and substitution rate distributions, biasing divergence time inference.
-      Mitigation strategies:
-      — Ensure broad and representative taxon sampling to break up long branches
-        and reduce the probability of convergent substitutions being misread.
-      — Include appropriate outgroups and intermediate lineages.
-      — Use substitution models that account for rate heterogeneity (e.g. GTR+Γ).
-      — Apply diagnostic tools to detect LBA before interpreting final topologies.
+  - q: What distinguishes orthologs from paralogs at the most fundamental level?
+    a: >
+      The mechanism at their most recent common ancestor — speciation
+      for orthologs, gene duplication for paralogs. It is not about
+      the sequences themselves or their function.
+
+  - q: What is the difference between in-paralogs and out-paralogs?
+    a: >
+      In-paralogs arose by duplication AFTER a speciation event —
+      restricted to one lineage. Out-paralogs arose by duplication
+      BEFORE a speciation event — present in the common ancestor
+      of both species.
+
+  - q: What is an orthogroup?
+    a: >
+      A group of homologous genes all descending from the most recent
+      common ancestor of a set of species — it extends the concept
+      of orthology to multiple species simultaneously.
+
+  - q: How does Reciprocal Best Hit (RBH) work?
+    a: >
+      An all-vs-all BLAST is run between two genomes. Gene A in
+      species 1 is an RBH of gene X in species 2 only if A's best
+      hit is X AND X's best hit is A — both directions must agree.
+
+  - q: What is the biggest limitation of RBH?
+    a: >
+      It fails to detect one-to-many or many-to-many orthologs.
+      If one gene in species 1 corresponds to multiple copies in
+      species 2, RBH will miss those relationships.
+
+  - q: Name two advantages of transcriptomes over genomes for phylogenetics.
+    a: >
+      Transcriptomes are much cheaper (€250–500 vs thousands for
+      genomes), allowing more species to be sampled, and they do
+      not require a reference genome.
+
+  - q: What is the main disadvantage of mitochondrial genomes for deep phylogenies?
+    a: >
+      Their high substitution rate leads to saturation and homoplasy
+      at deeper divergences, and they provide only a limited number
+      of genetic markers (usually around 15 genes).
+
+  - q: What are UCEs and what is their key advantage over RADseq?
+    a: >
+      Ultraconserved Elements — short conserved genomic regions captured
+      by targeted probes. They work on ethanol-fixed and museum specimens,
+      whereas RADseq is limited to closely related species and
+      population-level studies.
+
+  - q: What is the cheapest sequencing approach and what are its limitations?
+    a: >
+      GBS (Genotyping-By-Sequencing) at €50–200. It only produces
+      short SNPs, not full genes, and is only suitable for population
+      genomics or very closely related species — no proper orthology
+      inference is possible.
+
+  - q: What is the orthology conjecture and why should it be used with caution?
+    a: >
+      The orthology conjecture (Nehrt et al. 2011) proposes that
+      orthologs share the same biological function while paralogs
+      differ. This has been widely questioned — function should not
+      be used to define orthology; only the mechanism of origin matters.
+
+  - q: In phylogenetics, which type of orthogroup is traditionally preferred?
+    a: >
+      Single-copy or one-to-one orthogroups — those with exactly one
+      copy per species — because they are unambiguously orthologous
+      and their gene tree is most likely to reflect the species tree.
 
 
 mcq:
-  # — Orthology / paralogy / xenology —
-  - question: >
-      Two genes in different species share a common ancestor that is a
-      gene duplication event predating the speciation of those species.
-      These genes are best described as:
+  - question: What is the main consequence of poor taxon sampling in phylogenetics?
     options:
-      - text: One-to-one orthologs
-        correct: false
-      - text: Out-paralogs
+      - text: Long branch attraction and artificial clade groupings
         correct: true
-      - text: In-paralogs
+      - text: More parsimony-informative sites in the alignment used
         correct: false
-      - text: Xenologs
+      - text: Increased accuracy in divergence time estimation results
         correct: false
-    explanation: |
-      Out-paralogs are paralogous genes whose most recent common ancestor is
-      a duplication event that occurred BEFORE the speciation event separating
-      the two species. Their divergence therefore predates the speciation, so
-      they do not track the species tree. In-paralogs arise from duplications
-      AFTER the relevant speciation event and are restricted to one lineage.
-      Orthologs require a speciation event as the MRCA; xenologs require a
-      transfer event.
+      - text: Better resolution of shallow and recent speciation events
+        correct: false
+    explanation: >
+      Missing taxa leave gaps that make distant lineages appear closer,
+      causing long branch attraction and artificial groupings. Adding
+      intermediate taxa breaks long branches and improves accuracy.
 
-  - question: >
-      A researcher performs an all-vs-all BLAST between species A and B.
-      GeneX in A hits GeneY in B as its best hit. GeneY in B hits GeneZ in A
-      as its best hit. What does RBH conclude about GeneX and GeneY?
+  - question: "Homologous characters are defined by:"
     options:
-      - text: GeneX and GeneY are orthologs
-        correct: false
-      - text: GeneX and GeneY are NOT reciprocal best hits and are not called orthologs
+      - text: Sharing a common evolutionary ancestry between organisms
         correct: true
-      - text: GeneX and GeneY are paralogs
+      - text: Performing the same biological function in both organisms
         correct: false
-      - text: GeneX and GeneY are xenologs
+      - text: Having identical DNA sequences in two compared species
         correct: false
-    explanation: |
-      RBH requires that each gene is the best hit of the other in both
-      directions. Here, GeneX's best hit in B is GeneY, but GeneY's best hit
-      in A is GeneZ — not GeneX. The reciprocity fails, so RBH does not call
-      them orthologs. This illustrates how gene duplication in one genome can
-      prevent correct pairwise ortholog identification.
+      - text: Being inherited through horizontal gene transfer events
+        correct: false
+    explanation: >
+      Homology is strictly about shared ancestry — two characters are
+      homologous if they descended from the same character in a common
+      ancestor, regardless of their current function.
 
-  - question: >
-      Why does traditional phylogenomics focus specifically on single-copy
-      orthogroups rather than multi-copy gene families?
+  - question: "Analogous characters (analogy) differ from homologous ones because they:"
     options:
-      - text: Multi-copy genes evolve too slowly to be informative
-        correct: false
-      - text: Single-copy orthogroups guarantee that each species contributes
-          exactly one gene, avoiding paralogy-driven conflict in tree inference
+      - text: Share function but have different evolutionary origins
         correct: true
-      - text: Gene families are only found in prokaryotes
+      - text: Share ancestry but have evolved very different functions
         correct: false
-      - text: Multi-copy genes are always xenologs
+      - text: Are identical in sequence but found in different organisms
         correct: false
-    explanation: |
-      If a gene family contains duplicated copies within a species, including
-      all copies in a phylogenomic matrix risks mixing orthologous and
-      paralogous signals. Single-copy orthogroups — one copy per species —
-      ensure that the gene tree topology is expected to match the species tree.
-      Multi-copy gene families are increasingly used in modern approaches,
-      but require careful handling to separate the paralogous from orthologous
-      signal.
+      - text: Arose through gene duplication within the same genome
+        correct: false
+    explanation: >
+      Analogy is a type of homoplasy — similar function evolved
+      independently in unrelated lineages, not inherited from a
+      common ancestor. Example: wings in birds and insects.
 
-  - question: >
-      Which of the following correctly distinguishes in-paralogs from
-      out-paralogs?
+  - question: "Orthologous genes arise through:"
     options:
-      - text: In-paralogs arose before a speciation event; out-paralogs after
-        correct: false
-      - text: In-paralogs arose after a speciation event and are restricted to
-          one lineage; out-paralogs arose before and span multiple lineages
+      - text: Speciation — the last common ancestor was a species split
         correct: true
-      - text: In-paralogs are found only in plants; out-paralogs only in animals
+      - text: Gene duplication — an extra copy formed within a genome
         correct: false
-      - text: In-paralogs and out-paralogs are both orthologs relative to
-          the speciation event
+      - text: Horizontal gene transfer — a gene moved between species
         correct: false
-    explanation: |
-      The in/out distinction is relative to a given speciation event.
-      In-paralogs: duplicated after the speciation — found in only one
-      descendent lineage, recently diverged from each other.
-      Out-paralogs: duplicated before the speciation — present in both
-      descendent lineages, diverged earlier than the speciation event.
-      Out-paralogs are more problematic for phylogenomics because they
-      appear in all sampled species and can mimic orthology relationships.
+      - text: Recombination — two genes fused into a single hybrid gene
+        correct: false
+    explanation: >
+      Orthologs are defined by speciation as the most recent common
+      ancestor event. Because they diverged when species split, their
+      gene tree is expected to match the species tree.
 
-  # — Sequencing strategies —
-  - question: >
-      A research group needs to resolve the phylogeny of 200 species of
-      beetles using the cheapest possible method. Which sequencing strategy
-      is most appropriate, and what is its main limitation?
+  - question: "Paralogous genes arise through:"
     options:
-      - text: Chromosome-level genome sequencing; limitation is cost
-        correct: false
-      - text: RAD-Seq or GBS; limitation is that only SNPs are generated —
-          no full genes — restricting analyses to closely related species
+      - text: Gene duplication within or across lineages in evolution
         correct: true
-      - text: Transcriptome sequencing; limitation is that it requires
-          chromosome-level assemblies as reference
+      - text: A speciation event that separated two different species
         correct: false
-      - text: UCE capture; limitation is that it requires fresh frozen tissue
+      - text: Horizontal gene transfer between two unrelated organisms
         correct: false
-    explanation: |
-      RAD-Seq and GBS are the cheapest options (~€50–300 per sample) and
-      do not require a reference genome. However, they generate only short
-      SNPs — not full gene sequences — making them appropriate only for
-      population genomics or phylogenomics of closely related species where
-      gene-level resolution is unnecessary. For deep divergences, saturation
-      in short markers and lack of orthology inference are critical problems.
+      - text: Recombination between two chromosomes during cell division
+        correct: false
+    explanation: >
+      Paralogs are copies created by gene duplication. Their gene
+      tree reflects the duplication event, not the species tree —
+      which is why they are problematic for species phylogenetics.
 
-  - question: >
-      A researcher wants to sequence specimens from a natural history museum
-      fixed in ethanol decades ago. Which strategy is LEAST suitable?
+  - question: Why are orthologs preferred over paralogs in species tree inference?
     options:
-      - text: Draft genome sequencing
-        correct: false
-      - text: UCE capture sequencing
-        correct: false
-      - text: RAD-Seq
-        correct: false
-      - text: Chromosome-level genome sequencing
+      - text: Their history reflects speciation and mirrors species history
         correct: true
-    explanation: |
-      Chromosome-level genome assembly requires high-molecular-weight DNA
-      from fresh or cryopreserved tissue. Ethanol-fixed museum specimens
-      yield highly fragmented DNA that is incompatible with long-read
-      sequencing technologies needed for chromosome-level assembly. Draft
-      genomes, UCEs, and RAD-Seq can tolerate more degraded DNA and are
-      viable with museum material, though quality varies.
+      - text: They are always present in higher copy numbers per species
+        correct: false
+      - text: They evolve faster and give more phylogenetic signal here
+        correct: false
+      - text: They can be identified without any sequence alignment needed
+        correct: false
+    explanation: >
+      Orthologs arise at speciation events, so their evolutionary
+      history matches the species tree. Paralogs arise at duplications,
+      so their gene tree may contradict the species tree.
 
-  - question: >
-      Compared to transcriptomes, whole genomes offer which key advantage
-      for ortholog inference?
+  - question: "In-paralogs differ from out-paralogs because in-paralogs:"
     options:
-      - text: They are cheaper and faster to produce
-        correct: false
-      - text: They provide better identification of full-length genes with
-          fewer chimeric sequences and no missing data from unexpressed genes
+      - text: Arose by duplication AFTER the speciation event in question
         correct: true
-      - text: They do not require annotation
+      - text: Arose by duplication BEFORE the speciation event occurred
         correct: false
-      - text: They eliminate all paralogs automatically
+      - text: Are only found in prokaryotes due to frequent duplication
         correct: false
-    explanation: |
-      Transcriptomes represent only expressed genes at the moment of sampling
-      — genes not expressed in that tissue or condition are absent, generating
-      missing data. They are also prone to chimeric transcripts from misassembly
-      of similar paralogs. Genomes capture all genes regardless of expression,
-      provide full-length sequences, and are less prone to chimerism. The
-      trade-off is cost and annotation complexity.
+      - text: Are always present in both species as identical sequences
+        correct: false
+    explanation: >
+      In-paralogs duplicated after speciation — they are restricted
+      to one lineage. Out-paralogs duplicated before speciation —
+      they are present in the ancestor and inherited by both species.
 
-  - question: >
-      Which of the following correctly describes a limitation of UCEs
-      (Ultraconserved Elements) compared to transcriptomes?
+  - question: "An orthogroup is defined as:"
     options:
-      - text: UCEs require fresh tissue whereas transcriptomes do not
-        correct: false
-      - text: UCEs are limited to the markers designed a priori and cannot
-          recover new or unexpected loci
+      - text: All homologous genes descending from the MRCA of a set of species
         correct: true
-      - text: UCEs cannot be used with museum specimens
+      - text: A pair of genes with identical sequences across two genomes
         correct: false
-      - text: UCEs are more expensive than transcriptomes
+      - text: A single gene that is one-to-one orthologous across species
         correct: false
-    explanation: |
-      UCE capture relies on a predefined set of probes targeting conserved
-      genomic regions. No marker outside those probes can be recovered — the
-      approach is closed. This is unlike transcriptomes or genomes, which
-      capture the full expressed or genomic content. UCEs also lack proper
-      orthology inference pipelines and can have misassembly issues if probes
-      were designed from few reference species. Their key advantages are cost
-      (~€75–100), independence from a reference genome, and compatibility with
-      museum and ethanol-fixed specimens.
+      - text: Any gene family regardless of the duplication or transfer
+        correct: false
+    explanation: >
+      An orthogroup extends orthology to multiple species. It groups
+      all homologous genes descending from the most recent common
+      ancestor of the species being compared — always defined by
+      a reference speciation event.
 
-  # — Taxon sampling biases —
-  - question: >
-      Long branch attraction (LBA) occurs when:
+  - question: "In Reciprocal Best Hit (RBH), two genes are considered orthologs only if:"
     options:
-      - text: Very short branches in a tree attract each other due to
-          shared ancestral characters
-        correct: false
-      - text: Distantly related taxa with high substitution rates cluster
-          erroneously because convergent substitutions mimic shared ancestry
+      - text: Each is the other's top BLAST hit in both search directions
         correct: true
-      - text: Missing taxa cause outgroups to nest inside the ingroup
+      - text: They share more than 90% sequence identity in alignment
         correct: false
-      - text: Bootstrap support values are inflated by insufficient data
+      - text: They are found on the same chromosome in both genomes
         correct: false
-    explanation: |
-      LBA is a systematic artifact caused by unequal substitution rates across
-      lineages. Long branches accumulate many substitutions, and by chance
-      some positions converge on the same state independently. Parsimony and
-      model-violating analyses mistake these convergent substitutions for
-      synapomorphies, pulling long branches together regardless of true
-      ancestry. Adding intermediate taxa that break up long branches, or using
-      better-fitting models like GTR+Γ or CAT, mitigates LBA.
+      - text: One is the best hit of the other in only one direction
+        correct: false
+    explanation: >
+      RBH requires both directions to agree — gene A in species 1
+      must hit gene X in species 2 as its best match, AND gene X
+      must hit gene A as its best match in return.
 
-  - question: >
-      A student removes all taxa with more than 50% missing data from their
-      matrix before analysis. What unintended consequence might this cause?
+  - question: "The biggest limitation of RBH is that it:"
     options:
-      - text: The tree will always become more resolved
-        correct: false
-      - text: Long branches may emerge as intermediate taxa are removed,
-          potentially increasing the risk of LBA and reducing phylogenetic signal
+      - text: Cannot detect one-to-many or many-to-many ortholog pairs
         correct: true
-      - text: The molecular clock assumption is automatically satisfied
+      - text: Requires a reference genome from a closely related species
         correct: false
-      - text: Paralogs are automatically excluded
+      - text: Only works for mitochondrial genes and not nuclear genes
         correct: false
-    explanation: |
-      Taxa with high missing data are often those with fewer sequenced genes —
-      but they may be phylogenetically critical intermediate lineages. Removing
-      them can elongate the branches of their neighbors, increasing substitution
-      rate contrasts and making LBA more likely. Missing data per se is less
-      damaging than missing taxa: modern ML and BI methods handle missing
-      data well, while the absence of key taxa permanently distorts topology.
+      - text: Overestimates the number of orthologs in large gene families
+        correct: false
+    explanation: >
+      RBH only finds one-to-one relationships. If a gene in species 1
+      duplicated in species 2, RBH picks only one match and misses
+      the others — requiring orthogroup clustering methods instead.
 
-  # — Sequencing types —
-  - question: >
-      Metagenomics differs from single-cell genomics and bulk sequencing in that:
+  - question: Which sequencing approach is best for a study needing many species at low cost?
     options:
-      - text: It sequences DNA from a single cell only
-        correct: false
-      - text: It sequences DNA from multiple organisms within an environmental
-          sample without prior isolation of individual organisms
+      - text: Transcriptomes — cheap and genome-independent per species
         correct: true
-      - text: It sequences RNA rather than DNA
+      - text: Chromosome-level genomes — expensive but most accurate
         correct: false
-      - text: It is exclusively used for bacterial phylogenomics
+      - text: PCR gene fragments — targeted but limited to one gene each
         correct: false
-    explanation: |
-      Metagenomics sequences all DNA present in an environmental sample
-      (soil, seawater, gut content) from multiple organisms simultaneously,
-      without culturing or isolating individual organisms. Bulk sequencing
-      sequences DNA from multiple cells of one organism. Single-cell genomics
-      sequences the genome of a single cell. All three are distinct experimental
-      designs with different applications in phylogenomics.
+      - text: RADseq — cheapest but only for closely related species
+        correct: false
+    explanation: >
+      Transcriptomes cost €250–500 per sample, produce thousands of
+      markers, and require no reference genome — making them ideal
+      for sampling many species across a wide phylogenetic range.
+
+  - question: "Mitochondrial genomes are NOT recommended for deep phylogenies because:"
+    options:
+      - text: High substitution rates cause saturation and homoplasy
+        correct: true
+      - text: They are expensive and difficult to sequence from tissues
+        correct: false
+      - text: They provide too many markers making analysis unwieldy
+        correct: false
+      - text: They are biparentally inherited and track both parents
+        correct: false
+    explanation: >
+      Mitogenomes evolve fast — great for shallow phylogenies but
+      problematic at deep divergences because multiple substitutions
+      at the same site (saturation) erase the true historical signal.
+
+  - question: "RADseq and GBS are most appropriate for:"
+    options:
+      - text: Population genomics or closely related species studies
+        correct: true
+      - text: Reconstructing deep animal phylogenies across major phyla
+        correct: false
+      - text: Obtaining full gene sequences for orthology inference
+        correct: false
+      - text: Studies requiring museum and ethanol-fixed ancient specimens
+        correct: false
+    explanation: >
+      RADseq/GBS only produce short SNP markers at restriction sites —
+      not full genes. They work at population or closely-related-species
+      level but cannot resolve deeper phylogenetic relationships.
+
+  - question: "UCEs (Ultraconserved Elements) have an advantage over RADseq because they:"
+    options:
+      - text: Work on museum and ethanol-fixed specimens across wider depths
+        correct: true
+      - text: Provide full-length gene sequences with proper annotation
+        correct: false
+      - text: Are the cheapest sequencing method available for any study
+        correct: false
+      - text: Allow proper orthology inference without targeted probes
+        correct: false
+    explanation: >
+      UCEs are captured by hybridization probes and work on degraded
+      DNA from ethanol-fixed or museum specimens. They cover moderate
+      to large phylogenetic distances — broader than RADseq.
+
+  - question: "The key principle for distinguishing orthologs, paralogs, and xenologs is:"
+    options:
+      - text: The mechanism at the most recent common ancestor of the genes
+        correct: true
+      - text: The similarity of function between the genes across species
+        correct: false
+      - text: The percentage of sequence identity shared between copies
+        correct: false
+      - text: Whether the genes are found on the same chromosome location
+        correct: false
+    explanation: >
+      The category is determined entirely by HOW the genes came to
+      share ancestry — speciation (orthologs), duplication (paralogs),
+      or transfer (xenologs). Function and sequence similarity are
+      irrelevant to this classification.
 
 
 fill_in_blank:
   - question: >
-      Genes related by a speciation event are called _______________, while
-      genes related by a duplication event are called _______________, and
-      genes related by a horizontal transfer event are called _______________.
+      Poor taxon sampling can cause ___ branch attraction, create
+      artificial ___ groups, and reduce ___ signal in the alignment.
     answers:
-      - "orthologs"
-      - "paralogs"
-      - "xenologs"
+      - "long"
+      - "monophyletic (clade)"
+      - "phylogenetic"
 
   - question: >
-      An orthogroup is a group of homologous genes descending from the _______________
-      of a defined group of species. It is always defined relative to a reference
-      _______________ event.
+      ___ characters share common ancestry. ___ characters share
+      function but have different evolutionary origins.
     answers:
-      - "most recent common ancestor (MRCA)"
+      - "Homologous"
+      - "Analogous"
+
+  - question: >
+      ___ genes arose by speciation and track the species tree.
+      ___ genes arose by duplication and may conflict with it.
+      ___ genes arose by horizontal gene transfer.
+    answers:
+      - "Orthologous"
+      - "Paralogous"
+      - "Xenologous"
+
+  - question: >
+      ___ paralogs arose by duplication AFTER a speciation event
+      (lineage-specific). ___ paralogs arose by duplication BEFORE
+      a speciation event (ancestral duplication).
+    answers:
+      - "In"
+      - "Out"
+
+  - question: >
+      An ___ is a group of homologous genes descending from the
+      ___ of a set of species. It is always defined by a reference
+      ___ event.
+    answers:
+      - "orthogroup"
+      - "MRCA (most recent common ancestor)"
       - "speciation"
 
   - question: >
-      In Reciprocal Best Hit, two genes are called orthologs only if each gene
-      is the other's _______________ in _______________ directions. The main
-      limitation of this approach is that it fails to detect _______________
-      ortholog relationships.
+      RBH stands for Reciprocal ___ Hit. Gene A and gene X are RBH
+      if A's best hit is X AND X's best hit is ___. This requires
+      an all-vs-all ___ search.
     answers:
-      - "best hit (top BLAST hit)"
-      - "both"
-      - "one-to-many or many-to-many"
+      - "Best"
+      - "A"
+      - "BLAST"
 
   - question: >
-      Paralogs that arose from a duplication event BEFORE a speciation event are
-      called _______________, while those arising AFTER the speciation event and
-      restricted to one lineage are called _______________.
+      The biggest limitation of RBH is that it fails to detect
+      ___-to-___ or ___-to-___ ortholog relationships.
     answers:
-      - "out-paralogs"
-      - "in-paralogs"
+      - "one"
+      - "many"
+      - "many"
+      - "many"
 
   - question: >
-      The orthology conjecture proposed that orthologous genes share the same
-      _______________, while paralogous genes differ in _______________. This
-      has been largely _______________ by subsequent studies.
+      In phylogenetics, ___ copy orthogroups are traditionally
+      preferred because they unambiguously reflect the ___ tree.
     answers:
-      - "biological function"
-      - "function"
-      - "challenged / questioned"
+      - "single (one-to-one)"
+      - "species"
 
   - question: >
-      The four main consequences of incomplete taxon sampling are:
-      _______________ attraction, artificial _______________ resolution,
-      loss of _______________ signal, and model _______________.
+      Transcriptomes cost approximately €___–___ per sample and
+      produce ___ of genes. Chromosome-level genomes cost
+      €___–___ and produce ___ of genes.
     answers:
-      - "long branch"
-      - "clade"
-      - "phylogenetic"
-      - "inadequacy"
+      - "250"
+      - "500"
+      - "thousands"
+      - "10,000"
+      - "20,000"
+      - "thousands"
 
   - question: >
-      RAD-Seq costs approximately _______________ per sample and generates only
-      _______________ rather than full gene sequences, making it suitable only
-      for _______________ or closely related species comparisons.
+      Mitochondrial genomes are useful for ___ and moderate
+      divergences but problematic at deep divergences due to
+      ___ caused by their high substitution rate.
     answers:
-      - "€100–300"
-      - "SNPs (short markers)"
-      - "population genomics"
+      - "shallow"
+      - "saturation (homoplasy)"
 
   - question: >
-      The statement 'Phylogenies require _______________, not _______________
-      genes' was made by Walter M. Fitch in _______________.
+      RADseq and GBS only produce short ___ markers, making
+      them suitable only for ___ genomics or very closely
+      related species — no proper ___ inference is possible.
     answers:
-      - "orthologous"
-      - "paralogous"
-      - "1970"
+      - "SNP"
+      - "population"
+      - "orthology"

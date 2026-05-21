@@ -1,426 +1,397 @@
-# LESSON 13 — Biases in Phylogenetics
-
 oral:
-  - q: >
-      Distinguish stochastic bias from systematic bias in phylogenetics.
-      How does each behave as more data are added, and what causes each?
-    a: |
-      Stochastic bias arises from random sampling noise due to limited data.
-      When an alignment has too few informative sites, random fluctuations in
-      which characters happen to be sampled can outweigh the true phylogenetic
-      signal, producing incorrect or poorly resolved trees. The key property
-      of stochastic error is that it is random and inconsistent — it decreases
-      as more data are added. With enough sites or genes, stochastic effects
-      average out and the true signal dominates.
-      Systematic bias arises from violations of model assumptions or incorrect
-      analytical choices. It is not random — it consistently pushes the
-      inference toward specific wrong answers. Critically, systematic bias does
-      NOT decrease with more data: it gets worse. Adding more sequences under
-      a misspecified model or with a compositional bias will make the algorithm
-      more confidently recover the wrong tree.
-      Causes:
-      Stochastic: insufficient sequence length, too few genes, low phylogenetic
-      signal (few variable sites), high variance in the substitution process.
-      Systematic: model misspecification (wrong substitution model), saturation,
-      long branch attraction (LBA), compositional heterogeneity, violation of
-      the SRH assumptions (Stationarity, Reversibility, Homogeneity).
-      Key distinguishing test: if adding more data makes the problem worse or
-      the confidence in the wrong answer increases, the bias is systematic.
-      If adding more data resolves the problem, it was stochastic.
+  - q: What is stochastic bias in phylogenetics?
+    a: >
+      Random noise introduced by limited data that can overwhelm the true
+      phylogenetic signal — even when the model used is correct.
 
-  - q: >
-      What are the SRH assumptions? Describe each and give a biological
-      example of when each is violated.
-    a: |
-      SRH stands for Stationarity, Reversibility, and Homogeneity — the three
-      assumptions shared by most standard substitution models (JC69 through GTR).
-      Stationarity: nucleotide or amino acid frequencies are at equilibrium
-      and constant over time. The composition of sequences does not change
-      directionaly across the tree.
-      Violation example: endosymbionts such as Buchnera (aphid symbionts)
-      experience extreme AT pressure due to reduced effective population size
-      and relaxed selection on DNA repair. Their GC content drops progressively
-      over evolutionary time — sequences are clearly non-stationary.
-      Reversibility (detailed balance): the substitution process looks the same
-      forward and backward in time — π(i)×Q(i,j) = π(j)×Q(j,i). This makes the
-      likelihood root-position independent, so unrooted trees can be evaluated.
-      Violation example: directional substitution biases in GC-biased gene
-      conversion, or episodic positive selection driving directional amino acid
-      change, violate detailed balance by making certain substitution directions
-      more probable than their reverse.
-      Homogeneity: the same substitution model and rate matrix apply uniformly
-      across all branches of the tree. The evolutionary process does not change
-      across lineages.
-      Violation example: parasitic organisms often shift metabolic requirements
-      when becoming obligate endoparasites, dramatically changing which amino
-      acids are selectively tolerated across the transition — the substitution
-      process differs between free-living ancestors and derived parasitic lineages.
+  - q: What are three causes of stochastic bias?
+    a: >
+      (1) Insufficient sequence length or number of genes. (2) Low
+      phylogenetic signal — few informative sites. (3) High variance
+      in the substitution process.
 
-  - q: >
-      What is long branch attraction (LBA)? Describe its mechanistic cause
-      and explain why parsimony is more susceptible than ML or BI.
-    a: |
-      LBA is a systematic artifact where distantly related taxa with high
-      substitution rates are incorrectly grouped as sisters in the inferred tree,
-      regardless of their true evolutionary relationship.
-      Mechanistic cause: long branches accumulate many substitutions. By chance,
-      independent substitutions at the same site in two separate long branches
-      converge on the same nucleotide state — a homoplasy. In parsimony, which
-      minimizes total changes, these convergent states look like synapomorphies
-      (shared derived characters indicating common ancestry), and the algorithm
-      groups the two long-branch taxa together. The longer the branches, the
-      more convergent changes accumulate, and the more confidently parsimony
-      recovers the wrong grouping.
-      Why parsimony is worse: parsimony has no explicit substitution model and
-      cannot distinguish between a true synapomorphy and a convergent change. It
-      treats all shared character states as evidence of common ancestry.
-      ML and BI with rate-heterogeneity models (e.g. GTR+Γ) are less susceptible
-      because they explicitly model the probability of multiple substitutions at
-      the same site. A long branch under GTR+Γ generates high transition
-      probabilities for all states — the model "knows" convergence is likely and
-      down-weights apparent shared states accordingly. However, ML/BI are not
-      immune: if the model is severely misspecified (e.g. rate homogeneity
-      assumed when strong heterogeneity exists), LBA can still affect them.
-      Mitigation: add intermediate taxa to break long branches, use better
-      models, or exclude confirmed long-branch taxa.
+  - q: How do you mitigate stochastic bias?
+    a: >
+      Use longer alignments and more genes to average out noise, focus
+      on genes with high phylogenetic signal, and filter hypervariable
+      or uninformative regions of the alignment.
 
-  - q: >
-      What is compositional heterogeneity and why does it mislead
-      phylogenetic inference? What strategies can mitigate it?
-    a: |
-      Compositional heterogeneity (also called non-stationarity or compositional
-      bias) occurs when nucleotide or amino acid frequencies differ among taxa
-      — violating the stationarity assumption. Standard models assume all
-      lineages evolve with the same base frequencies at equilibrium. When this
-      fails, taxa with similar compositions are attracted to each other in the
-      inferred tree, regardless of their true relationships. Two organisms with
-      high GC content will appear more similar to each other simply because they
-      share many G and C states — not because they share recent common ancestry.
-      This can produce strongly supported but wrong topologies.
-      Biological causes: lifestyle shifts (thermophily drives high GC; intracellular
-      parasitism drives AT-richness), organelle genomes (mitochondrial and plastid
-      DNA often deviate from nuclear frequencies), dietary or habitat adaptations
-      changing selective pressures on amino acid usage.
-      Mitigation strategies:
-      — Add intermediate taxa to break up long branches and distribute
-        compositional shifts across more lineages.
-      — Use profile mixture models (CAT, LG+C60) that model site-specific
-        frequency variation — more realistic than a single global frequency.
-      — Recoding: reduce the state space to minimize the effect of compositional
-        bias. For nucleotides, RY-coding (purines = R, pyrimidines = Y) eliminates
-        AT/GC bias. For amino acids, Dayhoff6 or SR4 recoding groups biochemically
-        similar amino acids, reducing the impact of compositional shifts.
-      — As a last resort, exclude taxa with extreme compositional deviation.
+  - q: What is systematic bias and how does it differ from stochastic bias?
+    a: >
+      Systematic bias comes from incorrect model assumptions — it is
+      persistent and does not decrease with more data. Stochastic bias
+      is random and does decrease as more data is added.
 
-  - q: >
-      How many genes are typically needed to mitigate stochastic error at
-      different evolutionary depths, and what filtering strategies improve
-      phylogenetic signal?
-    a: |
-      Ballpark numbers from the literature (context-dependent):
-      Shallow divergences (recent speciation, closely related species): tens of
-      genes can be sufficient to resolve relationships, as there is ample
-      variable signal and little saturation.
-      Intermediate depths: 100–500 genes are recommended to significantly
-      reduce stochastic errors and resolve difficult nodes with confidence.
-      Deep divergences and ancient rapid radiations: thousands of genes are
-      recommended for genome-scale phylogenomics, where saturation, ILS, and
-      model violations accumulate and require large amounts of signal to overcome.
-      Filtering strategies to improve signal quality:
-      — Remove hypervariable / poorly aligned regions: saturated sites introduce
-        noise rather than signal, especially for deep phylogenies.
-      — Remove invariant / uninformative sites: sites with no variation contribute
-        nothing to resolving relationships.
-      — Select genes by phylogenetic informativeness: genes evolving at rates
-        appropriate for the depth of divergence being studied. Slowly evolving
-        genes are better for deep relationships; faster genes for shallow ones.
-      — Filter by missing data thresholds: genes with very low taxon coverage
-        contribute sparse signal.
-      — Use dN/dS or other quality metrics to identify and exclude chimeric,
-        pseudogenized, or misannotated sequences.
+  - q: What are the SRH assumptions?
+    a: >
+      Stationary (base frequencies stay constant over time), Reversible
+      (the process looks the same forward and backward), and Homogeneous
+      (the same model applies across all branches). Violations of these
+      can cause incorrect topologies.
+
+  - q: What is saturation in molecular phylogenetics?
+    a: >
+      When multiple substitutions accumulate at the same site over time.
+      This causes divergence to be underestimated and increases homoplasy,
+      leading to loss of phylogenetic signal especially at deep divergences.
+
+  - q: How do you mitigate saturation?
+    a: >
+      Use slowly evolving genes or amino acid alignments instead of
+      nucleotides, apply models that account for multiple hits and rate
+      heterogeneity (e.g. Gamma), or use recoding strategies like Dayhoff6
+      or RY coding.
+
+  - q: What is Long Branch Attraction (LBA)?
+    a: >
+      A bias where long branches accumulate so many substitutions that
+      some become parallel by chance, making unrelated taxa look falsely
+      similar and causing them to cluster together incorrectly.
+
+  - q: What are two ways to mitigate LBA?
+    a: >
+      (1) Use better-fitting models like GTR+Γ or CAT that account for
+      rate variation. (2) Add intermediate taxa to break up long branches,
+      reducing the chance of convergent substitutions being mistaken for
+      shared ancestry.
+
+  - q: What is composition heterogeneity and why is it a problem?
+    a: >
+      When different lineages have different nucleotide or amino acid
+      frequencies. Taxa with similar compositions cluster together based
+      on that similarity rather than true evolutionary ancestry.
+
+  - q: Name two causes of composition heterogeneity.
+    a: >
+      (1) Varying GC content due to mutation bias. (2) Lifestyle shifts
+      such as thermophily, parasitism, or endosymbiosis changing
+      metabolic constraints.
+
+  - q: How do you mitigate composition heterogeneity?
+    a: >
+      Use profile mixture models, apply amino acid or nucleotide recoding
+      (e.g. Dayhoff6, SR4, RY), add intermediate taxa to break long
+      branches, or exclude taxa that strongly deviate in composition.
+
+  - q: What does a saturation plot show and what does the plateau indicate?
+    a: >
+      It plots pairwise genetic distance against divergence time. Early
+      divergences show a linear increase (good signal). A plateau on the
+      right means additional time no longer adds detectable substitutions —
+      the sequences are saturated.
+
+  - q: Why do transitions saturate faster than transversions on a saturation plot?
+    a: >
+      Transitions (purine↔purine, pyrimidine↔pyrimidine) are biochemically
+      more frequent, so they accumulate and reach saturation faster than
+      transversions.
+
+  - q: Roughly how many genes are needed to resolve deep phylogenies reliably?
+    a: >
+      Hundreds of loci (100–500) for intermediate depths; thousands of
+      genes are recommended for genome-scale studies spanning a wide range
+      of divergence times.
 
 
 mcq:
-  - question: >
-      Systematic bias in phylogenetics is most dangerous because:
+  - question: "Stochastic bias in phylogenetics is caused by:"
     options:
-      - text: It is random and unpredictable
-        correct: false
-      - text: It only affects parsimony, not likelihood methods
-        correct: false
-      - text: It persists and worsens with more data — the wrong tree is
-          recovered with increasing confidence
+      - text: Limited data that introduces random noise into the signal
         correct: true
-      - text: It disappears when more taxa are included
+      - text: Using the wrong substitution model for the dataset
         correct: false
-    explanation: |
-      Unlike stochastic error (which averages out with more data), systematic
-      bias is directional and consistent. A model that is wrong in a specific
-      way will impose the same wrong signal across all sites — adding more
-      sites amplifies rather than dilutes that signal. The tree may be recovered
-      with 100% bootstrap support while being completely wrong. This is why
-      detecting and correcting systematic biases (LBA, compositional
-      heterogeneity, saturation) is critical before trusting high support values.
+      - text: Differences in base composition across lineages studied
+        correct: false
+      - text: Multiple substitutions accumulating at the same sites
+        correct: false
+    explanation: >
+      Stochastic bias is random error from insufficient data — too few
+      genes or too short alignments mean noise can dominate over the true
+      phylogenetic signal, even with a correct model.
 
-  - question: >
-      Which statement best describes SRH assumption violations?
+  - question: What is the key difference between stochastic and systematic bias?
     options:
-      - text: They are rare in real data and only occur in ancient lineages
-        correct: false
-      - text: They are common and lead to systematic bias — non-stationary,
-          non-reversible, or non-homogeneous evolution misleads standard models
+      - text: Stochastic decreases with more data; systematic does not
         correct: true
-      - text: They only affect Bayesian inference, not ML
+      - text: Systematic decreases with more data; stochastic does not
         correct: false
-      - text: They can always be corrected by adding more outgroups
+      - text: Both are eliminated by adding more taxa to the dataset
         correct: false
-    explanation: |
-      SRH violations are ubiquitous in real biological datasets. Non-stationarity
-      (composition shifts across lineages), non-homogeneity (different evolutionary
-      processes in different parts of the tree), and violations of detailed balance
-      all occur regularly — especially in GC-biased organisms, endosymbionts,
-      parasites, and organellar genomes. Standard GTR-family models assume all
-      three, so violations introduce systematic biases that outgroups alone
-      cannot fix.
+      - text: Both are caused by violations of the SRH assumptions
+        correct: false
+    explanation: >
+      Stochastic bias is random — averaging out with more data.
+      Systematic bias is persistent — it stays even with unlimited data
+      because it comes from incorrect model assumptions.
 
-  - question: >
-      Sequence saturation most severely affects:
+  - question: Which set of three terms correctly describes the SRH assumptions?
     options:
-      - text: Single-copy nuclear genes at shallow divergences
-        correct: false
-      - text: Highly conserved genes used as universal markers
-        correct: false
-      - text: Rapidly evolving sites such as transitions and third codon
-          positions at deep evolutionary distances
+      - text: Stationary, Reversible, Homogeneous
         correct: true
-      - text: Amino acid sequences but not nucleotide sequences
+      - text: Saturated, Recoded, Heterogeneous
         correct: false
-    explanation: |
-      Saturation occurs when multiple substitutions accumulate at the same site,
-      erasing earlier evolutionary events. It is most severe for rapidly evolving
-      positions (transitions, synonymous third codon positions, hypervariable
-      loop regions) and for deep divergences where more time has passed for
-      multiple hits to accumulate. Conserved sites and shallow comparisons are
-      less affected. Switching from nucleotides to amino acids reduces the state
-      space and the effective substitution rate, mitigating saturation for
-      deep phylogenies.
+      - text: Symmetric, Random, Hierarchical
+        correct: false
+      - text: Stochastic, Rapid, Homoplastic
+        correct: false
+    explanation: >
+      SRH stands for Stationary (constant base frequencies), Reversible
+      (same process forward and backward), and Homogeneous (same model on
+      all branches). Violations of these lead to systematic bias.
 
-  - question: >
-      Adding intermediate taxa to a dataset helps mitigate LBA because:
+  - question: "Saturation occurs when:"
     options:
-      - text: It increases the number of parsimony-informative sites
-        correct: false
-      - text: It breaks long branches, reducing convergent substitutions
-          that are mistaken for synapomorphies
+      - text: Multiple substitutions hit the same site, masking true change
         correct: true
-      - text: Intermediate taxa always have shorter sequences
+      - text: Base frequencies differ strongly between distant lineages
         correct: false
-      - text: It reduces the number of topologies to evaluate
+      - text: Too few genes are used to resolve shallow divergences here
         correct: false
-    explanation: |
-      Long branches attract each other because they accumulate many convergent
-      substitutions. Adding intermediate taxa splits long branches into shorter
-      segments — each shorter branch accumulates fewer substitutions, reducing
-      the probability that any two long branches share convergent states by
-      chance. This is one of the most effective practical solutions to LBA.
+      - text: Long branches are attracted together by random chance alone
+        correct: false
+    explanation: >
+      Saturation is the accumulation of multiple substitutions at the same
+      site. The observed distance underestimates the true number of changes,
+      reducing phylogenetic signal — especially at deep divergences.
 
-  - question: >
-      RY-coding for nucleotide sequences is used to mitigate:
+  - question: Which approach best mitigates saturation for deep phylogenies?
     options:
-      - text: Long branch attraction in parsimony analyses
-        correct: false
-      - text: Compositional heterogeneity by collapsing the four nucleotides
-          into two states (purines and pyrimidines), eliminating AT/GC bias
+      - text: Use amino acid alignments or slowly evolving gene regions
         correct: true
-      - text: Saturation by removing hypervariable sites
+      - text: Add more taxa sampled from the same time period studied
         correct: false
-      - text: ILS by reducing gene tree discordance
+      - text: Use parsimony to minimize the total number of changes seen
         correct: false
-    explanation: |
-      RY-coding converts A and G to R (purine) and C and T to Y (pyrimidine),
-      reducing the character state space from 4 to 2. This eliminates the
-      AT vs GC compositional bias because the distinction between purines and
-      pyrimidines is maintained but within-class frequency differences are
-      erased. It is particularly useful for deep phylogenies of organisms with
-      strongly divergent base compositions (e.g. comparing AT-rich parasites
-      to GC-rich free-living relatives).
+      - text: Increase the number of hypervariable regions in alignment
+        correct: false
+    explanation: >
+      Amino acids are less affected by saturation than nucleotides because
+      there are 20 states instead of 4 — the chance of reverting to the
+      same state by chance is much lower. Slowly evolving regions also
+      accumulate fewer multiple hits.
 
-  - question: >
-      A researcher finds that adding more genes to their phylogenomic
-      analysis consistently increases bootstrap support for what appears
-      to be the wrong topology. This is most likely evidence of:
+  - question: "Long Branch Attraction (LBA) causes:"
     options:
-      - text: Insufficient taxon sampling
-        correct: false
-      - text: Systematic bias — a model violation or compositional artifact
-          that is amplified rather than diluted by more data
+      - text: Unrelated long-branched taxa to cluster together falsely
         correct: true
-      - text: Stochastic error from too few sites
+      - text: Short-branched taxa to appear more distantly related here
         correct: false
-      - text: Convergence failure in the ML tree search
+      - text: Base composition to become uniform across all lineages
         correct: false
-    explanation: |
-      Increasing confidence in a specific wrong answer as data increase is the
-      hallmark of systematic bias. A correctly modeled analysis should converge
-      on the true tree as data increase. If it instead becomes more confident
-      in an incorrect topology, a systematic force — LBA, compositional
-      heterogeneity, model misspecification, or ILS-driven concatenation failure
-      — is consistently misleading the inference. More genes do not help and
-      can make it worse.
+      - text: Phylogenetic signal to increase at deeper divergence nodes
+        correct: false
+    explanation: >
+      Long branches accumulate many substitutions. Some of these become
+      identical by chance (parallel substitutions), making distantly related
+      long-branched taxa look similar — they incorrectly group together.
 
-  - question: >
-      Compositional heterogeneity groups taxa with similar nucleotide or
-      amino acid composition because:
+  - question: "The best way to break up long branches and reduce LBA is to:"
     options:
-      - text: They share the same substitution model
-        correct: false
-      - text: Similar composition produces similar sequences that standard
-          models misinterpret as evidence of shared ancestry rather than
-          parallel compositional evolution
+      - text: Add intermediate taxa that fill in the evolutionary gap
         correct: true
-      - text: High GC content always indicates a recent common ancestor
+      - text: Remove all taxa with short branches from the analysis
         correct: false
-      - text: Composition only varies in non-coding regions
+      - text: Switch from maximum likelihood to parsimony as the method
         correct: false
-    explanation: |
-      Standard models assume all lineages evolve with the same equilibrium
-      frequencies. When two unrelated taxa independently shift to high GC
-      content, they share many G and C states — not as synapomorphies but as
-      the result of parallel compositional evolution. Standard models interpret
-      these shared states as evidence of common ancestry and cluster the taxa
-      together, producing a wrong but often highly supported topology.
+      - text: Use only transitions and exclude transversions from data
+        correct: false
+    explanation: >
+      Adding intermediate taxa breaks long branches into shorter segments,
+      reducing the probability that parallel substitutions will accumulate
+      and be mistaken for shared ancestry between distant lineages.
 
-  - question: >
-      Which mitigation strategy specifically targets saturation rather
-      than LBA or compositional heterogeneity?
+  - question: "Composition heterogeneity causes problems in phylogenetics because:"
     options:
-      - text: Adding intermediate taxa
-        correct: false
-      - text: Using profile mixture models
-        correct: false
-      - text: Selecting slowly evolving genes or using amino acid sequences
-          for deep phylogenies to reduce the effective substitution rate
+      - text: Taxa with similar base frequencies cluster by composition
         correct: true
-      - text: Running multiple independent ML searches from different start trees
+      - text: It increases the number of informative sites in alignment
         correct: false
-    explanation: |
-      Saturation is caused by too many substitutions at the same sites over
-      time — the observed distance plateaus and underestimates true divergence.
-      The primary mitigation is to use slowly evolving characters (ribosomal
-      genes, conserved coding regions) or to switch from nucleotides to amino
-      acids (fewer states, lower effective rate, less saturation per unit time).
-      Adding intermediate taxa primarily breaks long branches (LBA mitigation);
-      profile mixture models primarily address compositional heterogeneity.
+      - text: It reduces the substitution rate uniformly across lineages
+        correct: false
+      - text: It causes short branches to appear much longer than they are
+        correct: false
+    explanation: >
+      When lineages have different base or amino acid frequencies, the
+      phylogenetic method may group taxa based on that compositional
+      similarity rather than true shared ancestry.
 
-  - question: >
-      Parsimony is statistically inconsistent in Felsenstein's zone.
-      This means:
+  - question: Which of the following is a cause of composition heterogeneity?
     options:
-      - text: Parsimony produces unrooted trees in regions of high rate variation
-        correct: false
-      - text: As more data are added, parsimony converges on the correct tree
-          but very slowly
-        correct: false
-      - text: In certain parameter regions, parsimony converges on the wrong
-          tree with increasing probability as sequence length increases
+      - text: Lifestyle shifts such as parasitism or thermophily in taxa
         correct: true
-      - text: Felsenstein proved parsimony always outperforms distance methods
+      - text: Using too few genes to resolve shallow evolutionary splits
         correct: false
-    explanation: |
-      Statistical inconsistency means the method converges on a wrong answer
-      as data go to infinity. Felsenstein's zone defines parameter space
-      (two long branches separated by a short internal branch, with two short
-      outgroup branches) where convergent substitutions on the two long branches
-      systematically outweigh true synapomorphies, causing parsimony to group
-      the long-branch taxa together. More sequence data make the convergent
-      signal stronger, not weaker — convergence on the wrong tree with
-      probability approaching 1.
+      - text: Applying a model that assumes rate variation across sites
+        correct: false
+      - text: Including outgroup taxa that are distantly related to rest
+        correct: false
+    explanation: >
+      Parasitism, thermophily, and endosymbiosis alter metabolic constraints
+      and mutation biases in different lineages, leading to different
+      nucleotide or amino acid frequencies — a classic source of composition
+      heterogeneity.
+
+  - question: "RY recoding is used to mitigate:"
+    options:
+      - text: Both saturation and composition heterogeneity in nucleotides
+        correct: true
+      - text: Stochastic bias from having too few genes in the study
+        correct: false
+      - text: LBA caused by very uneven substitution rates across taxa
+        correct: false
+      - text: Errors in alignment due to hypervariable indel-rich regions
+        correct: false
+    explanation: >
+      RY recoding collapses nucleotides into purines (R) and pyrimidines (Y),
+      reducing the impact of transition saturation and GC-content variation,
+      helping with both saturation and composition heterogeneity.
+
+  - question: "On a saturation plot, a plateau on the right side of the graph indicates:"
+    options:
+      - text: Sequences are saturated — more time adds no new detectable signal
+        correct: true
+      - text: Sequences are evolving faster than expected at that point
+        correct: false
+      - text: Transitions and transversions are accumulating at equal rates
+        correct: false
+      - text: The divergence time estimate is becoming more accurate now
+        correct: false
+    explanation: >
+      The plateau means the observed distance no longer increases with
+      greater true divergence — multiple substitutions at the same sites
+      erase the historical signal, causing saturation.
+
+  - question: Why do transitions saturate faster than transversions on a saturation plot?
+    options:
+      - text: Transitions are biochemically more frequent than transversions
+        correct: true
+      - text: Transversions involve more nucleotide bases changing at once
+        correct: false
+      - text: Transitions are only found in coding regions of the genome
+        correct: false
+      - text: Transversions are removed by DNA repair more efficiently
+        correct: false
+    explanation: >
+      Transitions (purine↔purine or pyrimidine↔pyrimidine) happen more
+      often because they require smaller biochemical changes. This higher
+      frequency means they hit multiple-hit saturation earlier than
+      transversions.
+
+  - question: Which model feature best addresses both LBA and rate heterogeneity?
+    options:
+      - text: GTR+Γ or CAT models that allow rate variation across sites
+        correct: true
+      - text: Strict parsimony that minimizes total substitutions counted
+        correct: false
+      - text: A strict molecular clock applied uniformly across all taxa
+        correct: false
+      - text: Uniform base frequencies assumed across all lineages here
+        correct: false
+    explanation: >
+      Models like GTR+Γ account for variation in substitution rates across
+      sites, reducing the tendency to misinterpret parallel substitutions
+      on long branches as shared ancestry — directly addressing LBA.
+
+  - question: How many genes are typically recommended for genome-scale phylogenies spanning wide divergence times?
+    options:
+      - text: Thousands of genes for reliable signal across deep splits
+        correct: true
+      - text: A single well-chosen gene is always sufficient for accuracy
+        correct: false
+      - text: Around ten genes are always enough regardless of depth
+        correct: false
+      - text: Fewer genes reduce noise better than using many loci here
+        correct: false
+    explanation: >
+      Literature guidelines suggest: dozens of genes for shallow splits,
+      100–500 for intermediate depths, and thousands for genome-scale
+      studies that need to accurately resolve a wide range of divergence
+      times.
 
 
 fill_in_blank:
   - question: >
-      Stochastic bias _______________ as more data are added; systematic bias
-      _______________ as more data are added. The key test: if confidence in
-      the wrong answer increases with more data, the bias is _______________.
+      ___ bias comes from random noise in limited data. ___ bias
+      comes from incorrect model assumptions.
     answers:
-      - "decreases (averages out)"
-      - "persists or worsens"
-      - "systematic"
+      - "Stochastic"
+      - "Systematic"
 
   - question: >
-      The SRH assumptions are _______________ (frequencies constant over
-      time), _______________ (process identical forward and backward), and
-      _______________ (same model across all branches). Violations of any
-      of these lead to _______________ bias.
+      Stochastic bias ___ with more data. Systematic bias ___
+      even when more data is added.
     answers:
-      - "Stationarity"
-      - "Reversibility"
-      - "Homogeneity"
-      - "systematic"
+      - "decreases"
+      - "persists (remains)"
 
   - question: >
-      LBA occurs because convergent substitutions on two _______________ branches
-      are mistaken for _______________. Parsimony is more susceptible than ML
-      because it lacks an explicit _______________ and cannot model the
-      probability of _______________ substitutions.
+      The SRH assumptions are: ___ (frequencies constant over time),
+      ___ (same process forward and backward), and ___ (same model
+      on all branches).
     answers:
-      - "long"
-      - "synapomorphies (shared derived characters)"
-      - "substitution model"
-      - "multiple (convergent)"
+      - "Stationary"
+      - "Reversible"
+      - "Homogeneous"
 
   - question: >
-      Compositional heterogeneity groups taxa by _______________ similarity
-      rather than _______________. It is caused by organisms independently
-      shifting their base or amino acid _______________ due to lifestyle changes
-      such as _______________ or endoparasitism.
+      Saturation occurs when multiple substitutions hit the ___ site,
+      causing divergence to be ___ and increasing ___.
     answers:
-      - "compositional"
-      - "shared ancestry"
-      - "composition (frequencies)"
-      - "thermophily"
+      - "same"
+      - "underestimated"
+      - "homoplasy"
 
   - question: >
-      Three mitigation strategies for compositional heterogeneity are:
-      using _______________ mixture models, _______________ coding (e.g. RY or
-      Dayhoff6), and adding _______________ taxa to break up compositional shifts
-      across more lineages.
+      For deep phylogenies, ___ alignments are preferred over
+      nucleotides to reduce saturation, because they have ___ possible
+      states, making chance reversions less likely.
     answers:
-      - "profile (CAT, LG+C60)"
-      - "recoding"
-      - "intermediate"
-
-  - question: >
-      Saturation causes the _______________ distance to plateau while the true
-      distance continues to grow. It is worst for _______________ evolving sites
-      and _______________ divergences. The main mitigation is to use _______________
-      evolving genes or switch to _______________ sequences.
-    answers:
-      - "observed (p-distance)"
-      - "rapidly"
-      - "deep"
-      - "slowly"
       - "amino acid"
+      - "20"
 
   - question: >
-      Stochastic bias is caused by _______________ sequence data or _______________
-      phylogenetic signal. Literature ballpark: _______________ genes for shallow
-      divergences, _______________ genes for intermediate depths, and _______________
-      genes for deep phylogenomics.
+      Long Branch Attraction causes distantly related taxa with ___
+      branches to cluster together because of ___ substitutions
+      that arise by chance.
     answers:
-      - "insufficient"
-      - "low (few informative sites)"
-      - "tens of"
-      - "100–500"
-      - "thousands of"
-
-  - question: >
-      Felsenstein's zone is a parameter region where parsimony is statistically
-      _______________ — it converges on the _______________ tree as more data
-      are added. This occurs when two _______________ branches are separated by
-      a _______________ internal branch.
-    answers:
-      - "inconsistent"
-      - "wrong"
       - "long"
-      - "short"
+      - "parallel (convergent)"
+
+  - question: >
+      Two ways to mitigate LBA are: adding ___ taxa to break long
+      branches, and using better-fitting models like ___ or ___.
+    answers:
+      - "intermediate"
+      - "GTR+Γ"
+      - "CAT"
+
+  - question: >
+      Composition heterogeneity causes taxa with similar ___ frequencies
+      to cluster together based on ___ rather than shared ancestry.
+    answers:
+      - "base (nucleotide/amino acid)"
+      - "composition"
+
+  - question: >
+      Two lifestyle shifts that cause composition heterogeneity are
+      ___ and ___.
+    answers:
+      - "thermophily"
+      - "parasitism (endosymbiosis)"
+
+  - question: >
+      On a saturation plot, a ___ on the right side means sequences
+      are saturated. ___ saturate faster than ___ because they are
+      biochemically more frequent.
+    answers:
+      - "plateau"
+      - "Transitions"
+      - "transversions"
+
+  - question: >
+      RY recoding collapses nucleotides into ___ (R) and ___ (Y),
+      helping mitigate both ___ and composition heterogeneity.
+    answers:
+      - "purines"
+      - "pyrimidines"
+      - "saturation"

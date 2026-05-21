@@ -1,477 +1,406 @@
-# LESSON 06 — Distance-Based vs Character-Based Algorithms
-
 oral:
-  - q: >
-      Explain the key conceptual difference between distance-based and
-      character-based phylogenetic methods. When would you still use
-      a distance-based method today?
-    a: |
-      Distance-based methods collapse the alignment into a pairwise distance
-      matrix — a single summary number per pair of taxa representing their
-      total evolutionary divergence. The tree is then built directly from this
-      matrix using a clustering or optimization algorithm. Once the matrix is
-      computed, the original character data (individual columns) are never
-      consulted again. This is fast but loses all site-specific information.
-      Character-based methods evaluate the alignment one column at a time,
-      comparing specific character states at homologous positions across taxa.
-      They construct and score many alternative trees by asking how well each
-      tree explains the observed pattern of characters. This retains far more
-      information and allows integration of explicit evolutionary models.
-      Distance-based methods are still useful today for:
-      — Rapid exploratory analysis of very large datasets (thousands of taxa)
-        where ML or BI would be computationally prohibitive.
-      — Building guide trees for progressive alignment.
-      — Quick sanity checks on data quality before intensive analysis.
-      — Situations where only pairwise distances are available (e.g. some
-        immunological or phenotypic data).
-      However, for publishable phylogenomic inference, character-based ML
-      or BI methods are always preferred.
+  - q: What are distance-based phylogenetic methods based on?
+    a: >
+      Pairwise differences between sequences. They count how many
+      characters differ between each pair of aligned sequences and
+      summarize these in a distance matrix.
 
-  - q: >
-      Compare UPGMA and Neighbor Joining (NJ). What assumption does each
-      make about molecular evolution, and what type of tree does each produce?
-    a: |
-      UPGMA (Unweighted Pair Group Method with Arithmetic Mean):
-      — Assumes a strict molecular clock: all lineages evolve at the same
-        constant rate. This means all tips are equidistant from the root.
-      — Produces a rooted, ultrametric tree: all tips are at equal total
-        distance from the root, and internal node heights represent
-        divergence times (given a clock).
-      — Clusters taxa by repeatedly merging the pair with the smallest
-        pairwise distance and averaging distances to form the new cluster.
-      — Is sensitive to violations of the clock assumption: if lineages
-        evolve at different rates, UPGMA will give a systematically wrong tree.
-      Neighbor Joining (NJ):
-      — Does not assume a molecular clock. It corrects for unequal evolutionary
-        rates by computing a Q-matrix that accounts for net divergence (R-value)
-        of each taxon from all others before selecting which pair to cluster.
-      — Produces an unrooted tree with branch lengths proportional to
-        evolutionary change. A root must be added afterward via an outgroup
-        or midpoint rooting.
-      — Is more accurate than UPGMA when rate variation exists across lineages.
-      — Still less accurate than ML or BI because it uses collapsed pairwise
-        distances rather than the full character data with an explicit model.
+  - q: Name the two main distance-based methods and their key difference.
+    a: >
+      UPGMA produces a rooted, ultrametric tree and assumes a constant
+      molecular clock. Neighbor Joining (NJ) produces an unrooted tree
+      and does NOT assume a molecular clock.
 
-  - q: >
-      What is the Q-matrix in Neighbor Joining and why is it necessary?
-      Walk through the logic of why raw pairwise distance alone is insufficient
-      to select the correct neighbors.
-    a: |
-      The Q-matrix is a corrected distance matrix computed in each NJ iteration
-      to account for the fact that a taxon may appear close to another simply
-      because both are rapidly evolving, not because they are true sisters.
-      The raw pairwise distance d(i,j) conflates two effects: the actual
-      evolutionary distance between i and j, and the background rate at which
-      each taxon has been evolving relative to all others in the dataset.
-      NJ corrects for this by computing R(i) — the sum of distances from taxon i
-      to all other taxa (net divergence). The Q-value for a pair is:
-      Q(i,j) = (n − 2) × d(i,j) − R(i) − R(j)
-      where n is the current number of taxa.
-      By subtracting the net divergences, Q adjusts for the tendency of
-      long-branch taxa to appear artificially close to each other. The pair
-      with the most negative Q-value is the true neighbor pair — they are
-      closest after correcting for rate differences.
-      This is the key reason NJ outperforms UPGMA when evolutionary rates
-      differ: UPGMA picks the pair with the smallest raw d(i,j) and is fooled
-      by fast-evolving taxa appearing close to each other, whereas NJ
-      compensates for rate variation at every clustering step.
+  - q: What does UPGMA stand for and what kind of tree does it produce?
+    a: >
+      Unweighted Pair Group Method with Arithmetic Mean. It produces a
+      rooted, ultrametric tree where all tips are equidistant from the root.
 
-  - q: >
-      In Maximum Parsimony, what makes a site parsimony-informative?
-      Describe the process of scoring a tree under parsimony.
-    a: |
-      A parsimony-informative site must satisfy two conditions simultaneously:
-      1. It must contain at least two different character states.
-      2. Each of those states must appear in at least two taxa.
-      A site where one state is unique to a single taxon (singleton) is not
-      informative — it adds the same cost to all topologies and cannot
-      discriminate among them. An invariant site is also uninformative.
-      Scoring a tree under parsimony:
-      For each informative site, the tree is evaluated using Fitch's algorithm
-      (for unweighted parsimony). Working from the tips upward to the root:
-      — At each internal node, if the sets of states from its two children
-        overlap, the intersection is assigned to that node (no change, cost 0).
-      — If they do not overlap, the union is assigned and one substitution is
-        counted (cost +1).
-      The total parsimony score for a tree is the sum of changes across all
-      informative sites. The most parsimonious tree is the one requiring the
-      fewest total changes across all characters — the minimum number of
-      evolutionary events necessary to explain the observed data.
-      Because the number of possible trees grows super-exponentially, heuristic
-      search methods (NNI, SPR, TBR) are used to explore tree space without
-      evaluating every possible topology.
+  - q: Describe the UPGMA algorithm in three steps.
+    a: >
+      (1) Build a pairwise distance matrix. (2) Merge the pair with the
+      smallest distance into a cluster. (3) Recalculate distances from
+      the new cluster to all remaining taxa as the average of the two
+      original distances. Repeat until one cluster remains.
 
-  - q: >
-      Compare the three tree rearrangement strategies — NNI, SPR, and TBR —
-      in terms of the extent of topological change and computational cost.
-      Why is TBR least prone to local optima?
-    a: |
-      NNI (Nearest Neighbour Interchange):
-      — Selects one internal branch and swaps one of the two subtrees on each
-        side with one of its neighbors across the branch — exactly 2 alternative
-        topologies per internal branch.
-      — Smallest topological change per step; fastest to evaluate.
-      — Most prone to getting stuck in local optima because it explores only
-        the immediate vicinity of the current tree.
-      SPR (Subtree Pruning and Regrafting):
-      — Prunes an entire subtree from the tree and reattaches it at a different
-        branch elsewhere in the tree.
-      — Explores a larger neighbourhood than NNI — many possible reattachment
-        points for each subtree.
-      — Intermediate computational cost and propensity for local optima.
-      TBR (Tree Bisection and Reconnection):
-      — Cuts the tree into two subtrees by removing an internal branch, then
-        reconnects any branch of one subtree to any branch of the other.
-      — Explores the largest topological neighbourhood — far more alternative
-        trees per step than NNI or SPR.
-      — Most computationally expensive per iteration.
-      — Least prone to local optima because it can make large jumps across
-        tree space and escape valleys that NNI and SPR cannot leave.
-      In practice, ML software (e.g. IQ-TREE, RAxML) typically uses SPR or
-      TBR as the primary search strategy, sometimes combined with NNI for
-      local refinement.
+  - q: What is the key difference between how UPGMA and NJ select the next pair to merge?
+    a: >
+      UPGMA merges the pair with the smallest raw distance. NJ first
+      corrects for the overall divergence of each taxon (the Q-matrix)
+      and merges the pair with the most negative Q-value — accounting
+      for rate variation across lineages.
+
+  - q: What is the Q-matrix in NJ and why is it needed?
+    a: >
+      The Q-matrix corrects raw distances by the net divergence (R) of
+      each taxon from all others. This adjustment accounts for unequal
+      substitution rates, preventing fast-evolving taxa from being
+      incorrectly grouped together.
+
+  - q: What are character-based phylogenetic methods and why are they more accurate than distance-based?
+    a: >
+      They evaluate each character (nucleotide or amino acid position)
+      individually and incorporate explicit evolutionary models. This
+      makes them more accurate than distance-based methods, which
+      compress all information into a single pairwise number.
+
+  - q: What is the principle of Maximum Parsimony?
+    a: >
+      Reconstruct the tree that requires the fewest total evolutionary
+      changes (substitutions) to explain the observed data.
+
+  - q: What makes a site parsimony-informative?
+    a: >
+      It must have at least two different character states, and each
+      state must appear in at least two taxa. Sites that are invariant
+      or have a state present in only one taxon (singletons) are not
+      informative.
+
+  - q: What is the main weakness of Maximum Parsimony?
+    a: >
+      It has no proper statistical model and does not correct for
+      multiple substitutions. It is sensitive to homoplasy and can
+      give wrong results with long branches (Long Branch Attraction).
+
+  - q: What are the three tree rearrangement methods used to explore tree space?
+    a: >
+      NNI (Nearest Neighbour Interchange) — swaps two neighbouring
+      subtrees around one internal branch; fast but may get stuck
+      locally. SPR (Subtree Pruning and Regrafting) — prunes and
+      reattaches a subtree elsewhere. TBR (Tree Bisection and
+      Reconnection) — cuts the tree in two and reconnects any two
+      branches; most thorough.
+
+  - q: Why can we not simply score every possible tree topology?
+    a: >
+      The number of possible trees grows exponentially with the number
+      of taxa — it becomes computationally impossible. Tree rearrangement
+      heuristics are used to explore the tree space efficiently instead.
+
+  - q: Which tree rearrangement method is fastest but most likely to get stuck in a local optimum?
+    a: >
+      NNI (Nearest Neighbour Interchange), because it only makes small
+      local changes — swapping two neighbouring subtrees around one
+      internal branch — and explores a very limited neighbourhood.
+
+  - q: Which tree rearrangement method explores the largest area of tree space?
+    a: >
+      TBR (Tree Bisection and Reconnection), because it cuts the tree
+      into two large subtrees and can reconnect any branch of one to
+      any branch of the other — exploring the widest set of alternatives.
+
+  - q: What is the main practical use of distance-based methods today?
+    a: >
+      Fast exploratory analysis of large datasets before running more
+      accurate but computationally intensive character-based methods
+      like Maximum Likelihood or Bayesian Inference.
 
 
 mcq:
-  # — UPGMA —
-  - question: >
-      UPGMA produces an ultrametric tree. This means:
+  - question: "Distance-based phylogenetic methods use:"
     options:
-      - text: The tree has no branch lengths
-        correct: false
-      - text: All tips are equidistant from the root, implying a strict
-          molecular clock
+      - text: Pairwise differences between sequences in a distance matrix
         correct: true
-      - text: The tree has been rooted using an outgroup
+      - text: Character-by-character evaluation with an evolutionary model
         correct: false
-      - text: Branch lengths represent time in millions of years
+      - text: The minimum number of substitutions to explain the data
         correct: false
-    explanation: |
-      An ultrametric tree satisfies the ultrametric inequality: for any three
-      taxa, the two largest pairwise distances are equal. This means all tips
-      are at the same total evolutionary distance from the root — a consequence
-      of assuming a constant molecular clock across all lineages. If lineages
-      evolve at different rates, UPGMA produces a wrong (non-ultrametric in
-      reality) topology because it forces a clock that does not exist.
+      - text: Bayesian probability distributions over tree topologies
+        correct: false
+    explanation: >
+      Distance-based methods compress sequence information into pairwise
+      differences, stored in a distance matrix. They do not evaluate
+      individual characters or use explicit evolutionary models.
 
-  - question: >
-      In UPGMA, when two taxa A and B are merged into a cluster (A,B), the
-      distance from (A,B) to a third taxon C is computed as:
+  - question: "UPGMA assumes:"
     options:
-      - text: The minimum of d(A,C) and d(B,C)
-        correct: false
-      - text: The arithmetic mean of d(A,C) and d(B,C)
+      - text: A constant molecular clock across all lineages in the tree
         correct: true
-      - text: The product of d(A,C) and d(B,C)
+      - text: Different lineages can evolve at very different rates freely
         correct: false
-      - text: The sum of d(A,C) and d(B,C)
+      - text: The tree must be unrooted and lacks a temporal dimension
         correct: false
-    explanation: |
-      UPGMA uses the arithmetic (unweighted) mean: d((A,B),C) = [d(A,C) +
-      d(B,C)] / 2. This is where the "Unweighted" and "Arithmetic Mean" parts
-      of the name come from. The alternative WPGMA weights by cluster size,
-      preventing large clusters from dominating the distance estimates in
-      subsequent iterations.
+      - text: Branch lengths are estimated using a Q-matrix correction
+        correct: false
+    explanation: >
+      UPGMA assumes a strict molecular clock — all lineages evolve at
+      the same constant rate. This is why it produces an ultrametric
+      tree (all tips equidistant from the root).
 
-  - question: >
-      A researcher applies UPGMA to a dataset where one lineage evolves three
-      times faster than all others. The expected result is:
+  - question: What type of tree does UPGMA produce?
     options:
-      - text: A perfectly accurate tree, since UPGMA uses corrected distances
-        correct: false
-      - text: A biased tree where the fast-evolving lineage is incorrectly
-          placed as sister to a distant group, because UPGMA assumes all
-          lineages evolve at the same rate
+      - text: Rooted and ultrametric (all tips equidistant from root)
         correct: true
-      - text: An unrooted tree, since UPGMA cannot handle rate variation
+      - text: Unrooted with branch lengths reflecting rate variation
         correct: false
-      - text: A polytomy at the position of the fast-evolving lineage
+      - text: Rooted but with tips at very different depths in the tree
         correct: false
-    explanation: |
-      UPGMA's molecular clock assumption means it interprets large pairwise
-      distances as ancient divergences. A fast-evolving lineage has large
-      distances to all other taxa, so UPGMA places it at a deep node in the
-      tree — even if it is actually closely related to other taxa. This is a
-      systematic error, not random noise. NJ corrects for this via the Q-matrix.
+      - text: Unrooted and ultrametric with no branch length estimates
+        correct: false
+    explanation: >
+      Because UPGMA assumes a constant clock, all lineages accumulate
+      the same amount of change per unit time, making all tips
+      equidistant from the root — an ultrametric tree.
 
-  # — Neighbor Joining —
-  - question: >
-      The Q-matrix in NJ corrects for:
+  - question: "NJ differs from UPGMA because NJ:"
     options:
-      - text: Multiple substitutions at the same site
-        correct: false
-      - text: The net divergence of each taxon from all others, adjusting
-          for unequal evolutionary rates before selecting neighbor pairs
+      - text: Does not assume a molecular clock and gives unrooted trees
         correct: true
-      - text: Missing data in the alignment
+      - text: Assumes a strict molecular clock and gives rooted trees
         correct: false
-      - text: Compositional heterogeneity among sequences
+      - text: Uses character states directly rather than pairwise distances
         correct: false
-    explanation: |
-      The Q-value for a pair Q(i,j) = (n−2)×d(i,j) − R(i) − R(j) subtracts
-      the summed distances of each taxon from all others (R-values). This
-      correction removes the effect of overall rate: a fast-evolving taxon has
-      a high R-value, which is subtracted from its Q-scores, preventing it from
-      appearing as a false neighbor of another fast-evolving taxon. NJ selects
-      the pair with the most negative Q-value as true neighbors.
+      - text: Requires more computation time than Bayesian inference does
+        correct: false
+    explanation: >
+      NJ allows different lineages to evolve at different rates (no clock
+      assumption) and produces an unrooted tree. It uses the Q-matrix
+      to correct for rate variation before merging pairs.
 
-  - question: >
-      NJ produces an unrooted tree. To interpret evolutionary direction,
-      the most common approaches are:
+  - question: "In NJ, the Q-matrix is used to:"
     options:
-      - text: UPGMA can be applied afterward to root the NJ tree
-        correct: false
-      - text: Adding an outgroup taxon or using midpoint rooting
+      - text: Correct raw distances for the overall divergence of each taxon
         correct: true
-      - text: NJ trees automatically root at the most divergent taxon
+      - text: Calculate the exact branch length from root to each tip
         correct: false
-      - text: The root is placed at the node with the longest branch
+      - text: Average distances between clusters as in UPGMA arithmetic
         correct: false
-    explanation: |
-      Without a clock assumption, NJ cannot determine which end of the tree
-      is ancestral. Rooting requires external information: an outgroup taxon
-      (known to lie outside the ingroup) places the root at the branch
-      separating it from the ingroup. Midpoint rooting places the root at the
-      midpoint of the longest path between any two taxa, implicitly assuming a
-      clock — valid only when rate variation is modest.
+      - text: Count the number of parsimony-informative sites per pair
+        correct: false
+    explanation: >
+      The Q-matrix adjusts raw pairwise distances by subtracting the
+      net divergence (R) of each taxon, correcting for taxa that are
+      generally fast-evolving and would otherwise be incorrectly grouped.
 
-  - question: >
-      NJ branch lengths (from the merging node to its child taxa) are computed
-      using a formula that considers:
+  - question: "When NJ merges the most negative Q-value pair, the new cluster distance to other taxa is calculated using:"
     options:
-      - text: Only the distance between the two merged taxa
-        correct: false
-      - text: The pairwise distance between the merged pair and their net
-          divergences (R-values), allocating branch lengths to each child
-          so they sum correctly to the pairwise distance
+      - text: The average of distances from both original taxa to each other
         correct: true
-      - text: The number of parsimony-informative sites in the alignment
+      - text: The maximum of the two original distances to that taxon
         correct: false
-      - text: The Q-matrix values of the merged pair
+      - text: The Q-value of the merged pair divided by taxon number
         correct: false
-    explanation: |
-      After merging the pair (i,j) into node U, the branch length from U to
-      i is: b(i) = d(i,j)/2 + [R(i)−R(j)] / [2(n−2)], and symmetrically for
-      j. This formula partitions the pairwise distance between the two branches
-      while correcting for rate asymmetry via the R-values. These branch lengths
-      reflect the amount of evolution along each lineage, not time.
+      - text: The same formula as UPGMA — arithmetic mean of distances
+        correct: false
+    explanation: >
+      NJ uses the formula: d(U,X) = [d(A,X) + d(B,X) − d(A,B)] / 2,
+      which accounts for the distance between the merged taxa themselves,
+      unlike UPGMA which simply averages the two distances.
 
-  # — Maximum Parsimony —
-  - question: >
-      A site with pattern AACTAA across six taxa (A A C T A A) is:
+  - question: "Character-based methods are more accurate than distance-based because they:"
     options:
-      - text: Parsimony-informative, because it has two states
-        correct: false
-      - text: Not parsimony-informative, because the C and T states each
-          appear in only one taxon (singletons)
+      - text: Evaluate each site individually using explicit evolutionary models
         correct: true
-      - text: Parsimony-informative, because it varies across taxa
+      - text: Run faster and scale better to very large datasets overall
         correct: false
-      - text: An autapomorphy that supports one specific topology
+      - text: Require no assumptions about how sequences evolve over time
         correct: false
-    explanation: |
-      For a site to be parsimony-informative, each of at least two character
-      states must appear in at least two taxa. Here, A appears in four taxa
-      (informative state), but C and T each appear in only one taxon —
-      they are singletons. A singleton adds the same cost (one change) to
-      every possible topology and provides no discriminating power. The site
-      is not parsimony-informative.
+      - text: Use only pairwise distances corrected by the Q-matrix method
+        correct: false
+    explanation: >
+      Character-based methods consider each alignment position separately
+      and apply evolutionary models — preserving more information than
+      collapsing everything into a single pairwise distance.
 
-  - question: >
-      Parsimony is often criticized for being susceptible to long branch
-      attraction (LBA). The mechanistic reason is:
+  - question: "Maximum Parsimony selects the tree that:"
     options:
-      - text: Parsimony ignores all character data on long branches
-        correct: false
-      - text: Parsimony has no substitution model, so convergent substitutions
-          on long branches are mistaken for shared derived characters
-          (synapomorphies), pulling long branches together
+      - text: Requires the fewest total substitutions to explain the data
         correct: true
-      - text: Parsimony always underestimates the number of substitutions
+      - text: Has the highest probability given the substitution model
         correct: false
-      - text: Parsimony cannot handle datasets with more than 20 taxa
+      - text: Maximizes the average pairwise distance between all taxa
         correct: false
-    explanation: |
-      Long branches accumulate many substitutions. By chance, some positions
-      independently converge to the same nucleotide in two long branches
-      (homoplasy). Parsimony, lacking a model of rate variation and multiple
-      hits, interprets these convergent states as synapomorphies — evidence
-      of shared ancestry — and incorrectly groups the two long-branch taxa
-      as sisters. ML and BI methods with rate-heterogeneity models (e.g. +Γ)
-      can partially correct for this because they explicitly model the
-      probability of multiple hits.
+      - text: Groups taxa with the most similar base composition together
+        correct: false
+    explanation: >
+      Parsimony applies Occam's razor — the simplest explanation (fewest
+      changes) is preferred. It counts the minimum number of substitutions
+      required on each tree and selects the tree with the lowest total.
 
-  - question: >
-      Which tree rearrangement method makes the smallest topological change
-      per move and is therefore most likely to get trapped in local optima?
+  - question: "A parsimony-informative site must have:"
     options:
-      - text: TBR
-        correct: false
-      - text: SPR
-        correct: false
-      - text: NNI
+      - text: At least two states, each present in at least two taxa
         correct: true
-      - text: UPGMA
+      - text: Only one character state present across all taxa in data
         correct: false
-    explanation: |
-      NNI (Nearest Neighbour Interchange) swaps only immediately adjacent
-      subtrees around one internal branch, generating exactly 2 alternative
-      topologies per move. This is the smallest possible topological change.
-      While fast, it explores a very small neighbourhood and easily gets trapped
-      in local optima — nearby trees with higher scores that do not lead to the
-      global optimum. SPR and TBR explore progressively larger portions of
-      tree space per move and are therefore better at escaping local optima,
-      at higher computational cost.
+      - text: A unique state found in exactly one taxon (singleton here)
+        correct: false
+      - text: All four nucleotides represented at least once in column
+        correct: false
+    explanation: >
+      Informative sites must have at least two different states AND
+      each state must appear in at least two taxa — otherwise the site
+      cannot help distinguish between alternative tree topologies.
 
-  - question: >
-      The number of possible unrooted bifurcating trees for n taxa grows as
-      (2n−5)!! (double factorial). For 10 taxa, this number is approximately:
+  - question: "A site where one character state appears in only one taxon is called:"
     options:
-      - text: 100
-        correct: false
-      - text: 2 million
-        correct: false
-      - text: 945
-        correct: false
-      - text: 2,027,025
+      - text: A singleton — it is not parsimony-informative at all
         correct: true
-    explanation: |
-      For 10 taxa: (2×10−5)!! = 15!! = 15 × 13 × 11 × 9 × 7 × 5 × 3 × 1 =
-      2,027,025. Already at 10 taxa, exhaustive search over all topologies is
-      computationally feasible but marginal; by 20 taxa the number exceeds
-      10^20. This super-exponential growth is the fundamental reason why
-      heuristic tree search methods (NNI, SPR, TBR) are necessary for
-      real datasets.
+      - text: A synapomorphy — it supports a specific grouping of taxa
+        correct: false
+      - text: An informative site — it helps resolve tree topology here
+        correct: false
+      - text: A homoplasy — it arose independently in two lineages here
+        correct: false
+    explanation: >
+      A singleton has a unique state in only one taxon. It cannot
+      favor one tree over another — any topology has the same parsimony
+      score for that site — so it adds no information.
 
-  # — Character-based overview —
-  - question: >
-      All three character-based methods (MP, ML, BI) require tree scoring.
-      They differ primarily in:
+  - question: "A key weakness of Maximum Parsimony is:"
     options:
-      - text: The type of data they can analyze
-        correct: false
-      - text: The scoring criterion used — MP minimizes changes, ML maximizes
-          the probability of the data given a model, BI maximizes the
-          posterior probability of the tree given the data
+      - text: It has no proper model and ignores multiple substitutions
         correct: true
-      - text: Whether they use an alignment as input
+      - text: It is too slow to be used on any real biological dataset
         correct: false
-      - text: The type of outgroup they require
+      - text: It always produces rooted trees with a molecular clock
         correct: false
-    explanation: |
-      All character-based methods take an alignment as input and score trees
-      by character. They differ in their objective function:
-      MP: minimize total evolutionary changes (no explicit probabilistic model).
-      ML: maximize P(data | model, tree) — the probability of observing the
-      alignment given the tree and substitution model.
-      BI: maximize P(tree | data) — the posterior probability, integrating
-      prior beliefs about parameters and using MCMC to approximate the
-      posterior distribution.
-      This distinction in scoring criterion leads to fundamentally different
-      statistical properties, especially regarding model violations and
-      ability to quantify uncertainty.
+      - text: It requires a full distance matrix as its starting input
+        correct: false
+    explanation: >
+      Parsimony does not correct for multiple hits at the same site
+      and has no statistical model of evolution. This makes it sensitive
+      to homoplasy and Long Branch Attraction.
 
-  - question: >
-      Maximum parsimony does not require an explicit substitution model.
-      This is simultaneously its main advantage and its main weakness because:
+  - question: "NNI (Nearest Neighbour Interchange) works by:"
     options:
-      - text: Without a model it is slower but more accurate
-        correct: false
-      - text: Being model-free makes it fast and assumption-light, but it
-          cannot correct for multiple substitutions, making it susceptible
-          to homoplasy and long branch attraction
+      - text: Swapping two subtrees around one internal branch at a time
         correct: true
-      - text: Without a model it automatically selects the correct tree
+      - text: Cutting a subtree and regrafting it anywhere in the tree
         correct: false
-      - text: Being model-free means it can only analyze morphological data
+      - text: Splitting the tree in two and reconnecting any two branches
         correct: false
-    explanation: |
-      The absence of an explicit substitution model means parsimony is fast
-      and does not require model selection. However, it implicitly assumes
-      that the simplest explanation — fewest changes — is always correct. This
-      breaks down when multiple substitutions occur at the same site or when
-      rates vary among lineages, because parsimony cannot distinguish
-      convergence from shared ancestry. The more data you add to a parsimony
-      analysis under these conditions, the more confidently it can recover
-      the wrong tree — a statistically inconsistent behaviour known as
-      Felsenstein's zone.
+      - text: Randomly generating new trees from scratch each iteration
+        correct: false
+    explanation: >
+      NNI is the most local rearrangement — it takes one internal branch,
+      identifies the four surrounding subtrees, and swaps two of them.
+      Fast but prone to local optima.
+
+  - question: "SPR (Subtree Pruning and Regrafting) differs from NNI because it:"
+    options:
+      - text: Moves an entire subtree to a new position anywhere in tree
+        correct: true
+      - text: Only swaps two immediate neighbours around one branch here
+        correct: false
+      - text: Cuts the whole tree into two halves and rejoins any branches
+        correct: false
+      - text: Evaluates every possible topology without any heuristics
+        correct: false
+    explanation: >
+      SPR prunes a subtree from its current position and regrafts it
+      at a different location in the tree — a larger move than NNI
+      but less exhaustive than TBR.
+
+  - question: "TBR (Tree Bisection and Reconnection) explores the largest tree space because:"
+    options:
+      - text: It cuts the tree in two and can reconnect any pair of branches
+        correct: true
+      - text: It only swaps two subtrees adjacent to one internal branch
+        correct: false
+      - text: It uses the Q-matrix to guide which branches to reconnect
+        correct: false
+      - text: It evaluates all possible trees before selecting the best
+        correct: false
+    explanation: >
+      TBR cuts the tree into two large subtrees and can rejoin any branch
+      of one with any branch of the other — this explores far more
+      topologies per step than NNI or SPR.
+
+  - question: Which statement correctly summarizes UPGMA vs NJ?
+    options:
+      - text: UPGMA assumes a clock and roots the tree; NJ does neither
+        correct: true
+      - text: NJ assumes a clock and roots the tree; UPGMA does neither
+        correct: false
+      - text: Both assume a clock but produce different root positions
+        correct: false
+      - text: Both are character-based and use substitution models here
+        correct: false
+    explanation: >
+      UPGMA assumes a constant molecular clock and produces a rooted
+      ultrametric tree. NJ does not assume a clock and produces an
+      unrooted tree — making NJ more flexible for real data.
 
 
 fill_in_blank:
   - question: >
-      Distance-based methods collapse the alignment into a _______________ matrix
-      and build a tree from it, whereas character-based methods evaluate the
-      alignment _______________ at a time and score trees against an explicit
-      _______________ of sequence evolution.
+      Distance-based methods summarize pairwise differences in a
+      ___ matrix. They are best used today for ___ analysis before
+      running character-based methods.
     answers:
-      - "pairwise distance"
-      - "one column (one site / one character)"
-      - "model"
+      - "distance"
+      - "exploratory"
 
   - question: >
-      UPGMA assumes a constant _______________ across all lineages, produces
-      a _______________ tree, and clusters the pair with the smallest
-      _______________ at each step.
+      UPGMA produces a ___ and ___ tree, assuming a constant
+      ___ clock. NJ produces an ___ tree and makes no clock assumption.
     answers:
-      - "molecular clock (substitution rate)"
-      - "rooted, ultrametric"
-      - "pairwise distance"
+      - "rooted"
+      - "ultrametric"
+      - "molecular"
+      - "unrooted"
 
   - question: >
-      NJ corrects for unequal evolutionary rates using the _______________
-      -matrix, which adjusts raw distances by subtracting the net divergence
-      _______________ of each taxon from all others. The pair with the most
-      _______________ Q-value is selected as true neighbors.
+      In UPGMA, the distance from a new cluster (A,B) to taxon C is
+      calculated as the ___ of d(A,C) and d(B,C).
+    answers:
+      - "average (arithmetic mean)"
+
+  - question: >
+      In NJ, instead of merging the pair with the smallest raw distance,
+      the ___ matrix is first computed to correct for the overall ___
+      of each taxon from all others.
     answers:
       - "Q"
-      - "R (R-value)"
-      - "negative"
+      - "divergence (net divergence, R)"
 
   - question: >
-      A parsimony-informative site must have at least _______________ different
-      character states, each present in at least _______________ taxa. A site
-      where only one taxon differs from all others is called a _______________.
+      Character-based methods evaluate one ___ at a time and
+      incorporate explicit ___ models, making them more accurate
+      than distance-based methods.
+    answers:
+      - "character (site)"
+      - "evolutionary (substitution)"
+
+  - question: >
+      Maximum Parsimony selects the tree with the ___ total number
+      of evolutionary ___. It uses only ___ sites.
+    answers:
+      - "fewest (minimum)"
+      - "changes (substitutions)"
+      - "parsimony-informative"
+
+  - question: >
+      A parsimony-informative site must have at least ___ different
+      character states, and each state must appear in at least ___
+      taxa. A site with a state in only one taxon is a ___.
     answers:
       - "two"
       - "two"
-      - "singleton (uninformative / autapomorphic site)"
+      - "singleton"
 
   - question: >
-      The three heuristic tree rearrangement methods from smallest to largest
-      topological change are _______________, _______________, and _______________.
-      The method most likely to escape local optima is _______________ because
-      it explores the _______________ neighbourhood per move.
+      Two weaknesses of Maximum Parsimony are: it has no proper
+      ___ model, and it does not correct for ___ substitutions
+      at the same site.
     answers:
-      - "NNI (Nearest Neighbour Interchange)"
-      - "SPR (Subtree Pruning and Regrafting)"
-      - "TBR (Tree Bisection and Reconnection)"
+      - "statistical (evolutionary)"
+      - "multiple"
+
+  - question: >
+      The three tree rearrangement methods in order of increasing
+      thoroughness are: ___ (swap neighbours), ___ (prune and
+      regraft a subtree), and ___ (bisect and reconnect any branches).
+    answers:
+      - "NNI"
+      - "SPR"
       - "TBR"
-      - "largest topological"
 
   - question: >
-      The number of unrooted bifurcating topologies for n taxa is given by
-      the formula _______________. This number grows _______________, which
-      is why exhaustive search is computationally impossible for datasets
-      with more than approximately _______________ taxa.
+      NNI is the ___ but most likely to get stuck in a ___ optimum.
+      TBR explores the ___ area of tree space.
     answers:
-      - "(2n − 5)!! (double factorial)"
-      - "super-exponentially"
-      - "~20 (10–20 taxa)"
-
-  - question: >
-      In NJ, after merging taxa i and j into a new node U, the distance from
-      U to any remaining taxon k is computed as _______________. This formula
-      ensures that the new cluster's distance correctly reflects the _______________.
-    answers:
-      - "d(U,k) = [d(i,k) + d(j,k) − d(i,j)] / 2"
-      - "average evolutionary distance from both merged taxa to the remaining taxa"
-
-  - question: >
-      UPGMA is criticized primarily because it _______________ the molecular
-      clock. In contrast, NJ is criticized because although it handles rate
-      variation, it is less accurate than _______________ or _______________
-      methods, which explicitly model character evolution.
-    answers:
-      - "assumes (requires)"
-      - "Maximum Likelihood (ML)"
-      - "Bayesian Inference (BI)"
+      - "fastest"
+      - "local"
+      - "largest"
