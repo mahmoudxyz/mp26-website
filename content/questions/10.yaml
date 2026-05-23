@@ -1,473 +1,397 @@
-# LESSON 10 — Support Metrics
-
 oral:
-  - q: >
-      What does non-parametric bootstrapping measure in phylogenetics?
-      Describe the procedure step by step and explain what the bootstrap
-      proportion (BP) actually represents.
-    a: |
-      Non-parametric bootstrapping (Felsenstein 1985) measures the robustness
-      of a phylogenetic inference to random resampling of the alignment columns.
-      It does NOT measure the probability that a branch is correct — it measures
-      the consistency of the phylogenetic signal across subsets of the data.
-      Procedure:
-      1. Start with an alignment of length n columns.
-      2. Generate a bootstrapped alignment: randomly sample n columns WITH
-         REPLACEMENT from the original alignment (some columns appear multiple
-         times, others not at all). This produces a new alignment of the same
-         length but different composition.
-      3. Infer a tree from the bootstrapped alignment using the same method
-         (ML, parsimony, NJ) as the original analysis.
-      4. Repeat steps 2–3 many times (typically 100–1,000 replicates), storing
-         all bootstrap trees.
-      5. For each branch in the reference tree (usually the ML best tree or
-         the majority-rule consensus), count the percentage of bootstrap trees
-         containing that same bipartition. This is the bootstrap proportion (BP).
-      What BP represents: the fraction of data-resampling replicates that
-      recover a given clade. High BP (e.g. >95%) means the signal supporting
-      that clade is robust to data sampling — removing and replacing random
-      columns repeatedly still recovers it. Low BP means the signal is fragile
-      and sensitive to which sites happen to be sampled.
-      BP is NOT a posterior probability: it does not represent P(clade is correct).
-      It reflects data robustness, not phylogenetic accuracy.
+  - q: What is a phylogenetic tree in terms of scientific certainty?
+    a: >
+      A hypothesis — it represents the best supported explanation of
+      evolutionary relationships given the data and methods used, not
+      a proven fact. Support metrics quantify how confident we can be.
 
-  - q: >
-      What is Transfer Bootstrap Expectation (TBE) and why was it introduced?
-      How does it differ conceptually from standard Felsenstein bootstrap?
-    a: |
-      TBE (Lemoine et al. 2018) was introduced because standard non-parametric
-      bootstrap (Felsenstein BP) systematically underestimates support at deep
-      branches in large datasets with rogue taxa.
-      The problem with Felsenstein BP at scale:
-      Standard BP uses binary scoring — a clade is either PRESENT or ABSENT
-      in a bootstrap tree. In a tree with 1,000 tips, if 999 taxa are placed
-      correctly but one rogue taxon jumps to the wrong position in a replicate,
-      the entire branch is scored as ABSENT despite being nearly correct.
-      With many rogue taxa, deep branches can score near 0% BP even when
-      strongly supported — a severe underestimation at scale.
-      TBE solution — the transfer distance:
-      For each reference clade R in the best tree, TBE finds the closest
-      matching bipartition B in each bootstrap tree by computing the transfer
-      distance: the minimum number of taxa that need to move from one side of
-      B to the other to match R exactly. Then:
-      Transfer index = 1 − (transfer distance / (size of smaller side of R))
-      A perfect match gives transfer index = 1; a complete mismatch = 0.
-      TBE averages transfer indices across all bootstrap replicates, giving
-      a continuous score that rewards partial support — even if a clade is
-      not exactly present, near-matches contribute positively.
-      Key difference from Felsenstein BP: BP is binary (present/absent per
-      replicate); TBE is continuous (partial credit for near-correct clades).
-      TBE is more informative for large trees and robust to rogue taxa.
+  - q: Describe the non-parametric bootstrap in three steps.
+    a: >
+      (1) Randomly sample n columns with replacement from the original
+      alignment of length n to create a bootstrapped alignment.
+      (2) Infer a tree from that alignment using the same method.
+      (3) Repeat many times — the bootstrap proportion (BP) is the
+      percentage of replicates containing a given bipartition.
 
-  - q: >
-      Compare non-parametric jackknife and non-parametric bootstrap.
-      How do they differ in resampling strategy and what is the typical
-      deletion proportion used in phylogenetics?
-    a: |
-      Both are resampling methods that assess branch support by generating
-      alternative alignments and inferring trees from them, then counting how
-      often a given branch is recovered.
-      Non-parametric bootstrap (Felsenstein 1985):
-      — Resamples WITH REPLACEMENT: n columns sampled from n original columns.
-        Some columns appear multiple times; others are absent.
-      — Produces an alignment of the SAME LENGTH as the original.
-      — Each column has a probability 1/n of being selected each draw.
-      Non-parametric jackknife:
-      — Resamples WITHOUT REPLACEMENT: a fixed proportion of columns is
-        DELETED and the rest retained.
-      — Produces an alignment SHORTER than the original.
-      — Typical deletion: 50% of sites are removed per replicate (as
-        recommended by Felsenstein 1985), equivalent to drawing n/2 sites
-        without replacement from an alignment of length n.
-      — No column appears more than once in a given replicate.
-      The resulting jackknife proportion (JF) is computed identically to BP:
-      the percentage of jackknifed trees containing a given bipartition.
-      Key practical difference: bootstrap produces same-length alignments
-      (information density unchanged); jackknife produces shorter alignments
-      (less total signal per replicate). In practice, jackknife and bootstrap
-      values are highly correlated for well-supported branches. Jackknife is
-      less commonly used in modern phylogenomics but remains theoretically
-      valid and occasionally preferred for very large alignments where 50%
-      deletion still leaves ample signal.
+  - q: What does a bootstrap proportion (BP) actually measure?
+    a: >
+      The robustness of the phylogenetic signal — how consistently
+      a branch appears across resampled datasets. It is NOT a direct
+      probability that the branch is correct.
 
-  - q: >
-      What is the approximate Likelihood Ratio Test (aLRT) for branch support?
-      Derive its logic from the standard LRT and explain its key approximation
-      and limitation.
-    a: |
-      Standard LRT: compares two nested models. For branch support, compare:
-      H1 (alternative): the tree with the branch of interest present.
-      H0 (null): the same tree with that branch collapsed to zero length
-        (removing it as a bipartition).
-      The test statistic 2(lnL_H1 − lnL_H0) follows approximately a chi-squared
-      distribution. If large, the branch significantly improves fit over a
-      collapsed version.
-      aLRT approximation (Anisimova & Gascuel 2006): instead of collapsing
-      the branch (H0), approximate L_H0 using L_2 — the log-likelihood of the
-      SECOND BEST NNI rearrangement around the branch of interest.
-      Test statistic: aLRT = 2(lnL_best − lnL_second-best NNI)
-      Why L_2? Optimizing a fully collapsed model requires a separate analysis.
-      NNI rearrangements around the branch change only the four adjacent
-      subtrees, keeping all other parameters fixed at their ML values. This
-      makes aLRT extremely fast — only four adjacent branches need re-evaluation.
-      The aLRT score can be converted to a p-value (chi-squared with 1 df)
-      or left as a raw statistic; high values indicate the focal topology is
-      significantly better than the best NNI alternative.
-      Key limitation: aLRT is local — it only compares the branch against its
-      immediate NNI alternatives. It misses distant alternative topologies
-      that might have higher likelihood but require larger rearrangements (SPR
-      or TBR moves). If the ML tree is itself in a poor local optimum, aLRT
-      can give high support for wrong branches.
+  - q: How does parametric bootstrap differ from non-parametric bootstrap?
+    a: >
+      Parametric bootstrap simulates new alignments using a substitution
+      model and tree estimated from the real data, rather than resampling
+      the original columns. Its values depend heavily on model correctness —
+      a wrong model gives biased support values.
 
-  - q: >
-      What are gene concordance factors (gCF) and site concordance factors
-      (sCF)? How do they complement bootstrap support, and what does a
-      high bootstrap / low concordance combination indicate?
-    a: |
-      Concordance Factors (CFs) quantify how consistently individual genes or
-      sites support each branch in a reference species tree, independently of
-      the bootstrap framework.
-      Gene Concordance Factor (gCF): the proportion of gene trees (from
-      individual gene-by-gene analyses) that contain a specific branch or
-      split present in the reference species tree. A gCF of 0.70 means 70%
-      of gene trees support that branch. Requires individual gene trees.
-      Site Concordance Factor (sCF): the proportion of parsimony-informative
-      sites in the alignment that support a given branch. Rather than using
-      all sites, a random quartet of taxa is drawn around each internal branch,
-      and the proportion of informative sites supporting the focal quartet
-      topology vs the two alternatives is computed. sCF does not require
-      individual gene trees.
-      How they complement bootstrap:
-      Bootstrap measures robustness to resampling of the full dataset — it
-      assesses whether the signal, whatever its source, is consistently sampled.
-      CFs measure the fraction of independent loci or sites that actually
-      support a branch — they assess biological consistency.
-      High bootstrap / low gCF: the branch is consistently recovered by
-      resampling the concatenated data, but most individual gene trees do NOT
-      support it. This is the classic signature of ILS (Incomplete Lineage
-      Sorting) or gene tree conflict — concatenation statistically amplifies
-      a minority signal to appear strongly supported. It flags branches where
-      the species tree may be biologically contentious despite apparent
-      statistical confidence. This combination is a major warning sign that
-      the inferred relationship may not reflect the true evolutionary history.
+  - q: What problem does TBE (Transfer Bootstrap Expectation) solve?
+    a: >
+      Standard BP uses binary scoring — a branch is either fully present
+      or absent in a replicate. With large trees, one misplaced taxon
+      causes the entire branch to score as absent. TBE uses a gradual
+      transfer distance, giving partial credit and producing more
+      informative support on deep branches.
+
+  - q: How does jackknife differ from bootstrap in its resampling approach?
+    a: >
+      Jackknife deletes a fixed proportion of columns (typically 50%)
+      without replacement — sampling without replacement. Bootstrap
+      resamples n columns with replacement, keeping the alignment
+      the same length.
+
+  - q: What does the aLRT measure and what is L2 in the formula?
+    a: >
+      The approximate Likelihood Ratio Test measures branch support
+      as 2(L1 − L2), where L1 is the log-likelihood of the best tree
+      and L2 is the log-likelihood of the second-best NNI rearrangement
+      around that branch. A large difference means the branch is
+      well-supported by the data.
+
+  - q: What are Posterior Probabilities (PPs) in Bayesian phylogenetics?
+    a: >
+      The frequency with which a bipartition appears in trees sampled
+      during the stationary phase of an MCMC chain. A PP of 0.95
+      means the clade appeared in 95% of sampled trees. PPs tend
+      to be higher than non-parametric bootstrap values.
+
+  - q: What is the difference between gCF and sCF?
+    a: >
+      Gene Concordance Factor (gCF) — the proportion of individual
+      gene trees that contain a specific branch. Site Concordance
+      Factor (sCF) — the proportion of informative sites in the
+      alignment that support a branch in the reference tree.
+
+  - q: How do you interpret concordance factor values?
+    a: >
+      Above 70% — strong signal and high agreement across genes or
+      sites. 40–70% — moderate support with possible discordance.
+      Below 40% — weak support or substantial gene tree conflict.
+
+  - q: Why should you compare multiple support metrics rather than relying on one?
+    a: >
+      Each metric has different assumptions and pitfalls — parametric
+      methods depend on model correctness, PPs can be inflated, BPs
+      can be conservative. Consistent results across different metrics
+      give much more reliable support than any single metric alone.
+
+  - q: What is one key limitation of aLRT?
+    a: >
+      It only evaluates local rearrangements around the branch of
+      interest (the four adjacent branches). It may miss alternative
+      topologies that are far from the current tree but have a higher
+      likelihood.
+
+  - q: Why do Posterior Probabilities tend to be higher than bootstrap proportions?
+    a: >
+      PPs integrate over uncertainty in all model parameters and can
+      concentrate probability on well-supported clades very quickly.
+      They are also sensitive to prior choice — if priors are
+      informative, PPs can be inflated relative to BPs.
+
+  - q: What proportion of sites does jackknife typically remove per replicate?
+    a: >
+      50% — half the alignment columns are randomly deleted without
+      replacement, producing a shorter alignment for each replicate tree.
 
 
 mcq:
-  - question: >
-      Non-parametric bootstrapping in phylogenetics samples alignment
-      columns WITH replacement. The consequence is that:
+  - question: "A phylogenetic tree is best described as:"
     options:
-      - text: Each bootstrap replicate has fewer columns than the original
-        correct: false
-      - text: Some columns appear multiple times and others not at all in
-          each bootstrapped alignment, but the total length remains n
+      - text: A hypothesis about evolutionary relationships in the data
         correct: true
-      - text: All columns are sampled exactly once per replicate
+      - text: A proven record of exactly how species are all related
         correct: false
-      - text: Bootstrap replicates include columns from other alignments
+      - text: A fixed map of evolution that does not need any support
         correct: false
-    explanation: |
-      Sampling with replacement from n columns produces an alignment of the
-      same length n, but the composition differs: by random chance, some
-      columns are drawn multiple times (up-weighting their signal) and others
-      are omitted (down-weighting or eliminating their signal). This random
-      variation in column composition between replicates is what makes the
-      bootstrap a test of signal robustness — if a branch disappears when
-      some columns are reweighted, its signal is fragile.
+      - text: A distance matrix summarizing pairwise sequence differences
+        correct: false
+    explanation: >
+      Phylogenetic trees are hypotheses — they represent the best
+      supported explanation given the data and model. Support metrics
+      tell us how confident we can be in each branch of that hypothesis.
 
-  - question: >
-      A bootstrap proportion of 95% means:
+  - question: "In non-parametric bootstrapping, the resampled alignment is created by:"
     options:
-      - text: There is a 95% probability that the branch is correct
-        correct: false
-      - text: The branch was recovered in 95% of bootstrap replicate trees,
-          indicating the signal supporting it is robust to data resampling
+      - text: Sampling n columns with replacement from the original alignment
         correct: true
-      - text: The branch has a posterior probability of 0.95
+      - text: Deleting 50% of columns randomly without any replacement
         correct: false
-      - text: 95% of taxa in the dataset support the branch
+      - text: Simulating new sequences using the best-fit model and tree
         correct: false
-    explanation: |
-      Bootstrap proportions are frequently misinterpreted as probabilities of
-      correctness — they are not. A BP of 95% means that when the alignment
-      columns are randomly resampled with replacement 100 (or more) times,
-      95 of those resampled datasets recover the same clade in their inferred
-      tree. It reflects signal robustness, not phylogenetic accuracy. A branch
-      can have BP = 100% and still be wrong if the data contain a systematic
-      bias (e.g. long branch attraction, compositional heterogeneity).
+      - text: Randomly shuffling taxa labels across the original alignment
+        correct: false
+    explanation: >
+      Non-parametric bootstrap samples n columns with replacement —
+      some columns may appear multiple times, others not at all.
+      The resulting alignment is the same length as the original.
 
-  - question: >
-      Felsenstein bootstrap underestimates support at deep branches in very
-      large trees primarily because:
+  - question: "A bootstrap proportion (BP) of 95% means:"
     options:
-      - text: It uses fewer replicates for large datasets
-        correct: false
-      - text: It scores each clade as entirely present or absent — one rogue
-          taxon misplaced makes the entire deep branch count as absent,
-          even if all other taxa are correctly placed
+      - text: That branch appeared in 95% of the bootstrap replicate trees
         correct: true
-      - text: Deep branches have shorter branch lengths and less signal
+      - text: There is a 95% probability that branch reflects true history
         correct: false
-      - text: Bootstrap cannot handle alignments with missing data
+      - text: 95% of alignment sites support that specific branch directly
         correct: false
-    explanation: |
-      The binary scoring of standard BP is its critical weakness at scale.
-      For a clade of 500 taxa, if 499 are placed correctly but 1 rogue taxon
-      moves in a replicate, the entire clade scores as ABSENT despite being
-      99.8% correct. With many rogue taxa in large datasets, deep branches
-      can score near 0% BP even when genuinely supported. TBE addresses this
-      by using transfer distance to give partial credit for near-correct clades.
+      - text: The branch has a likelihood ratio of 95 over the null model
+        correct: false
+    explanation: >
+      BP is the percentage of bootstrap trees containing a given
+      bipartition — it measures signal robustness, not a direct
+      probability of correctness. This is a common misconception.
 
-  - question: >
-      TBE (Transfer Bootstrap Expectation) improves upon Felsenstein BP by:
+  - question: "Parametric bootstrap differs from non-parametric bootstrap because it:"
     options:
-      - text: Using more bootstrap replicates
-        correct: false
-      - text: Replacing binary present/absent scoring with a continuous
-          transfer index that rewards near-correct bipartitions based on
-          how few taxa need to move to match the reference clade
+      - text: Simulates alignments from a model and tree fitted to the data
         correct: true
-      - text: Applying a parametric model to simulate bootstrap replicates
+      - text: Resamples columns from the original alignment with replacement
         correct: false
-      - text: Using amino acid rather than nucleotide alignments
+      - text: Deletes half the alignment columns without any replacement
         correct: false
-    explanation: |
-      TBE computes the minimum transfer distance between each reference clade
-      R and the closest bipartition in each bootstrap tree — the minimum number
-      of taxa that must be moved to match R exactly. The transfer index =
-      1 − (transfer distance / smaller-side size). This gives partial credit:
-      a nearly correct bipartition (transfer distance = 1) scores nearly 1,
-      not 0 as in Felsenstein BP. TBE is more informative for deep branches
-      in large datasets with rogue taxa.
+      - text: Uses MCMC sampling to generate posterior tree distributions
+        correct: false
+    explanation: >
+      Parametric bootstrap fits a model and tree to the real data,
+      then simulates replicate alignments under that model. If the
+      model is wrong, support values will be biased.
 
-  - question: >
-      The key difference between the non-parametric jackknife and the
-      non-parametric bootstrap is:
+  - question: "TBE (Transfer Bootstrap Expectation) was introduced because standard BP:"
     options:
-      - text: Jackknife uses parametric simulation; bootstrap uses resampling
-        correct: false
-      - text: Jackknife deletes a fixed proportion of columns WITHOUT
-          replacement (shorter alignment per replicate); bootstrap resamples
-          WITH replacement (same length per replicate)
+      - text: Scores a branch as absent if even one taxon is misplaced
         correct: true
-      - text: Jackknife produces rooted trees; bootstrap produces unrooted trees
+      - text: Tends to give values that are too low for shallow branches
         correct: false
-      - text: Bootstrap is applicable only to ML; jackknife only to parsimony
+      - text: Cannot be computed for trees with more than 100 taxa at all
         correct: false
-    explanation: |
-      Jackknife: sample WITHOUT replacement, removing a fixed fraction (typically
-      50%) of columns. Each column appears at most once; the result is a shorter
-      alignment. Bootstrap: sample WITH replacement; each column can appear
-      multiple times; the result is the same length as the original. Both
-      produce support proportions by counting how often each branch appears
-      across replicates. In practice they give similar results for well-supported
-      branches; jackknife is less commonly used today.
+      - text: Requires a molecular clock assumption to score each branch
+        correct: false
+    explanation: >
+      Standard BP is binary — one misplaced rogue taxon in a large
+      tree causes the whole branch to be scored as absent. TBE uses
+      a gradual transfer distance that gives partial credit, producing
+      more informative values on deep branches of large trees.
 
-  - question: >
-      Parametric bootstrapping differs from non-parametric bootstrapping in that:
+  - question: "Jackknife differs from bootstrap in that jackknife:"
     options:
-      - text: It resamples columns without replacement
-        correct: false
-      - text: It simulates new alignments from the estimated model and ML
-          tree rather than resampling observed columns, so support values
-          depend on whether the model is correctly specified
+      - text: Deletes a fixed proportion of columns without replacement
         correct: true
-      - text: It always gives higher support values than non-parametric bootstrap
+      - text: Resamples the same number of columns with replacement here
         correct: false
-      - text: It requires Bayesian inference rather than ML
+      - text: Simulates new alignments using a fitted substitution model
         correct: false
-    explanation: |
-      Parametric bootstrap: (1) estimate the substitution model and ML tree
-      from the real alignment; (2) simulate new alignments from that model
-      and tree; (3) infer trees from each simulated alignment; (4) count
-      branch frequencies. The key danger: if the model is misspecified —
-      e.g. assumes rate homogeneity when it does not hold — simulated
-      alignments do not reflect the true data-generating process, and support
-      values are biased toward the assumed model. Non-parametric bootstrap
-      resamples real data and is model-free in the resampling step.
+      - text: Uses MCMC chains to estimate the posterior of each branch
+        correct: false
+    explanation: >
+      Jackknife samples WITHOUT replacement and removes a fixed
+      fraction (typically 50%) of columns. Bootstrap samples WITH
+      replacement, keeping alignment length the same.
 
-  - question: >
-      The aLRT approximates the null hypothesis log-likelihood L_0 using:
+  - question: "In aLRT, the support statistic 2(L1 − L2) uses L2 as:"
     options:
-      - text: The log-likelihood of the tree with the branch collapsed to zero
-        correct: false
-      - text: The log-likelihood of the second-best NNI rearrangement around
-          the branch of interest, L_2
+      - text: The log-likelihood of the second-best NNI rearrangement nearby
         correct: true
-      - text: The log-likelihood averaged across all bootstrap replicates
+      - text: The log-likelihood of the tree with that branch collapsed here
         correct: false
-      - text: The prior probability of the branch length
+      - text: The log-likelihood averaged over all possible NNI moves made
         correct: false
-    explanation: |
-      The full LRT would require optimizing the tree with the branch collapsed
-      (H0) — a separate computationally expensive analysis. aLRT approximates
-      L_0 with L_2, the log-likelihood of the second-best NNI configuration
-      around that branch. Since NNI only moves the four adjacent subtrees and
-      keeps all other parameters fixed, it is computed extremely quickly.
-      The statistic 2(L_best − L_2) approximates the LRT statistic. The
-      limitation is that L_2 only considers local rearrangements — distant
-      but better topologies are not considered.
+      - text: The log-likelihood of a random tree used as a null model
+        correct: false
+    explanation: >
+      L2 in aLRT is the log-likelihood of the second-best NNI topology
+      around the branch of interest — a fast local approximation that
+      avoids the cost of computing a fully collapsed null model.
 
-  - question: >
-      A branch shows bootstrap = 98% but gCF = 22%. The most likely
-      biological interpretation is:
+  - question: "A key limitation of aLRT is that it:"
     options:
-      - text: The branch is definitively correct and strongly supported
-        correct: false
-      - text: Gene tree conflict due to ILS or hybridization — concatenation
-          amplifies a minority signal across genes to appear highly supported,
-          but most individual gene trees disagree
+      - text: Only evaluates local rearrangements around the tested branch
         correct: true
-      - text: The substitution model is misspecified
+      - text: Requires hundreds of replicate trees, making it very slow
         correct: false
-      - text: The bootstrap replicates used insufficient columns
+      - text: Can only be used with Bayesian inference, not maximum likelihood
         correct: false
-    explanation: |
-      High bootstrap / low gCF is the canonical signature of gene tree
-      discordance driven by ILS or reticulate evolution. Bootstrap measures
-      signal robustness in the concatenated matrix — even a minority gene
-      signal, if consistent, will be confidently recovered by resampling.
-      gCF = 22% means only 22% of individual gene trees support this branch —
-      78% support alternative relationships. This branch may be statistically
-      robust in the supermatrix but biologically contentious. It is a warning
-      that coalescent-based methods should be applied to test whether the
-      concatenated tree reflects the true species history.
+      - text: Gives values that are always lower than bootstrap proportions
+        correct: false
+    explanation: >
+      aLRT only considers the four branches adjacent to the branch
+      of interest. It may miss distant topologies with higher likelihoods,
+      potentially overestimating support in some cases.
 
-  - question: >
-      Site concordance factor (sCF) differs from gCF in that:
+  - question: "Posterior Probabilities (PPs) in Bayesian inference represent:"
     options:
-      - text: sCF uses gene trees; gCF uses individual alignment sites
-        correct: false
-      - text: sCF uses the proportion of informative sites supporting a
-          branch without requiring individual gene trees; gCF uses the
-          proportion of gene trees containing the branch
+      - text: How often a clade appears in trees sampled during the MCMC run
         correct: true
-      - text: sCF is computed only for Bayesian trees; gCF only for ML trees
+      - text: The percentage of bootstrap replicates containing that branch
         correct: false
-      - text: sCF and gCF are identical metrics computed at different scales
+      - text: The proportion of genes that support a branch in the tree
         correct: false
-    explanation: |
-      gCF requires inferring individual gene trees first, then comparing them
-      to the reference species tree — computationally expensive and dependent
-      on gene tree accuracy. sCF works directly from the alignment: for each
-      internal branch, a random quartet of taxa is drawn, and the proportion
-      of parsimony-informative sites supporting the focal quartet topology vs
-      the two alternatives is computed. sCF requires no gene trees and is
-      therefore computationally lighter, though it measures a different thing:
-      site-level rather than gene-level concordance.
+      - text: The likelihood ratio of the best tree versus the null model
+        correct: false
+    explanation: >
+      PPs are the frequency of a bipartition in trees sampled at the
+      stationary phase of the MCMC chain — ranging from 0 to 1, where
+      0.95 means the clade appeared in 95% of sampled trees.
 
-  - question: >
-      Posterior probabilities (PPs) compared to non-parametric bootstrap
-      proportions (BPs) tend to be:
+  - question: "Compared to non-parametric bootstrap, Posterior Probabilities tend to be:"
     options:
-      - text: Always lower, because BI is more conservative
-        correct: false
-      - text: Higher, because PPs incorporate prior information and integrate
-          over model uncertainty, but are sensitive to prior choice and
-          model misspecification
+      - text: Higher — PPs can be inflated relative to bootstrap values
         correct: true
-      - text: Identical, because both measure the same quantity
+      - text: Lower — MCMC sampling is more conservative than bootstrapping
         correct: false
-      - text: Higher only when the dataset is small
+      - text: Identical — both measure the same aspect of branch support
         correct: false
-    explanation: |
-      PPs are typically higher than BPs for the same branch and dataset.
-      This is because PPs integrate over all model parameter uncertainty
-      (branch lengths, substitution rates) rather than treating them as fixed,
-      giving a fuller accounting of what the data support. However, PPs are
-      sensitive to prior choice (e.g. priors on branch lengths can inflate
-      support for short branches) and to model misspecification. A poorly
-      fitting model can produce PPs near 1.0 for wrong branches. The two
-      metrics are philosophically different and should both be reported where
-      possible.
+      - text: More variable — PPs fluctuate more across different runs here
+        correct: false
+    explanation: >
+      PPs consistently tend to be higher than non-parametric BPs.
+      They are also sensitive to prior choice — informative priors
+      can push PPs toward 1 even when support is ambiguous.
+
+  - question: "The gene Concordance Factor (gCF) measures:"
+    options:
+      - text: The proportion of gene trees containing a specific branch
+        correct: true
+      - text: The proportion of informative sites supporting that branch
+        correct: false
+      - text: The percentage of bootstrap trees that contain that branch
+        correct: false
+      - text: The posterior probability of a branch across the MCMC chain
+        correct: false
+    explanation: >
+      gCF counts how many individual gene trees (out of all gene trees
+      analyzed) contain the branch of interest in the reference tree.
+      It directly measures gene tree concordance, not site-level support.
+
+  - question: "A site Concordance Factor (sCF) below 40% suggests:"
+    options:
+      - text: Weak support or substantial conflict across sites in data
+        correct: true
+      - text: Strong support — most sites agree with that branch here
+        correct: false
+      - text: The branch is perfectly resolved with no gene tree conflict
+        correct: false
+      - text: The branch should be collapsed into a polytomy immediately
+        correct: false
+    explanation: >
+      sCF < 40% means fewer than 40% of informative sites support
+      the branch — indicating weak signal, high homoplasy, or gene
+      tree discordance. Values above 70% indicate strong concordance.
+
+  - question: Why should multiple support metrics always be compared?
+    options:
+      - text: Each metric has different assumptions and can be misleading alone
+        correct: true
+      - text: Using one metric is always sufficient if it exceeds 95% value
+        correct: false
+      - text: Different software packages cannot compute the same metric here
+        correct: false
+      - text: Multiple metrics always give conflicting results by definition
+        correct: false
+    explanation: >
+      Each metric has pitfalls — parametric supports assume the model
+      is correct; PPs can be inflated; BPs can be conservative; CFs
+      capture discordance others miss. Agreement across metrics is
+      the best evidence for reliable branch support.
+
+  - question: Which support metric is specifically designed to handle large trees with rogue taxa better than standard BP?
+    options:
+      - text: TBE — Transfer Bootstrap Expectation with gradual distances
+        correct: true
+      - text: aLRT — approximate Likelihood Ratio Test around each branch
+        correct: false
+      - text: PP — Posterior Probability from Bayesian MCMC sampling here
+        correct: false
+      - text: gCF — gene Concordance Factor across individual gene trees
+        correct: false
+    explanation: >
+      TBE was specifically introduced to address the problem of standard
+      BP performing poorly on large trees — one rogue taxon no longer
+      collapses the entire branch score to zero as it does in standard BP.
 
 
 fill_in_blank:
   - question: >
-      Non-parametric bootstrapping samples _______________ columns with
-      _______________ to produce a replicate alignment of the _______________ 
-      length. The process is repeated _______________  times and the bootstrap
-      proportion equals the percentage of replicates _______________ the branch.
+      Phylogenetic trees are not facts — they are ___ about evolutionary
+      relationships. Support metrics tell us how ___ we can be in each branch.
     answers:
-      - "n"
-      - "replacement"
-      - "same"
-      - "100–1000 (many)"
-      - "containing (recovering)"
+      - "hypotheses"
+      - "confident"
 
   - question: >
-      Bootstrap proportion does NOT represent the probability that a branch
-      is _______________. It measures robustness of the phylogenetic _______________
-      to random _______________ of the alignment data.
+      In non-parametric bootstrap, n columns are sampled ___ replacement
+      to create a new alignment of the same ___. The BP is the ___ of
+      replicates containing a given branch.
     answers:
-      - "correct"
-      - "signal"
-      - "resampling (sampling)"
+      - "with"
+      - "length"
+      - "percentage"
 
   - question: >
-      TBE was introduced because Felsenstein BP uses _______________ scoring
-      (a clade is either present or absent), which causes _______________
-      of support at deep branches in large trees when _______________ taxa
-      are present. TBE instead uses a continuous _______________ index.
+      Bootstrap proportion (BP) measures the ___ of the signal, NOT
+      the ___ that a branch is correct.
     answers:
-      - "binary"
-      - "underestimation"
-      - "rogue"
+      - "robustness"
+      - "probability"
+
+  - question: >
+      Parametric bootstrap simulates alignments using a ___ and ___ fitted
+      to the real data. If the model is ___, support values will be biased.
+    answers:
+      - "substitution model"
+      - "tree"
+      - "wrong (misspecified)"
+
+  - question: >
+      TBE was introduced because standard BP scores a branch as ___ if
+      even one taxon is misplaced. TBE uses a gradual ___ distance to
+      give partial credit instead.
+    answers:
+      - "absent"
       - "transfer"
 
   - question: >
-      The non-parametric jackknife deletes a fixed proportion (typically
-      _______________%) of alignment columns _______________ replacement,
-      producing a _______________ alignment per replicate. The result is
-      qualitatively similar to the bootstrap but systematically produces
-      _______________ alignments.
+      Jackknife deletes ___ % of columns ___ replacement per replicate.
+      Bootstrap resamples ___ columns ___ replacement.
     answers:
       - "50"
       - "without"
-      - "shorter"
-      - "shorter"
+      - "n"
+      - "with"
 
   - question: >
-      Parametric bootstrap simulates new alignments from the _______________
-      model and _______________ tree estimated from the real data. Its key
-      risk is that if the model is _______________, the simulated data do
-      not reflect reality and support values become _______________.
+      aLRT support = 2(L1 − ___). L1 is the likelihood of the ___ tree.
+      L2 is the likelihood of the second-best ___ rearrangement around
+      that branch.
     answers:
-      - "substitution"
-      - "ML (maximum likelihood)"
-      - "misspecified"
-      - "biased"
+      - "L2"
+      - "best (current)"
+      - "NNI"
 
   - question: >
-      The aLRT statistic is computed as 2(_______________ − _______________),
-      where L_2 is the log-likelihood of the _______________ NNI rearrangement
-      around the branch. Its main limitation is that it only evaluates
-      _______________ rearrangements and may miss better _______________ topologies.
+      Posterior Probabilities range from ___ to ___. A PP of 0.95 means
+      the clade appeared in ___% of MCMC sampled trees. PPs tend to be
+      ___ than bootstrap proportions.
     answers:
-      - "lnL_best (best ML tree)"
-      - "lnL_2 (second-best NNI)"
-      - "second-best"
-      - "local (NNI)"
-      - "distant"
-
-  - question: >
-      gCF is the proportion of _______________ trees containing a given branch.
-      sCF is the proportion of _______________ sites supporting a branch.
-      A high bootstrap combined with low gCF is the signature of _______________
-      driven by _______________ or hybridization.
-    answers:
-      - "gene"
-      - "parsimony-informative (concordant)"
-      - "gene tree conflict (discordance)"
-      - "ILS (incomplete lineage sorting)"
-
-  - question: >
-      Posterior probabilities (PPs) tend to be _______________ than bootstrap
-      proportions. They are computed as the _______________ of a clade in the
-      post-burn-in MCMC sample. They are sensitive to _______________ choice
-      and model _______________, which can cause inflation of support.
-    answers:
+      - "0"
+      - "1"
+      - "95"
       - "higher"
-      - "frequency (proportion)"
-      - "prior"
-      - "misspecification"
+
+  - question: >
+      ___ CF measures the proportion of gene trees supporting a branch.
+      ___ CF measures the proportion of informative sites supporting it.
+      Values above ___% indicate strong concordance.
+    answers:
+      - "g (gene)"
+      - "s (site)"
+      - "70"
+
+  - question: >
+      A gCF or sCF below ___% suggests weak support or substantial ___
+      across genes or sites. A value of 40–70% indicates ___ support
+      with possible discordance.
+    answers:
+      - "40"
+      - "conflict (discordance)"
+      - "moderate"

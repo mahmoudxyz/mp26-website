@@ -1,0 +1,391 @@
+oral:
+  - q: What are phylogenetic comparative methods used for?
+    a: >
+      They combine biology, mathematics, and computer science to study
+      evolutionary processes using phylogenetic trees and associated data.
+      Applications include model fitting, ancestral state reconstruction,
+      diversification rates, and biogeography.
+
+  - q: What is the difference between discrete and continuous characters?
+    a: >
+      Discrete characters have a finite number of distinct states —
+      e.g. presence/absence of wings. Continuous characters vary along
+      a measurable scale — e.g. body length or beak depth.
+
+  - q: What is the Mk model and what does each letter stand for?
+    a: >
+      The Mk model is used for discrete character evolution. M stands
+      for Markov — the process follows the Markov property. k refers
+      to an arbitrary number of character states. It is essentially the
+      discrete-trait equivalent of nucleotide substitution models.
+
+  - q: What are the three parameterisations of the Mk model?
+    a: >
+      ER (Equal Rates) — all transitions have the same rate.
+      SYM (Symmetrical) — forward and reverse rates between states
+      are equal but different rates exist between state pairs.
+      ARD (All Rates Different) — every transition has its own rate.
+
+  - q: What is Brownian Motion (BM) as a model of trait evolution?
+    a: >
+      A random walk model where traits change by small random amounts
+      at each step with no preferred direction or optimum. Trait variance
+      increases linearly with time since divergence. It is the null model
+      for neutral trait evolution.
+
+  - q: What is the Ornstein-Uhlenbeck (OU) model and when should it be used?
+    a: >
+      OU extends BM by adding stabilizing selection — traits are pulled
+      toward an optimum value θ with strength α. Variance levels off
+      over time rather than increasing indefinitely. Use it when traits
+      show selective constraints, adaptive peaks, or convergent evolution.
+
+  - q: What are the four parameters of the OU model?
+    a: >
+      θ (theta) — the trait optimum toward which evolution is pulled.
+      z₀ — the ancestral/root state. α (alpha) — the strength of
+      selection toward the optimum. σ² — the evolutionary rate
+      (same as in BM).
+
+  - q: What is phylogenetic signal?
+    a: >
+      The tendency for related species to resemble each other more than
+      expected under random trait distribution. It reflects statistical
+      non-independence due to shared ancestry. Strong signal means
+      trait variation is structured by the phylogeny.
+
+  - q: What does Pagel's λ measure and what do λ = 0 and λ = 1 mean?
+    a: >
+      Pagel's λ quantifies how much trait variation is explained by
+      the phylogeny by rescaling internal branches. λ = 1 means full
+      phylogenetic signal — traits evolve under BM. λ = 0 means
+      internal branches collapse — traits evolve independently of phylogeny.
+
+  - q: What does Blomberg's K measure and how do you interpret it?
+    a: >
+      K compares observed trait variance across a phylogeny to the
+      variance expected under BM. K ≈ 1 — trait matches BM expectations.
+      K > 1 — trait is more conserved than expected. K < 1 — trait
+      is less conserved, suggesting weak signal or convergence.
+
+  - q: Why are species not independent data points in comparative analyses?
+    a: >
+      Species share evolutionary history through common ancestry, creating
+      statistical non-independence. Ignoring this violates the assumption
+      of independent residuals and inflates Type I error rates (false positives).
+
+  - q: What is the difference between PIC and PGLS?
+    a: >
+      PIC (Phylogenetically Independent Contrasts) uses data transformation
+      plus regression and assumes BM — simple and fast (Felsenstein 1985).
+      PGLS (Phylogenetic Generalized Least Squares) models the covariance
+      structure directly in regression and is more flexible — it can
+      incorporate λ and OU models (Grafen 1989).
+
+  - q: When should you use BM versus OU as a model of trait evolution?
+    a: >
+      Use BM as a null model when traits are expected to evolve neutrally
+      or by drift with no selective optimum. Use OU when traits show
+      evidence of stabilizing selection, convergence, or evolution toward
+      one or more adaptive peaks.
+
+
+mcq:
+  - question: "The Mk model for discrete character evolution is named because:"
+    options:
+      - text: M = Markov process; k = arbitrary number of character states
+        correct: true
+      - text: M = mutation rate; k = number of taxa in the phylogeny used
+        correct: false
+      - text: M = mixture model; k = number of rate categories allowed
+        correct: false
+      - text: M = maximum likelihood; k = number of partitions in alignment
+        correct: false
+    explanation: >
+      The Mk model treats discrete trait evolution as a Markov process
+      (M) with k possible states. It is the discrete-character equivalent
+      of nucleotide substitution models like JC69 or GTR.
+
+  - question: "In the Mk model, the ARD parameterisation means:"
+    options:
+      - text: Every transition between states has its own independent rate
+        correct: true
+      - text: All transitions occur at exactly the same rate in all directions
+        correct: false
+      - text: Forward and reverse rates between state pairs are set equal
+        correct: false
+      - text: Only transitions between adjacent states are permitted at all
+        correct: false
+    explanation: >
+      ARD (All Rates Different) is the most parameter-rich version —
+      each directional transition between states gets its own rate,
+      allowing maximum flexibility in modelling trait evolution.
+
+  - question: "Brownian Motion (BM) models trait evolution as:"
+    options:
+      - text: A random walk with no optimum and variance increasing with time
+        correct: true
+      - text: A directed process pulling traits toward a fixed optimal value
+        correct: false
+      - text: A process where trait variance stays constant over all time
+        correct: false
+      - text: A discrete state model where traits jump between fixed categories
+        correct: false
+    explanation: >
+      BM is a pure random walk — traits change by small random amounts
+      with no directional tendency. Variance grows linearly with time,
+      and closely related species tend to be more similar because they
+      have diverged more recently.
+
+  - question: "BM is best used as a model when traits are expected to evolve:"
+    options:
+      - text: Neutrally or by drift with no selective optimum toward a peak
+        correct: true
+      - text: Toward a fixed optimum under stabilizing selection pressure
+        correct: false
+      - text: Rapidly toward multiple adaptive peaks in different lineages
+        correct: false
+      - text: Identically across all lineages at a perfectly constant rate
+        correct: false
+    explanation: >
+      BM is the null model for trait evolution — it assumes no selection
+      and no optimum. It is appropriate when drift or neutral evolution
+      is the expected mechanism, not when stabilizing selection is present.
+
+  - question: "The OU model extends BM by adding:"
+    options:
+      - text: Stabilizing selection that pulls traits toward an optimum θ
+        correct: true
+      - text: Rate heterogeneity across branches using a Gamma distribution
+        correct: false
+      - text: Discrete state transitions modelled as a Markov process here
+        correct: false
+      - text: A molecular clock assumption forcing equal rates across all taxa
+        correct: false
+    explanation: >
+      OU adds an "attraction" parameter α that pulls the evolving trait
+      back toward an optimum θ. This means variance does not increase
+      indefinitely as in BM — it levels off as selection resists drift.
+
+  - question: "In the OU model, the parameter α controls:"
+    options:
+      - text: The strength of selection pulling traits toward the optimum
+        correct: true
+      - text: The trait optimum value that evolution is attracted toward
+        correct: false
+      - text: The evolutionary rate of trait change equivalent to BM sigma
+        correct: false
+      - text: The ancestral root state at the base of the phylogenetic tree
+        correct: false
+    explanation: >
+      α is the "rubber band" strength — high α means strong pull toward
+      the optimum (fast return after perturbation); low α approaches BM
+      behavior (weak pull, traits drift more freely).
+
+  - question: "Phylogenetic signal refers to:"
+    options:
+      - text: Related species resembling each other more than expected by chance
+        correct: true
+      - text: The bootstrap support values placed on internal tree branches
+        correct: false
+      - text: The rate at which nucleotide substitutions accumulate over time
+        correct: false
+      - text: The tendency of traits to evolve toward multiple adaptive peaks
+        correct: false
+    explanation: >
+      Phylogenetic signal measures the degree to which trait similarity
+      among species reflects their shared evolutionary history rather than
+      independent evolution. High signal = phylogeny explains trait variance.
+
+  - question: "Pagel's λ = 0 means:"
+    options:
+      - text: Traits evolve independently of the phylogeny — no signal at all
+        correct: true
+      - text: Traits evolve exactly as expected under Brownian motion model
+        correct: false
+      - text: All internal branches are maximally elongated in the analysis
+        correct: false
+      - text: Traits show strong stabilizing selection toward one optimum
+        correct: false
+    explanation: >
+      λ = 0 collapses all internal branches to zero — as if all species
+      diverged simultaneously and share no history. Trait variation is
+      completely independent of phylogenetic relationships.
+
+  - question: "Pagel's λ = 1 means:"
+    options:
+      - text: Trait covariance fully matches Brownian motion expectations
+        correct: true
+      - text: Traits evolve completely independently of phylogenetic history
+        correct: false
+      - text: Stabilizing selection is pulling all traits to the same optimum
+        correct: false
+      - text: The tree has been rescaled so all branches have equal length
+        correct: false
+    explanation: >
+      λ = 1 means internal branches are unchanged — the observed trait
+      covariance perfectly matches what BM would predict given the
+      phylogeny. Maximum phylogenetic signal.
+
+  - question: "Blomberg's K > 1 indicates that traits are:"
+    options:
+      - text: More conserved than expected under Brownian motion evolution
+        correct: true
+      - text: Less conserved than expected — weak or no phylogenetic signal
+        correct: false
+      - text: Evolving exactly as expected under a Brownian motion model
+        correct: false
+      - text: Converging independently in distantly related lineages here
+        correct: false
+    explanation: >
+      K > 1 means closely related species are more similar than BM
+      predicts — trait evolution is highly phylogenetically conserved,
+      possibly due to strong stabilizing selection or slow evolution.
+
+  - question: "Ignoring phylogenetic non-independence in comparative analyses leads to:"
+    options:
+      - text: Inflated Type I error rates — too many false positive results
+        correct: true
+      - text: Deflated Type I error rates — too many false negative results
+        correct: false
+      - text: More accurate parameter estimates due to larger sample sizes
+        correct: false
+      - text: Underestimation of phylogenetic signal in the trait data here
+        correct: false
+    explanation: >
+      Species are not independent data points — they share history.
+      Treating them as independent inflates the effective sample size
+      and makes it too easy to find statistically significant patterns
+      that are actually driven by shared ancestry (false positives).
+
+  - question: "PIC (Phylogenetically Independent Contrasts) differs from PGLS because PIC:"
+    options:
+      - text: Uses data transformation and regression assuming only BM model
+        correct: true
+      - text: Models covariance structure directly and supports multiple models
+        correct: false
+      - text: Was developed by Grafen in 1989 for flexible covariance modeling
+        correct: false
+      - text: Can incorporate λ and OU models into the regression framework
+        correct: false
+    explanation: >
+      PIC (Felsenstein 1985) is simpler — it transforms the data into
+      independent contrasts under BM and runs standard regression.
+      PGLS (Grafen 1989) is more flexible — it models the covariance
+      matrix directly and can accommodate different evolutionary models.
+
+  - question: "PGLS is preferred over PIC when:"
+    options:
+      - text: The data may not follow BM and λ or OU models may apply better
+        correct: true
+      - text: The phylogeny is very small and computation speed is the priority
+        correct: false
+      - text: All traits are perfectly described by Brownian motion evolution
+        correct: false
+      - text: Discrete traits need to be analyzed using a Markov process model
+        correct: false
+    explanation: >
+      PGLS is more flexible because it can incorporate different
+      covariance structures, including Pagel's λ or OU-based covariance.
+      When BM is a poor fit, PGLS can adjust the model — PIC cannot.
+
+
+fill_in_blank:
+  - question: >
+      ___ characters have a finite number of states (e.g. wings present/absent).
+      ___ characters vary along a measurable scale (e.g. body length).
+    answers:
+      - "Discrete"
+      - "Continuous"
+
+  - question: >
+      The Mk model uses a ___ process to model discrete trait evolution.
+      k refers to the number of possible ___. Its three parameterisations
+      are ___, ___, and ___.
+    answers:
+      - "Markov"
+      - "states"
+      - "ER (Equal Rates)"
+      - "SYM (Symmetrical)"
+      - "ARD (All Rates Different)"
+
+  - question: >
+      In Brownian Motion, trait variance increases ___ with time.
+      There is no ___ or preferred ___. BM is used as a ___
+      model for neutral trait evolution.
+    answers:
+      - "linearly"
+      - "optimum"
+      - "direction"
+      - "null"
+
+  - question: >
+      The OU model adds ___ selection to BM. Traits are pulled toward
+      an optimum ___ with strength ___. Variance ___ off over time
+      rather than increasing indefinitely.
+    answers:
+      - "stabilizing"
+      - "θ (theta)"
+      - "α (alpha)"
+      - "levels"
+
+  - question: >
+      The four parameters of the OU model are: ___ (optimum), ___
+      (root state), ___ (selection strength), and ___ (evolutionary rate).
+    answers:
+      - "θ"
+      - "z₀"
+      - "α"
+      - "σ²"
+
+  - question: >
+      Phylogenetic signal is the tendency for related species to resemble
+      each other ___ than expected by chance. Strong signal means trait
+      variation is ___ by the phylogeny.
+    answers:
+      - "more"
+      - "structured (explained)"
+
+  - question: >
+      Pagel's λ rescales ___ branches of the tree. λ = ___ means full
+      phylogenetic signal (BM). λ = ___ means traits evolve independently
+      of phylogeny. λ is bounded between ___ and ___.
+    answers:
+      - "internal"
+      - "1"
+      - "0"
+      - "0"
+      - "1"
+
+  - question: >
+      Blomberg's K ≈ ___ matches BM expectations. K > ___ means traits
+      are more ___ than expected. K < ___ means weak signal or ___.
+    answers:
+      - "1"
+      - "1"
+      - "conserved"
+      - "1"
+      - "convergence"
+
+  - question: >
+      Ignoring phylogenetic non-independence inflates ___ error rates,
+      producing too many ___ positives. Solutions include ___ and ___.
+    answers:
+      - "Type I"
+      - "false"
+      - "PIC"
+      - "PGLS"
+
+  - question: >
+      PIC was developed by ___ in ___. It uses ___ transformation
+      and assumes ___. PGLS was developed by ___ in ___ and can
+      incorporate ___ and ___ models.
+    answers:
+      - "Felsenstein"
+      - "1985"
+      - "data"
+      - "BM"
+      - "Grafen"
+      - "1989"
+      - "λ"
+      - "OU"

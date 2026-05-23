@@ -1,430 +1,384 @@
-# LESSON 11 — Complex Models (Partition and Mixture Models)
-
 oral:
-  - q: >
-      What is the fundamental difference between partition models and mixture
-      models in phylogenetics? Why does this distinction matter in practice?
-    a: |
-      Partition models divide the alignment into predefined subsets before
-      analysis. Each subset (partition) is assigned its own substitution model
-      and parameters based on prior biological knowledge (e.g. by gene, by
-      codon position, by structural domain). The assignment of sites to
-      partitions is fixed and known before the analysis begins.
-      Mixture models do not require any pre-assignment of sites to categories.
-      Instead, each site has a probability of belonging to multiple model
-      components simultaneously. The likelihood is computed as a weighted sum
-      of per-component likelihoods across all categories, and the site-to-class
-      assignment is inferred probabilistically from the data itself.
-      The key distinction:
-      — Partition models use predefined, discrete structure (known before analysis).
-      — Mixture models infer structure probabilistically (unknown, learned from data).
-      In practice this matters because partition models require prior knowledge
-      to define sensible partitions — poor partitioning introduces bias. Mixture
-      models are more flexible and can capture heterogeneity that is not obvious
-      a priori, but they are more computationally expensive and risk over-fitting
-      if too many mixture components are used.
+  - q: Why do we need complex models beyond simple substitution models?
+    a: >
+      Real sequence data are heterogeneous — different sites, lineages,
+      or regions of an alignment often evolve at different rates, under
+      different frequencies, or even different substitution processes.
+      Simple models that assume one process for all sites are violated.
 
-  - q: >
-      Describe the three types of partition models (edge-linked equal,
-      edge-linked proportional, edge-unlinked) and justify which is
-      generally recommended and why.
-    a: |
-      Edge-linked equal (shared branch lengths): all partitions share the same
-      single set of branch lengths. Each partition has its own substitution model
-      and parameters, but every branch is assumed to have accumulated the same
-      absolute amount of change for all genes. This is almost always biologically
-      unrealistic because genes evolve at different rates.
-      Edge-linked proportional (proportional branch lengths): partitions share
-      a reference set of branch lengths but each partition scales that set by a
-      partition-specific multiplier. Genes evolving faster have a multiplier >1;
-      slower genes have multiplier <1. Topology and relative branching pattern
-      are shared; absolute rates differ per gene.
-      Edge-unlinked (independent branch lengths): each partition has a completely
-      independent set of branch lengths. Most flexible and biologically realistic,
-      but most parameter-heavy. Risks severe overfitting when partitions are
-      short — insufficient data in a single gene to reliably estimate dozens of
-      branch lengths independently.
-      Recommendation: edge-linked proportional is generally preferred. It
-      captures the biological reality that different genes evolve at different
-      overall rates, while avoiding the overfitting risk of full unlinking. It
-      represents the best tradeoff between realism and parameter economy.
+  - q: What is the fundamental difference between partition models and mixture models?
+    a: >
+      Partition models assign each site to a predefined subset before
+      analysis — the assignment is fixed. Mixture models do not assign
+      sites in advance; instead each site has a probability of belonging
+      to multiple model components, inferred from the data.
 
-  - q: >
-      What are the three types of mixture models discussed in the lecture?
-      Describe what each one varies across sites.
-    a: |
-      Rate mixture model (+Γ, Gamma): the simplest type. All sites evolve under
-      the same substitution matrix and base/amino acid frequencies, but each site
-      is assigned a rate drawn from a Gamma distribution (shape parameter α).
-      Sites vary only in how fast they evolve — some are slow (conserved),
-      others fast (variable) — but the relative substitution process is identical.
-      Profile mixture model: sites share the same substitution rate matrix but
-      can have different equilibrium frequency profiles. Different positions in
-      a protein may have distinct amino acid compositions reflecting their
-      structural environment (buried vs exposed, active site vs scaffolding).
-      Empirical profile models (e.g. LG+C60) use 60 fixed frequency profiles
-      derived from large datasets. Bayesian profile models (e.g. CAT) infer
-      the number and composition of profiles from the data.
-      Full mixture model: the most general type. Each site may evolve under a
-      completely different substitution model — not just a different rate or
-      frequency profile, but an entirely different Q-matrix. This captures
-      maximum heterogeneity but is the most computationally expensive and
-      parameter-rich option.
-      The three differ in what they allow to vary across sites: rate only (rate
-      mixture), frequencies only (profile mixture), or the entire substitution
-      model (full mixture).
+  - q: What do all three types of partition models share?
+    a: >
+      They all share the same topology and each partition has its own
+      substitution model (Q-matrix). They differ only in how branch
+      lengths are handled across partitions.
 
-  - q: >
-      What is heterotachy and why do standard +Γ models fail to capture it?
-      What model specifically addresses it?
-    a: |
-      Heterotachy is the phenomenon where the same site evolves at different
-      rates on different branches of the tree. A position that is conserved
-      in one clade may be hypervariable in another, reflecting shifts in
-      functional constraint across lineages (e.g. an amino acid that is
-      essential in mammals but less constrained in fish).
-      Why +Γ fails: the Gamma rate heterogeneity model assigns each site a
-      single rate drawn from a Gamma distribution that applies uniformly across
-      all branches. It models variation in rate AMONG sites but assumes each
-      site's rate is CONSTANT across branches. Heterotachy — rate variation for
-      the same site across branches — is structurally different and cannot be
-      captured by +Γ alone. Ignoring heterotachy can distort branch lengths and
-      in severe cases even mislead topology inference.
-      The GHOST model (General Heterogeneous evolution On a Single Topology)
-      specifically addresses heterotachy. It is implemented as a mixture model
-      where sites are probabilistically assigned to classes, each with its own
-      complete set of branch lengths and substitution matrix — similar in spirit
-      to the edge-unlinked partition model, but without requiring any a priori
-      partitioning of sites. Each class can have a different tempo on any given
-      branch, capturing the branch-specific rate variation that defines heterotachy.
+  - q: Describe the three partition model types for branch lengths.
+    a: >
+      Edge-linked equal — all partitions share exactly the same branch
+      lengths. Edge-linked proportional — each partition scales a shared
+      set of branch lengths by its own multiplier. Edge-unlinked — each
+      partition has a completely independent set of branch lengths.
 
-  - q: >
-      What is the MAST model and how does it extend beyond all other complex
-      models discussed? What biological scenarios motivate it?
-    a: |
-      MAST (Mixtures Across Sites and Trees) is the most radical extension among
-      complex models. All previous models — partition models, rate mixture, profile
-      mixture, full mixture, GHOST — relax assumptions about rates, frequencies,
-      or the substitution matrix, but they all assume a single fixed tree topology
-      for every site.
-      MAST relaxes the topology itself. It allows different sites to evolve on
-      different tree topologies simultaneously within a single concatenated ML
-      framework. Each site is assigned a probability of belonging to each
-      candidate topology, and the overall likelihood is a weighted sum across
-      all topologies considered.
-      Biological scenarios motivating MAST:
-      Incomplete Lineage Sorting (ILS): different genomic regions can have
-      genuinely different genealogical histories due to ancestral polymorphism
-      persisting across speciation events. ILS means sites in the same alignment
-      may have different true gene tree topologies.
-      Introgression/hybridization: gene flow between species transfers alleles
-      between lineages, so some genomic regions track the history of one parent
-      and others track the other parent.
-      Recombination: within a locus, recombination breakpoints can create
-      different genealogical histories in different segments.
-      MAST is the first model to address topological discordance within the
-      concatenated ML framework, bridging the gap between concatenation and
-      fully coalescent-based methods.
+  - q: Which partition model is generally recommended and why?
+    a: >
+      Edge-proportional, because it balances biological realism
+      (different partitions evolve at different speeds) against
+      overparameterization (unlike edge-unlinked which can overfit
+      when partitions are short).
+
+  - q: Why is edge-unlinked dangerous for short partitions?
+    a: >
+      Short partitions have few informative sites, so they cannot
+      reliably estimate their own branch lengths independently —
+      the model starts fitting noise rather than true evolutionary signal.
+
+  - q: What is a rate mixture model?
+    a: >
+      A model where all sites share the same substitution matrix but
+      evolve at different rates drawn from a distribution — for example
+      the Gamma (+Γ) model, where each site gets its own rate multiplier.
+
+  - q: What is a profile mixture model?
+    a: >
+      A model where sites can have different base or amino acid frequency
+      profiles but share the same substitution matrix. Examples include
+      empirical models like LG+C60 and Bayesian models like CAT.
+
+  - q: What is a full mixture model?
+    a: >
+      Each site may evolve under a completely different substitution
+      model — not just a different rate or frequency profile, but a
+      different Q-matrix entirely.
+
+  - q: What is heterotachy and which model addresses it?
+    a: >
+      Heterotachy is when the same site evolves at different rates on
+      different branches. The GHOST model addresses it by assigning
+      sites probabilistically to classes, each with its own branch
+      lengths and Q-matrix, without requiring predefined partitions.
+
+  - q: What is the key difference between GHOST and an edge-unlinked partition model?
+    a: >
+      GHOST assigns sites to rate classes probabilistically (like a
+      mixture model) without any a priori partitioning. Edge-unlinked
+      partitions require the user to define partitions in advance.
+
+  - q: In a mixture model, how is the likelihood calculated?
+    a: >
+      As a weighted sum of the per-component likelihoods across all
+      mixture classes — each site contributes to the likelihood of
+      every component, weighted by the probability of belonging to it.
+
+  - q: What does LG+C60 mean as a model specification?
+    a: >
+      LG is the amino acid substitution matrix; C60 refers to a profile
+      mixture model with 60 empirical frequency profiles derived from
+      large protein datasets, allowing variation in amino acid
+      composition across sites.
 
 
 mcq:
-  - question: >
-      What is the key defining difference between partition and mixture models?
+  - question: "Simple substitution models are often violated in real data because:"
     options:
-      - text: Mixture models are faster to compute
-        correct: false
-      - text: Partition models require predefined site assignments; mixture
-          models infer class membership probabilistically from the data
+      - text: Different sites and lineages often evolve heterogeneously
         correct: true
-      - text: Partition models can only be used with nucleotide data
+      - text: Real sequences always follow a strict molecular clock perfectly
         correct: false
-      - text: Mixture models always outperform partition models in accuracy
+      - text: All sites in an alignment always share the same base frequency
         correct: false
-    explanation: |
-      Partition models: sites are assigned to categories a priori based on
-      biological knowledge (e.g. gene identity, codon position). The assignment
-      is fixed before analysis.
-      Mixture models: no pre-assignment. Each site has a probability of belonging
-      to each component, inferred from the data. This flexibility comes at higher
-      computational cost and risk of overfitting.
+      - text: Sequence alignments are always too short for any model to fit
+        correct: false
+    explanation: >
+      Real data show heterogeneity in rates, frequencies, and substitution
+      processes across sites and lineages. Complex models are needed to
+      capture this variation rather than assuming one process for all sites.
 
-  - question: >
-      The edge-equal partition model is considered unrealistic because:
+  - question: "The key difference between partition and mixture models is that:"
     options:
-      - text: It assigns different substitution models to each partition
-        correct: false
-      - text: It uses too many branch length parameters
-        correct: false
-      - text: It forces every gene to record the same absolute evolutionary
-          change along every branch, ignoring known rate variation among genes
+      - text: Partition models use predefined site groups; mixture models do not
         correct: true
-      - text: It cannot be used with ML inference
+      - text: Mixture models use predefined site groups; partition models do not
         correct: false
-    explanation: |
-      Edge-equal shares one set of branch lengths across all partitions.
-      This means every gene is assumed to have accumulated identical amounts
-      of change on every branch — a strict assumption violated by any real
-      dataset where genes evolve at different overall rates. It is the least
-      flexible partition model and rarely appropriate in practice.
+      - text: Both assign sites to groups, but partition models use probabilities
+        correct: false
+      - text: Partition models are always better because they use more parameters
+        correct: false
+    explanation: >
+      Partition models require the user to define which sites belong to
+      which subset before analysis. Mixture models instead assign sites
+      probabilistically to components — no prior grouping is needed.
 
-  - question: >
-      Which partition model type uses the fewest additional parameters
-      beyond a single-partition analysis while still allowing genes to
-      evolve at different overall rates?
+  - question: "In an edge-linked equal partition model, branch lengths are:"
     options:
-      - text: Edge-unlinked
-        correct: false
-      - text: Edge-linked equal
-        correct: false
-      - text: Edge-linked proportional
+      - text: Identical across all partitions — one shared set for all
         correct: true
-      - text: Full mixture model
+      - text: Scaled by a multiplier unique to each partition separately
         correct: false
-    explanation: |
-      Edge-proportional adds only one scalar multiplier per partition to a
-      shared reference branch length set. For k partitions, this adds k−1
-      free parameters (one partition's multiplier is fixed to 1 as reference).
-      Edge-unlinked adds a full independent set of branch lengths per partition —
-      (n−1) × k extra parameters for n taxa. Edge-proportional is the minimal
-      extension that captures between-gene rate variation.
+      - text: Estimated independently for every partition in the dataset
+        correct: false
+      - text: Borrowed from a reference tree and fixed before analysis
+        correct: false
+    explanation: >
+      Edge-linked equal is the most constrained partition model — all
+      partitions share exactly the same branch lengths. This is often
+      unrealistic because different genes evolve at different speeds.
 
-  - question: >
-      A profile mixture model (e.g. LG+C60) differs from a standard +Γ model
-      in that it allows variation across sites in:
+  - question: "Edge-proportional partition models give each partition:"
     options:
-      - text: Substitution rates only
-        correct: false
-      - text: Amino acid equilibrium frequency profiles, capturing compositional
-          heterogeneity among sites
+      - text: Branch lengths proportional to a shared set via a scalar multiplier
         correct: true
-      - text: Tree topology across sites
+      - text: Completely independent branch lengths estimated from scratch here
         correct: false
-      - text: Branch lengths across partitions
+      - text: Exactly the same branch lengths as all other partitions always
         correct: false
-    explanation: |
-      +Γ varies substitution rates across sites using a Gamma distribution —
-      all sites share the same frequency profile and Q-matrix.
-      Profile mixture models (LG+C60, CAT) vary the amino acid frequency
-      profiles across sites. Different structural environments in proteins
-      (buried hydrophobic core vs solvent-exposed surface) impose different
-      frequency constraints. LG+C60 uses 60 empirically derived frequency
-      vectors; CAT infers the number and composition of profiles from the data.
-      Neither model varies branch lengths or topology per se.
+      - text: Branch lengths fixed to 1.0 for all branches in every partition
+        correct: false
+    explanation: >
+      Edge-proportional allows each partition to scale a shared base
+      set of branch lengths by its own multiplier — faster-evolving
+      partitions get longer branches proportionally.
 
-  - question: >
-      The CAT model differs from LG+C60 in that:
+  - question: "Edge-unlinked partition models are risky for short partitions because:"
     options:
-      - text: CAT uses nucleotides; LG+C60 uses amino acids
-        correct: false
-      - text: CAT infers the number and composition of frequency profiles
-          from the data; LG+C60 uses 60 fixed profiles from a pre-trained database
+      - text: Too few sites means branch lengths are estimated from noise only
         correct: true
-      - text: CAT is a rate mixture; LG+C60 is a profile mixture
+      - text: They require more taxa than any other partition model type here
         correct: false
-      - text: LG+C60 is a Bayesian model; CAT is a maximum likelihood model
+      - text: They cannot accommodate more than one substitution model type
         correct: false
-    explanation: |
-      Both are profile mixture models for amino acid data. LG+C60 is empirical:
-      the 60 frequency profiles are fixed from a large training dataset.
-      CAT is Bayesian: it places a Dirichlet process prior on the frequency
-      profiles and infers the optimal number and composition of profiles
-      from the focal dataset. CAT is more flexible but requires Bayesian
-      inference (PhyloBayes software) and is computationally expensive.
+      - text: They always produce longer computation times than Bayesian tools
+        correct: false
+    explanation: >
+      With few informative sites, an edge-unlinked model cannot reliably
+      estimate its own independent branch lengths — it overfits noise
+      rather than capturing true evolutionary signal.
 
-  - question: >
-      Heterotachy refers to:
+  - question: Which partition model is generally recommended as the best trade-off?
     options:
-      - text: Rate variation among sites within a single branch
+      - text: Edge-proportional — balances realism and parameter efficiency
+        correct: true
+      - text: Edge-equal — simplest and always the most accurate option here
         correct: false
+      - text: Edge-unlinked — always preferred because it has more parameters
+        correct: false
+      - text: No partition model — always use a single model for everything
+        correct: false
+    explanation: >
+      Edge-proportional allows biologically meaningful rate differences
+      between partitions without overparameterizing by estimating fully
+      independent branch lengths for every partition separately.
+
+  - question: "A rate mixture model (e.g. +Γ) allows sites to differ in their:"
+    options:
+      - text: Substitution rate, while sharing the same substitution matrix
+        correct: true
+      - text: Substitution matrix, while sharing exactly the same rate here
+        correct: false
+      - text: Topology, with each site supporting a different tree structure
+        correct: false
+      - text: Taxon composition, with different species per site category
+        correct: false
+    explanation: >
+      Rate mixture models like +Γ keep the same Q-matrix for all sites
+      but allow each site to draw its rate from a Gamma distribution —
+      accounting for fast and slow-evolving positions in the alignment.
+
+  - question: "A profile mixture model accounts for heterogeneity in:"
+    options:
+      - text: Amino acid or nucleotide frequencies varying across sites
+        correct: true
+      - text: Substitution rates varying across branches in the phylogeny
+        correct: false
+      - text: Topology differences between individual gene trees across data
+        correct: false
+      - text: The number of taxa included in different parts of alignment
+        correct: false
+    explanation: >
+      Profile mixture models allow different sites to have different
+      frequency profiles (e.g. some sites may be GC-rich, others AT-rich)
+      while sharing the same substitution rate matrix.
+
+  - question: "LG+C60 is an example of:"
+    options:
+      - text: A profile mixture model with 60 empirical frequency profiles
+        correct: true
+      - text: A rate mixture model with 60 discrete Gamma rate categories
+        correct: false
+      - text: A partition model dividing the alignment into 60 subsets here
+        correct: false
+      - text: A full mixture model with 60 independent substitution matrices
+        correct: false
+    explanation: >
+      LG is the substitution matrix; C60 adds 60 empirical amino acid
+      frequency profiles derived from large protein databases, allowing
+      composition to vary across sites in the alignment.
+
+  - question: "A full mixture model differs from a profile mixture model because it allows:"
+    options:
+      - text: Each site to use a completely different substitution matrix
+        correct: true
+      - text: Each site to have only a different frequency profile assigned
+        correct: false
+      - text: Each site to evolve at a different rate from a Gamma distribution
+        correct: false
+      - text: Each site to belong to a predefined partition based on gene type
+        correct: false
+    explanation: >
+      Full mixture models are the most complex — each site can have its
+      own Q-matrix, not just a different rate or frequency profile. This
+      captures the broadest range of evolutionary heterogeneity.
+
+  - question: "Heterotachy refers to:"
+    options:
       - text: The same site evolving at different rates on different branches
         correct: true
-      - text: Different genes having different mean substitution rates
+      - text: Different sites evolving at different rates on the same branch
         correct: false
-      - text: Compositional bias varying among taxa
+      - text: Different genes having different base composition profiles here
         correct: false
-    explanation: |
-      Heterotachy = rate variation across branches for the same site.
-      This is distinct from the rate variation captured by +Γ, which assigns
-      each site a single constant rate across all branches. Heterotachy means
-      a site's rate is branch-specific — it can be conserved in one lineage
-      and variable in another. The GHOST model addresses this by allowing
-      each site to probabilistically belong to classes with different branch
-      length sets.
+      - text: Rate variation across sites modeled by a Gamma distribution
+        correct: false
+    explanation: >
+      Heterotachy is branch-specific rate variation at individual sites —
+      the same position may be fast-evolving in one lineage and
+      slow-evolving in another. +Γ cannot capture this because it
+      assigns one rate per site across all branches.
 
-  - question: >
-      The GHOST model addresses heterotachy by:
+  - question: "The GHOST model addresses heterotachy by:"
     options:
-      - text: Partitioning sites by codon position before analysis
-        correct: false
-      - text: Assigning each site probabilistically to classes, each
-          with its own set of branch lengths and Q-matrix, without
-          requiring a priori site-to-class assignment
+      - text: Assigning sites probabilistically to classes with own branch lengths
         correct: true
-      - text: Estimating a separate topology for each site
+      - text: Requiring the user to predefine partitions for each branch set
         correct: false
-      - text: Applying a Gamma distribution of rates across lineages
+      - text: Applying a single Gamma distribution to all sites and branches
         correct: false
-    explanation: |
-      GHOST (General Heterogeneous evolution On a Single Topology) is a mixture
-      model where each class has its own branch lengths AND substitution matrix.
-      Sites are assigned probabilistically to classes — similar to edge-unlinked
-      partitions but without requiring any prior grouping. This allows different
-      sites to have different rates on any specific branch, capturing the
-      branch-specific rate variation that defines heterotachy.
+      - text: Fixing branch lengths equal across all sites in the alignment
+        correct: false
+    explanation: >
+      GHOST works like a mixture model — sites are probabilistically
+      assigned to classes, each with its own branch lengths and Q-matrix,
+      without any a priori partitioning by the user.
 
-  - question: >
-      Over-partitioning in a partitioned analysis leads to:
+  - question: "In a mixture model, the likelihood of a site is calculated as:"
     options:
-      - text: Improved model fit with no drawbacks
-        correct: false
-      - text: Underfitting the data and ignoring real heterogeneity
-        correct: false
-      - text: Overfitting — too many parameters are estimated from
-          insufficient data per partition, fitting noise rather than signal
+      - text: A weighted sum of likelihoods across all mixture components
         correct: true
-      - text: Faster computation because each partition is smaller
+      - text: The maximum likelihood across all possible component models
         correct: false
-    explanation: |
-      Each partition needs sufficient data to estimate its own branch lengths
-      and substitution model parameters. When partitions are too numerous and
-      each contains very few sites, there is not enough information to reliably
-      estimate all parameters — the model fits random noise. This overfitting
-      inflates apparent model fit (AIC/BIC can detect this) and produces
-      unreliable branch length and substitution rate estimates.
+      - text: The likelihood under the best-fitting single substitution model
+        correct: false
+      - text: An average of branch lengths across all partitions in the data
+        correct: false
+    explanation: >
+      Every site contributes to every component in a mixture model,
+      weighted by the probability of belonging to that component.
+      The total site likelihood is the weighted sum across all components.
 
-  - question: >
-      Model selection criteria such as AIC and BIC are used in partitioning
-      to balance:
+  - question: "Compared to partition models, mixture models have the advantage of:"
     options:
-      - text: Speed vs accuracy
-        correct: false
-      - text: Nucleotide vs amino acid models
-        correct: false
-      - text: Model fit (log-likelihood) against model complexity
-          (number of free parameters), penalizing overfitting
+      - text: Not requiring prior knowledge of which sites belong to which class
         correct: true
-      - text: Convergence speed of the MCMC chain
+      - text: Always producing more accurate trees with fewer parameters used
         correct: false
-    explanation: |
-      AIC = −2lnL + 2k (penalizes by number of parameters k).
-      BIC = −2lnL + k·ln(N) (penalizes more strongly for large datasets).
-      Adding parameters always improves lnL, but AIC and BIC impose a
-      penalty proportional to the number of parameters. The optimal partition
-      scheme minimizes AIC or BIC — balancing how well the model fits the
-      data against how many parameters are needed. Under-partitioning
-      gives low k but poor fit (high −2lnL); over-partitioning gives low
-      −2lnL but excessive k penalty.
-
-  - question: >
-      MAST differs from all other complex models covered in this lesson
-      primarily because:
-    options:
-      - text: It applies separate substitution models to each codon position
+      - text: Being limited to rate variation only, making them simpler to use
         correct: false
-      - text: It relaxes the assumption of a single fixed topology, allowing
-          different sites to support different tree topologies
-        correct: true
-      - text: It uses Bayesian inference exclusively
+      - text: Requiring the user to specify the number of classes in advance
         correct: false
-      - text: It models rate variation across lineages using a local clock
-        correct: false
-    explanation: |
-      All other models — partition, rate mixture, profile mixture, full mixture,
-      GHOST — keep the tree topology fixed and vary parameters of the evolutionary
-      process across sites or branches. MAST is the first to relax the topology
-      itself within a concatenated ML framework, assigning each site a probability
-      of evolving on each candidate topology. This directly addresses topological
-      discordance from ILS, hybridization, or recombination.
+    explanation: >
+      Mixture models infer class membership probabilistically from the
+      data — no predefined partitioning is needed. This is their key
+      advantage when the structure of the data is unknown in advance.
 
 
 fill_in_blank:
   - question: >
-      Partition models assign sites to categories _______________ based on
-      prior biological knowledge. Mixture models infer category membership
-      _______________ from the data, computing the likelihood as a
-      _______________ sum of per-component likelihoods.
-    answers:
-      - "a priori (before analysis)"
-      - "probabilistically"
-      - "weighted"
-
-  - question: >
-      The three partition model types differ in branch length treatment:
-      edge-_______________ shares one identical set; edge-_______________
-      scales a shared set by a gene-specific multiplier; edge-_______________
-      estimates fully independent sets per partition. The recommended
-      compromise is edge-_______________.
-    answers:
-      - "linked (equal)"
-      - "proportional"
-      - "unlinked"
-      - "proportional"
-
-  - question: >
-      A rate mixture model (+Γ) varies _______________ across sites.
-      A profile mixture model (e.g. LG+C60) varies amino acid _______________
-      profiles across sites. A full mixture model varies the entire
-      _______________ across sites.
-    answers:
-      - "substitution rates"
-      - "equilibrium frequency"
-      - "substitution model (Q-matrix)"
-
-  - question: >
-      LG+C60 uses _______________ fixed amino acid frequency profiles from a
-      pre-trained database. The Bayesian alternative _______________ infers
-      the _______________ and composition of profiles from the focal dataset
-      using a Dirichlet process prior.
-    answers:
-      - "60"
-      - "CAT"
-      - "number"
-
-  - question: >
-      Heterotachy is the phenomenon where the _______________ site evolves
-      at different _______________ on different branches. Standard +Γ cannot
-      capture this because it assigns each site a _______________ rate that
-      is constant across _______________ branches. The _______________ model
-      specifically addresses heterotachy.
+      Simple models assume all sites evolve under the ___ substitution
+      process. Complex models are needed when data show ___ in rates,
+      frequencies, or substitution processes.
     answers:
       - "same"
-      - "rates"
-      - "single"
-      - "all"
-      - "GHOST"
+      - "heterogeneity"
 
   - question: >
-      Under-partitioning means using _______________ partitions than the data
-      require, causing the model to _______________ real heterogeneity.
-      Over-partitioning uses _______________ partitions, causing the model to
-      fit _______________ rather than signal. Both are detected by _______________
-      criteria such as AIC and BIC.
+      ___ models assign sites to predefined subsets before analysis.
+      ___ models assign sites probabilistically to components without
+      any prior grouping.
     answers:
-      - "fewer"
-      - "ignore (miss)"
-      - "too many"
-      - "noise"
-      - "model selection"
+      - "Partition"
+      - "Mixture"
 
   - question: >
-      MAST relaxes the assumption of a single fixed _______________, allowing
-      different _______________ to evolve on different tree topologies. This
-      addresses discordance caused by _______________, introgression, and
-      recombination within a _______________ ML framework.
+      All partition models share one ___ and each partition has its
+      own ___. They differ only in how ___ are handled.
     answers:
       - "topology"
-      - "sites"
-      - "ILS (incomplete lineage sorting)"
-      - "concatenated"
+      - "substitution model (Q-matrix)"
+      - "branch lengths"
 
   - question: >
-      The GHOST model is similar in spirit to an edge-_______________ partition
-      model but differs because it requires _______________ prior partitioning
-      of sites. Each class has its own _______________ lengths and _______________
-      matrix, capturing site-specific rate variation across _______________.
+      Edge-linked ___ — all partitions share identical branch lengths.
+      Edge-linked ___ — each partition scales a shared set by a multiplier.
+      Edge-___ — each partition has fully independent branch lengths.
     answers:
+      - "equal"
+      - "proportional"
       - "unlinked"
-      - "no"
-      - "branch"
+
+  - question: >
+      Edge-___ is the recommended partition model because it balances
+      biological ___ with avoiding ___.
+    answers:
+      - "proportional"
+      - "realism"
+      - "overparameterization (overfitting)"
+
+  - question: >
+      A ___ mixture model varies rate across sites using a Gamma
+      distribution. A ___ mixture model varies frequency profiles
+      across sites. A ___ mixture model allows each site a different
+      substitution matrix entirely.
+    answers:
+      - "rate"
+      - "profile"
+      - "full"
+
+  - question: >
+      LG+C60 is a ___ mixture model. LG is the ___ matrix and C60
+      refers to ___ empirical frequency profiles.
+    answers:
+      - "profile"
       - "substitution (Q)"
-      - "branches"
+      - "60"
+
+  - question: >
+      ___ is when the same site evolves at different rates on different
+      branches. The +Γ model cannot capture this because it assigns
+      ___ rate per site across all branches.
+    answers:
+      - "Heterotachy"
+      - "one"
+
+  - question: >
+      The ___ model addresses heterotachy by assigning sites
+      probabilistically to classes, each with its own ___ and
+      Q-matrix, without requiring ___ partitioning.
+    answers:
+      - "GHOST"
+      - "branch lengths"
+      - "a priori (predefined)"
+
+  - question: >
+      In a mixture model, the site likelihood is a ___ sum of
+      per-component likelihoods. Each site contributes to ___
+      component, weighted by the probability of ___ to it.
+    answers:
+      - "weighted"
+      - "every"
+      - "belonging"

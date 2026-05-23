@@ -1,0 +1,375 @@
+oral:
+  - q: What are synonymous and nonsynonymous substitutions?
+    a: >
+      Synonymous substitutions do not change the amino acid — they are
+      assumed to be neutral with respect to selection. Nonsynonymous
+      substitutions change the amino acid and are expected to reflect
+      selective pressure on the protein.
+
+  - q: What is ω (omega) and what does it measure?
+    a: >
+      ω = dN/dS — the ratio of nonsynonymous to synonymous substitution
+      rates. It measures the selective pressure acting on a protein-coding
+      gene or codon.
+
+  - q: How do you interpret ω < 1, ω = 1, and ω > 1?
+    a: >
+      ω < 1 — purifying (negative) selection; harmful amino acid changes
+      are being removed. ω = 1 — neutral evolution; synonymous and
+      nonsynonymous changes accumulate at the same rate. ω > 1 —
+      positive (adaptive) selection; amino acid changes are being favored.
+
+  - q: What is purifying selection and where is it most common?
+    a: >
+      Purifying selection (ω < 1) eliminates harmful mutations that alter
+      protein function. It is the most common form of selection in coding
+      regions, especially in genes essential for basic cellular processes.
+
+  - q: What is positive selection and where is it commonly observed?
+    a: >
+      Positive selection (ω > 1) promotes advantageous mutations,
+      fixing them rapidly in populations. It is commonly observed in
+      genes involved in immune defense or sensory perception.
+
+  - q: What is relaxed selection and how does it differ from positive selection?
+    a: >
+      Relaxed selection is not defined by an absolute ω value but by
+      a relative increase in ω between lineages — a gene previously
+      under strong purifying selection shows reduced constraint, so
+      ω rises, but not necessarily above 1.
+
+  - q: What is the difference between site-specific, branch-specific, and branch-site models?
+    a: >
+      Site-specific models let ω vary across codons but average it
+      across all branches. Branch-specific models let ω vary across
+      lineages but average it across codons. Branch-site models allow
+      ω to vary across both codons AND lineages simultaneously.
+
+  - q: What do "foreground" and "background" mean in codon models?
+    a: >
+      The foreground is the branch or branches being tested for a
+      different ω. The background is all remaining branches, providing
+      the baseline ω for comparison.
+
+  - q: Why is a dN/dS > 1 for a whole gene considered unrealistic?
+    a: >
+      It would imply every codon in the gene is under positive selection,
+      which is biologically implausible. Extreme whole-gene ω values
+      usually indicate pseudogenization, alignment errors, or orthology
+      inference problems rather than genuine selection.
+
+  - q: What is a codon-based alignment and why is it important?
+    a: >
+      An alignment where nucleotide sequences are aligned in triplets
+      (codons). Indels must be multiples of three to preserve the reading
+      frame. Without this, frame-shift mutations would appear, making
+      codon models biologically meaningless.
+
+  - q: What did MG94 and GY94 contribute to evolutionary biology?
+    a: >
+      Both 1994 models introduced ways to distinguish synonymous from
+      nonsynonymous substitutions in codon evolution. MG94 estimates
+      absolute dS and dN rates; GY94 parameterizes them as ω = dN/dS,
+      laying the groundwork for detecting selection in protein-coding genes.
+
+  - q: Why is the assumption of dS neutrality debated?
+    a: >
+      Synonymous substitutions are assumed to be selectively neutral,
+      but evidence shows they can affect mRNA stability, splicing, and
+      codon usage bias — meaning dS is not always a clean neutral
+      baseline for comparison with dN.
+
+
+mcq:
+  - question: "Synonymous substitutions are assumed to be neutral because they:"
+    options:
+      - text: Do not change the amino acid sequence of the protein product
+        correct: true
+      - text: Always occur at a faster rate than nonsynonymous substitutions
+        correct: false
+      - text: Are found only in non-coding regions of the genome sequence
+        correct: false
+      - text: Are removed immediately by purifying selection in all genomes
+        correct: false
+    explanation: >
+      Synonymous substitutions change the DNA sequence but not the
+      amino acid — because of the genetic code's degeneracy. They are
+      assumed to be invisible to selection and therefore accumulate
+      neutrally, making dS a baseline for comparison.
+
+  - question: "ω = dN/dS > 1 indicates:"
+    options:
+      - text: Positive selection — amino acid changes are being favored
+        correct: true
+      - text: Purifying selection — harmful mutations are being removed
+        correct: false
+      - text: Neutral evolution — both substitution types accumulate equally
+        correct: false
+      - text: Relaxed selection — a reduction in functional constraint only
+        correct: false
+    explanation: >
+      When nonsynonymous changes (dN) accumulate faster than synonymous
+      ones (dS), selection is actively promoting amino acid changes —
+      the hallmark of positive or adaptive selection.
+
+  - question: "ω = dN/dS < 1 indicates:"
+    options:
+      - text: Purifying selection — deleterious amino acid changes are removed
+        correct: true
+      - text: Positive selection — advantageous changes are being fixed fast
+        correct: false
+      - text: Neutral evolution — changes accumulate without selective pressure
+        correct: false
+      - text: Relaxed selection — functional constraint has recently decreased
+        correct: false
+    explanation: >
+      ω < 1 means nonsynonymous changes are rarer than synonymous ones
+      — selection is removing amino acid changes because they are harmful
+      to protein function. This is the most common pattern in coding genes.
+
+  - question: "Relaxed selection differs from positive selection because it:"
+    options:
+      - text: Is defined by a relative increase in ω between lineages, not ω > 1
+        correct: true
+      - text: Always produces ω values greater than 1 in the tested lineage
+        correct: false
+      - text: Removes synonymous substitutions faster than nonsynonymous ones
+        correct: false
+      - text: Only applies to pseudogenes and non-functional gene copies here
+        correct: false
+    explanation: >
+      Relaxed selection means a previously constrained gene faces reduced
+      functional pressure — ω rises compared to a reference lineage or
+      time period, but may still stay below 1. It's a relative comparison,
+      not an absolute threshold.
+
+  - question: S"ite-specific codon models allow ω to vary across:"
+    options:
+      - text: Codons — but ω is averaged across all branches of the tree
+        correct: true
+      - text: Branches — but ω is averaged across all codons in alignment
+        correct: false
+      - text: Both codons and branches simultaneously in the same analysis
+        correct: false
+      - text: Only synonymous sites to detect changes in neutral evolution rate
+        correct: false
+    explanation: >
+      Site-specific models test whether different codons are under different
+      selective pressures, but they assume ω is constant across lineages —
+      averaging over the whole tree for each codon position.
+
+  - question: "Branch-site models are the most powerful codon models because they:"
+    options:
+      - text: Allow ω to vary across both specific codons and specific lineages
+        correct: true
+      - text: Are the simplest models and require the fewest parameters total
+        correct: false
+      - text: Only test for variation in ω across lineages in the background
+        correct: false
+      - text: Force all codons to have the same ω within foreground branches
+        correct: false
+    explanation: >
+      Branch-site models relax both the site-constant assumption of
+      branch models AND the branch-constant assumption of site models —
+      allowing detection of positive selection on specific codons in
+      specific lineages simultaneously.
+
+  - question: "In codon models, the (foreground) refers to:"
+    options:
+      - text: The branches being explicitly tested for a different ω value
+        correct: true
+      - text: The background branches providing the baseline ω comparison
+        correct: false
+      - text: The codons showing the highest ω values in the alignment here
+        correct: false
+      - text: The synonymous sites used to calibrate the neutral rate baseline
+        correct: false
+    explanation: >
+      The foreground is the set of branches under explicit testing —
+      typically suspected to be under positive or relaxed selection.
+      The background provides the comparison ω from the remaining tree.
+
+  - question: "A whole-gene dN/dS > 1 is considered unrealistic because:"
+    options:
+      - text: It implies every codon is under positive selection simultaneously
+        correct: true
+      - text: It is mathematically impossible for dN to exceed dS in a gene
+        correct: false
+      - text: Positive selection never occurs in protein-coding genes at all
+        correct: false
+      - text: Synonymous substitutions always outnumber nonsynonymous ones
+        correct: false
+    explanation: >
+      Genuine positive selection typically affects only a subset of
+      codons. A whole-gene ω > 1 averaging over all sites usually
+      reflects data quality issues — pseudogenization, alignment errors,
+      or incorrect orthology — rather than true adaptive evolution.
+
+  - question: "Codon-based alignments require indels to be multiples of three because:"
+    options:
+      - text: Indels that shift the frame destroy the codon reading structure
+        correct: true
+      - text: Only triplets can be aligned by multiple sequence alignment tools
+        correct: false
+      - text: Single nucleotide indels always indicate positive selection here
+        correct: false
+      - text: The genetic code only allows deletions at the third codon position
+        correct: false
+    explanation: >
+      The reading frame must be preserved for codons to be interpretable.
+      An indel of one or two nucleotides shifts the frame, making all
+      downstream codons meaningless — which is biologically implausible
+      in functional coding sequences.
+
+  - question: "MG94 and GY94 differ in that MG94 estimates:"
+    options:
+      - text: Absolute dN and dS rates separately for each substitution type
+        correct: true
+      - text: Only the ratio ω = dN/dS without estimating each rate alone
+        correct: false
+      - text: Branch-specific ω values across foreground and background clades
+        correct: false
+      - text: Site-specific ω to identify codons under positive selection only
+        correct: false
+    explanation: >
+      MG94 estimates the absolute rates dS and dN separately, allowing
+      measurement of how fast each type of change occurs. GY94 combines
+      them as the ratio ω = dN/dS, which is more interpretable in terms
+      of selective pressure direction.
+
+  - question: "Positive selection is most commonly detected in genes involved in:"
+    options:
+      - text: Immune defense and sensory perception across many lineages
+        correct: true
+      - text: Basic cellular processes conserved across all living organisms
+        correct: false
+      - text: Housekeeping functions like ribosomal proteins and histones
+        correct: false
+      - text: Non-coding regulatory regions upstream of coding sequences
+        correct: false
+    explanation: >
+      Genes in arms races (immune response, host-pathogen interaction)
+      and sensory adaptation frequently show ω > 1 because advantageous
+      amino acid changes are rapidly fixed. Housekeeping genes typically
+      show strong purifying selection (ω << 1).
+
+  - question: "The κ parameter in GY94 accounts for:"
+    options:
+      - text: The transition/transversion rate bias in the underlying mutation model
+        correct: true
+      - text: The number of codon frequency classes used in the mixture model
+        correct: false
+      - text: The ratio of synonymous to nonsynonymous substitution sites here
+        correct: false
+      - text: The branch-specific scaling factor for foreground lineages only
+        correct: false
+    explanation: >
+      GY94 incorporates a nucleotide-level model for the underlying
+      mutations. κ is the transition/transversion ratio — transitions
+      are more common than transversions biochemically, and κ captures
+      this bias at the codon level.
+
+  - question: "Neutral evolution (ω = 1) is expected in:"
+    options:
+      - text: Pseudogenes or sites where function is not tightly constrained
+        correct: true
+      - text: Genes under strong purifying selection in essential pathways
+        correct: false
+      - text: Rapidly evolving immune genes across host-pathogen interactions
+        correct: false
+      - text: Highly conserved structural proteins like collagen or actin here
+        correct: false
+    explanation: >
+      When there is no selective pressure — as in pseudogenes or
+      non-critical sites — synonymous and nonsynonymous changes
+      accumulate at equal rates, giving ω ≈ 1. This is the neutral
+      expectation under Kimura's neutral theory.
+
+
+fill_in_blank:
+  - question: >
+      ___ substitutions change the amino acid and reflect selective
+      pressure. ___ substitutions do not change the amino acid and
+      are assumed to be ___.
+    answers:
+      - "Nonsynonymous"
+      - "Synonymous"
+      - "neutral"
+
+  - question: >
+      ω = ___ / ___. A value below 1 indicates ___ selection.
+      A value equal to 1 indicates ___ evolution. A value above 1
+      indicates ___ selection.
+    answers:
+      - "dN"
+      - "dS"
+      - "purifying"
+      - "neutral"
+      - "positive"
+
+  - question: >
+      ___ selection is the most common form in coding regions — it
+      removes ___ amino acid changes to preserve protein function.
+    answers:
+      - "Purifying"
+      - "harmful (deleterious)"
+
+  - question: >
+      ___ selection (ω > 1) promotes advantageous mutations and is
+      commonly detected in genes involved in ___ defense or ___
+      perception.
+    answers:
+      - "Positive"
+      - "immune"
+      - "sensory"
+
+  - question: >
+      Relaxed selection is defined by a ___ increase in ω between
+      lineages, not necessarily ω > 1. It reflects a reduction in
+      ___ constraint on a gene.
+    answers:
+      - "relative"
+      - "functional"
+
+  - question: >
+      ___ models let ω vary across codons but average across branches.
+      ___ models let ω vary across branches but average across codons.
+      ___-site models let ω vary across both simultaneously.
+    answers:
+      - "Site-specific"
+      - "Branch-specific"
+      - "Branch"
+
+  - question: >
+      The ___ branches are those being explicitly tested for a different
+      ω. The ___ branches provide the baseline ω for comparison.
+    answers:
+      - "foreground"
+      - "background"
+
+  - question: >
+      A whole-gene ω > 1 is considered unrealistic because it implies
+      every ___ is under positive selection. It more likely indicates
+      ___ errors or ___.
+    answers:
+      - "codon"
+      - "alignment"
+      - "pseudogenization"
+
+  - question: >
+      Codon-based alignments require indels to be multiples of ___ to
+      avoid ___ mutations that would make codons unreadable downstream.
+    answers:
+      - "three"
+      - "frame-shift"
+
+  - question: >
+      MG94 estimates absolute ___ and ___ rates separately. GY94
+      parameterizes them as the ratio ω = ___/___, also incorporating
+      a transition/transversion bias parameter ___.
+    answers:
+      - "dN"
+      - "dS"
+      - "dN"
+      - "dS"
+      - "κ (kappa)"
